@@ -281,7 +281,7 @@ html[data-theme=light] .icon img{filter:invert(1)}
 </div></section>
 
 <script>
-(function(){var v=document.getElementById('reel'),b=document.getElementById('unmute');function tg(){v.muted=!v.muted;if(!v.muted){v.currentTime=0;v.play();}b.innerHTML=v.muted?'&#128266; UNMUTE REEL':'&#128263; MUTE REEL';b.style.animation=v.muted?'':'none';}b.onclick=tg;v.onclick=tg;})();
+(function(){var v=document.getElementById('reel'),b=document.getElementById('unmute');function tg(){v.muted=!v.muted;if(!v.muted){v.currentTime=0;v.play();}b.innerHTML=v.muted?'&#128266; UNMUTE REEL':'&#128263; MUTE REEL';b.style.animation=v.muted?'':'none';}b.onclick=tg;v.onclick=tg;var once=function(e){if(e&&e.target&&(e.target===b||b.contains(e.target)))return;if(v.muted){tg();}document.removeEventListener('pointerdown',once,true);document.removeEventListener('keydown',once,true);};document.addEventListener('pointerdown',once,true);document.addEventListener('keydown',once,true);})();
 (function(){var R=['WordPress Developer','SEO Specialist','AEO Specialist'],el=document.getElementById('rot'),i=0;setInterval(function(){el.classList.add('sw');setTimeout(function(){i=(i+1)%R.length;el.textContent=R[i];el.classList.remove('sw');},300);},3400);})();
 (function(){var g=document.getElementById('cgrid');document.getElementById('cprev').onclick=function(){g.scrollBy({left:-322,behavior:'smooth'})};document.getElementById('cnext').onclick=function(){g.scrollBy({left:322,behavior:'smooth'})};})();
 </script>

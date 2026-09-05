@@ -161,10 +161,28 @@ section{padding:100px 0}
 .stat{background:var(--surf);border:1px solid var(--line);border-radius:12px;padding:14px 15px}
 .stat b{display:block;font-size:20px;font-weight:800}
 .stat span{font:400 10px/1.4 'JetBrains Mono',monospace;color:var(--mut)}
-.xgrid{display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:minmax(150px,auto);gap:18px}
-.xcard.b1{grid-column:span 3;grid-row:span 2;display:flex;flex-direction:column}
-.xcard.b2,.xcard.b3{grid-column:span 3}
-.xcard.b4{grid-column:span 6}
+.roadmap{display:grid;grid-template-columns:1fr 1.15fr;gap:48px;align-items:start}
+.rleft{position:sticky;top:96px}
+.pilltag{display:inline-block;border:1px solid var(--line);background:#fff;border-radius:99px;padding:8px 16px;font-size:13px;font-weight:600;margin-bottom:22px;box-shadow:0 4px 14px rgba(0,0,0,.05)}
+.rleft h2{font-size:clamp(34px,4.2vw,54px);font-weight:900;line-height:1.05;letter-spacing:-.03em;margin-bottom:18px}
+.rleft p{color:var(--mut);font-size:17px;max-width:460px}
+.rleft .note{text-align:left;margin-top:30px}
+.rright{position:relative;display:flex;flex-direction:column;gap:64px;padding:20px 0 20px}
+.rpath{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.pin{position:relative;width:min(380px,100%);background:#fff;border:1px solid var(--line);border-radius:22px;padding:34px 26px 28px;box-shadow:0 18px 40px rgba(0,0,0,.08);transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s}
+.pin.r1{transform:rotate(3deg);align-self:flex-end}.pin.r2{transform:rotate(-2.5deg);align-self:flex-start}.pin.r3{transform:rotate(2deg);align-self:flex-end}.pin.r4{transform:rotate(-3deg);align-self:flex-start}
+.pin:hover{transform:rotate(0) translateY(-6px);box-shadow:0 26px 60px rgba(0,0,0,.14)}
+.pin.solid{background:var(--acc);color:#fff;border-color:var(--acc);box-shadow:0 22px 50px rgba(138,28,43,.35)}
+.pin.solid .xnum,.pin.solid h3{color:#fff}.pin.solid p{color:rgba(255,255,255,.9)}
+.tack{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#bdbdc4 60%,#8a8a92);box-shadow:0 3px 6px rgba(0,0,0,.25),inset 0 0 0 3px rgba(255,255,255,.35)}
+.pin .xnum{font:italic 700 16px/1 Georgia,serif;letter-spacing:.06em;margin-bottom:12px}
+.pin h3{font-size:24px;font-weight:800;line-height:1.15;margin-bottom:12px;letter-spacing:-.02em}
+.pin p{font-size:14.5px;line-height:1.6}
+.pin.hv:hover{border-color:var(--line)}
+.rv[data-rv=drop].pin.in{animation:dropBounce 1.15s cubic-bezier(.28,.84,.42,1) forwards}
+.pin.r1.in{--rot:3deg}.pin.r2.in{--rot:-2.5deg}.pin.r3.in{--rot:2deg}.pin.r4.in{--rot:-3deg}
+.pin.in{animation:none;transform:rotate(var(--rot,0));opacity:1}
+@media(max-width:980px){.roadmap{grid-template-columns:1fr}.rleft{position:static}.pin{align-self:center!important;width:100%}.rpath{display:none}}
 .bigk{margin-top:auto;padding-top:18px;display:flex;align-items:baseline;gap:10px}.bigk b{font-size:64px;font-weight:900;line-height:1;color:var(--acc);letter-spacing:-.04em}.bigk small{font:500 11px/1 'JetBrains Mono',monospace;color:var(--mut);letter-spacing:.14em;text-transform:uppercase}
 .pipe{display:flex;align-items:center;gap:8px;margin-top:16px;flex-wrap:wrap}.pipe span{font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.14em;border:1px solid var(--line);border-radius:99px;padding:7px 12px;background:#fff}.pipe i{flex:1;min-width:24px;height:2px;background:linear-gradient(90deg,var(--acc),rgba(138,28,43,.15));position:relative}.pipe i::after{content:"";position:absolute;right:-1px;top:-3px;width:8px;height:8px;border-radius:50%;background:var(--acc)}
 .xcard{background:var(--surf);border:1px solid var(--line);border-radius:16px;padding:26px 22px}
@@ -256,7 +274,7 @@ html[data-theme=light] .icon img{filter:invert(1)}
 .bigname{font-size:clamp(52px,10vw,118px);font-weight:900;letter-spacing:-.045em;line-height:.9;text-align:center;margin-top:70px;color:#111}
 .foot{display:flex;justify-content:space-between;gap:16px;margin-top:44px;padding:20px 0 26px;border-top:1px solid var(--line);font:400 11.5px/1.7 'JetBrains Mono',monospace;color:var(--mut);flex-wrap:wrap}
 .foot a{border-bottom:1px solid var(--line)}
-@media(max-width:980px){.nlinks{display:none}.about,.cgrid2{grid-template-columns:1fr}.xgrid{grid-template-columns:1fr}.xcard.b1,.xcard.b2,.xcard.b3,.xcard.b4{grid-column:span 1;grid-row:span 1}.pgrid{grid-template-columns:1fr}.cgrid{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr 1fr}.pcard{max-width:320px}}
+@media(max-width:980px){.nlinks{display:none}.about,.cgrid2{grid-template-columns:1fr}.pgrid{grid-template-columns:1fr}.cgrid{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr 1fr}.pcard{max-width:320px}}
 </style></head><body>
 
 <a class="skip" href="#about">Skip to content</a>
@@ -301,11 +319,17 @@ html[data-theme=light] .icon img{filter:invert(1)}
   </div>
 </div></section>
 
-<section id="expertise" class="lz"><div class="wrap">
-  <div class="shead center"><span class="mono">MY EXPERTISE</span><h2>Building Sites That Rank in Google &amp; AI</h2>
-  <p>Combining WordPress engineering, technical SEO and Answer Engine Optimization to create sites that get found, cited and hired.</p></div>
-  <div class="xgrid"><article class="xcard glow hv b1" data-rv="drop"><div class="xnum">01</div><h3>WordPress Development</h3><p>Building fast, responsive WordPress and Elementor Pro sites: custom and child themes, WooCommerce stores, migrations, staging to production, Core Web Vitals.</p><div class="bigk"><b>13</b><small>live builds</small></div></article><article class="xcard glow hv b2" data-rv="drop"><div class="xnum">02</div><h3>Technical SEO</h3><p>Audits, JSON-LD structured data, XML sitemaps, crawl and indexation fixes, internal linking, local and multi-location SEO with Google Business Profile.</p></article><article class="xcard glow hv b3" data-rv="drop"><div class="xnum">03</div><h3>AEO / GEO</h3><p>Making brands the cited answer in ChatGPT, Perplexity, Claude, Gemini, Copilot and Google AI Overviews. Citation tracking in Profound, AI-crawler management, llms.txt.</p></article><article class="xcard glow hv b4" data-rv="drop"><div class="xnum">04</div><h3>Automation & AI</h3><p>Node.js and Claude API content engines, programmatic SEO, Google Indexing API, 25+ API integrations, automated QA and validation pipelines.</p><div class="pipe"><span>Audit</span><i></i><span>Schema</span><i></i><span>Content</span><i></i><span>Index</span><i></i><span>Cited</span></div></article></div>
-  <div class="note">Turning rankings into revenue!</div>
+<section id="expertise" class="lz"><div class="wrap roadmap">
+  <div class="rleft">
+    <span class="pilltag">My Expertise</span>
+    <h2>Building Sites That Rank in Google &amp; AI</h2>
+    <p>Combining WordPress engineering, technical SEO and Answer Engine Optimization to create sites that get found, cited and hired.</p>
+    <div class="note">Turning rankings into revenue!</div>
+  </div>
+  <div class="rright" id="rright">
+    <svg class="rpath" id="rpath" aria-hidden="true"><defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#111"/></marker></defs><path id="rline" d="" fill="none" stroke="#111" stroke-width="1.5" stroke-dasharray="5 6" marker-end="url(#arr)"/></svg>
+    <article class="pin hv r1 solid" data-rv="drop"><span class="tack"></span><div class="xnum">01</div><h3>WordPress Development</h3><p>Building fast, responsive WordPress and Elementor Pro sites: custom and child themes, WooCommerce stores, migrations, staging to production, Core Web Vitals.</p></article><article class="pin hv r2" data-rv="drop"><span class="tack"></span><div class="xnum">02</div><h3>Technical SEO</h3><p>Audits, JSON-LD structured data, XML sitemaps, crawl and indexation fixes, internal linking, local and multi-location SEO with Google Business Profile.</p></article><article class="pin hv r3" data-rv="drop"><span class="tack"></span><div class="xnum">03</div><h3>AEO / GEO</h3><p>Making brands the cited answer in ChatGPT, Perplexity, Claude, Gemini, Copilot and Google AI Overviews. Citation tracking in Profound, AI-crawler management, llms.txt.</p></article><article class="pin hv r4" data-rv="drop"><span class="tack"></span><div class="xnum">04</div><h3>Automation & AI</h3><p>Node.js and Claude API content engines, programmatic SEO, Google Indexing API, 25+ API integrations, automated QA and validation pipelines.</p></article>
+  </div>
 </div></section>
 
 <section id="skills" class="lz"><div class="wrap">
@@ -374,6 +398,8 @@ html[data-theme=light] .icon img{filter:invert(1)}
 setInterval(function(){i=(i+1)%R.length;if(rm){el.textContent=R[i];}else scramble(R[i]);},3600);})();
 (function(){var els=document.querySelectorAll('.xcard,.proj,.icon,.flip,.lrow,.stat,.shead,.introwrap,.pcard,.cgrid2');var i=0;els.forEach(function(e){e.classList.add('rv');e.style.transitionDelay=((i++%6)*60)+'ms';});if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in')});return;}var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}});},{rootMargin:'0px 0px -8% 0px',threshold:.08});els.forEach(function(e){io.observe(e)});})();
 (function(){if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;var els=document.querySelectorAll('[data-count]');var io=new IntersectionObserver(function(en){en.forEach(function(x){if(!x.isIntersecting)return;var b=x.target;io.unobserve(b);var to=parseFloat(b.dataset.count),dec=parseInt(b.dataset.dec||'0'),pre=b.dataset.prefix||'',suf=b.dataset.suffix||'',t0=null;var fin=pre+(dec?to.toFixed(dec):Math.round(to).toLocaleString())+suf;function tick(t){if(!t0)t0=t;var p=Math.min(1,(t-t0)/1300);var e=1-Math.pow(1-p,3);var v=to*e;b.textContent=pre+(dec?v.toFixed(dec):Math.round(v).toLocaleString())+suf;if(p<1)requestAnimationFrame(tick);else b.textContent=fin;}requestAnimationFrame(tick);setTimeout(function(){b.textContent=fin;},1600);});},{threshold:.6});els.forEach(function(e){io.observe(e)});})();
+(function(){var wrap=document.getElementById('rright'),svg=document.getElementById('rpath'),line=document.getElementById('rline');if(!wrap||!line)return;function draw(){if(innerWidth<981){line.setAttribute('d','');return;}var pins=wrap.querySelectorAll('.pin');var W=wrap.getBoundingClientRect();svg.setAttribute('viewBox','0 0 '+W.width+' '+W.height);var pts=[].map.call(pins,function(p){var r=p.getBoundingClientRect();return {x:r.left-W.left+r.width/2,y:r.top-W.top,b:r.bottom-W.top,l:r.left-W.left,r:r.right-W.left};});var d='';for(var i=0;i<pts.length-1;i++){var a=pts[i],b=pts[i+1];var x1=(a.l+a.r)/2,y1=a.b-6,x2=(b.l+b.r)/2,y2=b.y+8;var cx=(x1+x2)/2;d+='M'+x1+','+y1+' C'+x1+','+(y1+50)+' '+x2+','+(y2-50)+' '+x2+','+y2+' ';}line.setAttribute('d',d);}
+draw();window.addEventListener('resize',draw);window.addEventListener('load',draw);setTimeout(draw,600);setTimeout(draw,2000);})();
 (function(){var n=document.querySelector('nav');function f(){n.classList.toggle('scrolled',window.scrollY>40)}window.addEventListener('scroll',f,{passive:true});f();})();
 (function(){var p=document.getElementById('prog');function up(){var h=document.documentElement;var m=h.scrollHeight-h.clientHeight;p.style.width=(m>0?(h.scrollTop/m*100):0)+'%';}window.addEventListener('scroll',up,{passive:true});up();var links=[].slice.call(document.querySelectorAll('.nlinks a'));var secs=links.map(function(a){return document.querySelector(a.getAttribute('href'))}).filter(Boolean);var so=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){links.forEach(function(a){var on=a.getAttribute('href')==='#'+x.target.id;a.classList.toggle('active',on);if(on){var sl=document.getElementById('slide');if(sl){sl.style.left=a.offsetLeft+'px';sl.style.width=a.offsetWidth+'px';}}});}});},{rootMargin:'-45% 0px -50% 0px'});secs.forEach(function(s){so.observe(s)});})();
 (function(){var kt=document.getElementById('kt');if(kt){var t=kt.textContent;kt.textContent='';var i=0;for(var c of t){var sp=document.createElement('span');sp.textContent=c===' '?' ':c;sp.style.animationDelay=(i++*35)+'ms';kt.appendChild(sp);}}})();

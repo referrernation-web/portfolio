@@ -296,6 +296,34 @@ html[data-theme=light] .icon img{filter:invert(1)}
 .pwrap{max-width:320px}.pcard{transform:rotate(-3deg);transition:transform .5s cubic-bezier(.2,.7,.2,1),box-shadow .5s}.pcard:hover{transform:rotate(0) scale(1.03);box-shadow:0 30px 60px rgba(0,0,0,.3)}
 .dot{animation:pulse 1.6s ease-in-out infinite}@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
 .atext.rv{transition-delay:200ms!important}}
+
+/* ---- Clay + Skeuo layer (patch14) ---- */
+:root{--clay-bg:linear-gradient(145deg,#ffffff 0%,#f3f3f7 100%);--clay-sh:0 18px 34px rgba(17,17,17,.10),0 4px 10px rgba(17,17,17,.06),inset 0 -6px 12px rgba(0,0,0,.06),inset 0 3px 6px rgba(255,255,255,.95);--clay-sh-hover:0 26px 46px rgba(138,28,43,.16),0 6px 14px rgba(0,0,0,.06),inset 0 -6px 12px rgba(0,0,0,.05),inset 0 3px 6px #fff}
+.stat,.icon,.proj,.jcard,.fface,.pin,.pcard,.csdIn,.lrow{background:var(--clay-bg);border:1px solid rgba(255,255,255,.9);box-shadow:var(--clay-sh)}
+.stat,.icon,.jcard,.lrow{border-radius:22px}.proj,.pin,.fface{border-radius:26px}
+.stat.glow,.proj.glow,.icon.glow{border-color:rgba(255,255,255,.9)}
+.hv:hover,.proj.tilt:hover,.pin.rv.in:hover{box-shadow:var(--clay-sh-hover);border-color:rgba(255,255,255,1)}
+.pin.solid{background:linear-gradient(145deg,#9d2436,#7a1424);border-color:rgba(255,255,255,.25);box-shadow:0 22px 44px rgba(138,28,43,.35),inset 0 -8px 14px rgba(0,0,0,.28),inset 0 3px 6px rgba(255,255,255,.28)}
+#about .stat{background:linear-gradient(145deg,rgba(255,255,255,.22),rgba(255,255,255,.10));border-color:rgba(255,255,255,.45);box-shadow:0 18px 34px rgba(0,0,0,.18),inset 0 -6px 12px rgba(0,0,0,.18),inset 0 3px 6px rgba(255,255,255,.35)}
+.btn,.hire,.unmute,.viewc,.arrows button,.pilltag{box-shadow:0 10px 20px rgba(17,17,17,.12),inset 0 -4px 8px rgba(0,0,0,.18),inset 0 3px 5px rgba(255,255,255,.35)}
+.btn.light,.hire{background:linear-gradient(180deg,#a02538,#7a1424)}
+.btn:not(.light){background:linear-gradient(180deg,#fff,#ececf1);color:#111}
+.btn:active,.hire:active,.viewc:active{box-shadow:0 3px 8px rgba(17,17,17,.12),inset 0 4px 8px rgba(0,0,0,.22);transform:translateY(1px) scale(.98)!important}
+.pill{background:linear-gradient(180deg,#fff,#f0f0f4);border-color:#fff;box-shadow:0 3px 6px rgba(0,0,0,.08),inset 0 -2px 3px rgba(0,0,0,.06),inset 0 1px 2px #fff;color:#444}
+.icon img{filter:drop-shadow(0 6px 8px rgba(0,0,0,.18))}
+.xnum,.cat{text-shadow:0 1px 0 #fff}
+/* sticky notes (skeuomorphic) */
+.note,.jquote{position:relative;font-family:Caveat,cursive;color:#3a2a00;background:linear-gradient(180deg,#fff5b0,#ffe98a);box-shadow:0 12px 22px rgba(0,0,0,.14),inset 0 -12px 18px rgba(0,0,0,.06);border:0;border-radius:4px 4px 6px 4px/4px 4px 10px 4px;display:inline-block;padding:16px 26px 20px;transform:rotate(-1.5deg)}
+.note{font-size:28px;margin:44px auto 0;left:50%;transform:translateX(-50%) rotate(-1.5deg)}
+.rleft .note{left:0;transform:rotate(1.5deg);margin-top:30px}
+.jquote{display:block;max-width:760px;margin:0 auto 54px;transform:rotate(-1deg);backdrop-filter:none;-webkit-backdrop-filter:none}
+.jquote p{color:#3a2a00}.jquote footer{color:#7a5a00}
+.note::before,.jquote::before{content:"";position:absolute;top:-12px;left:50%;width:110px;height:26px;transform:translateX(-50%) rotate(-2deg);background:rgba(255,255,255,.55);border:1px solid rgba(0,0,0,.05);box-shadow:0 2px 4px rgba(0,0,0,.08);backdrop-filter:blur(2px)}
+.note::after,.jquote::after{content:"";position:absolute;right:0;bottom:0;width:0;height:0;border-style:solid;border-width:0 0 22px 22px;border-color:transparent transparent #fff transparent;filter:drop-shadow(-2px -2px 2px rgba(0,0,0,.08))}
+.jquote.rv.in,.note.rv.in{transform:rotate(-1deg)}
+/* clay tack on pins gets a clay ball */
+.tack{background:radial-gradient(circle at 35% 30%,#fff 0,#f0c2c9 35%,#8a1c2b 70%,#5e0e1b 100%);box-shadow:0 4px 8px rgba(0,0,0,.28),inset 0 -3px 5px rgba(0,0,0,.25)}
+@media(prefers-reduced-motion:reduce){.note,.jquote{transform:none}}
 </style></head><body>
 
 <a class="skip" href="#about">Skip to content</a>

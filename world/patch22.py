@@ -19,8 +19,8 @@ function dogRoles(root){var R=boneChains(root),ch=R.chains.slice();function leaf
  var legs=ch.filter(function(c){return leaf(c).y<.3}).sort(function(p,q){return leaf(p).y-leaf(q).y}).slice(0,4);
  legs.forEach(function(c){var h=c[0].userData.n;c.front=h.z>.5;c.right=h.x>.5});
  var rest=ch.filter(function(c){return legs.indexOf(c)<0});
- var tail=rest.filter(function(c){return leaf(c).y>.35}).sort(function(p,q){return leaf(p).z-leaf(q).z})[0];
- var head=rest.filter(function(c){return c!==tail&&leaf(c).y>.4}).sort(function(p,q){return leaf(q).z-leaf(p).z})[0];
+ var tail=rest.slice().sort(function(p,q){return leaf(p).z-leaf(q).z})[0];                       // rearmost leaf = tail (it may hang low)
+ var head=rest.filter(function(c){return c!==tail}).sort(function(p,q){return leaf(q).z-leaf(p).z})[0];   // frontmost leaf = snout
  if(head){head=head.slice();for(var k=0;k<2;k++){var pb=head[0].parent;if(pb&&pb.isBone&&pb.userData.n.y>.45&&pb.userData.n.z>.55)head.unshift(pb);else break}}   // snout chain + head + neck
  var ears=rest.filter(function(c){return c!==tail&&c!==head&&c.length<=3&&leaf(c).y>.6&&leaf(c).z>.5});
  return {legs:legs,tail:tail||[],head:head||[],ears:ears}}

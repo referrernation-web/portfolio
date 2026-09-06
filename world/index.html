@@ -324,11 +324,11 @@ function lampsAround(x,z,r,n){mbStart();for(var i=0;i<n;i++){var a=i/n*Math.PI*2
 // ===== Kimpoy (real fur + real face) + Dianna (real face, puffer jacket): +z = forward =====
 var RG=new THREE.Group(),DOG=new THREE.Group(),legs=[],tail,dHair,EARS=[],TONGUE,HAIR;S.add(RG);RG.add(DOG);setTimeout(function(){RG.traverse(function(o){if(o.isMesh){o.castShadow=!o.userData.shell;o.receiveShadow=false}})},0);
 (function(){var FURM=new THREE.MeshStandardMaterial({map:TEX('kimpoy-fur.jpg',1.2),roughness:1,metalness:0});
- var SHELLM=new THREE.MeshStandardMaterial({map:TEX('fur-shell.png',2.4),transparent:true,alphaTest:.3,depthWrite:false,roughness:1,side:THREE.DoubleSide,color:0x8a847a});
+ var SHELLM=window.SHELLM=new THREE.MeshStandardMaterial({map:TEX('fur-shell.png',2.4),transparent:true,alphaTest:.3,depthWrite:false,roughness:1,side:THREE.DoubleSide,color:0x8a847a});
  function fs(r,x,y,z,sx,sy,sz,p){var m=new THREE.Mesh(new THREE.SphereGeometry(r,14,11),FURM);m.position.set(x,y,z);m.scale.set(sx||1,sy||1,sz||1);(p||DOG).add(m);return m}
  function shell(m,k){for(var i=1;i<=k;i++){var s2=new THREE.Mesh(m.geometry,SHELLM);s2.position.copy(m.position);s2.scale.copy(m.scale).multiplyScalar(1+i*.075);s2.rotation.copy(m.rotation);s2.userData.shell=true;m.parent.add(s2)}}
  function bx(w,h,d,c,x,y,z,parent){var m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(c));m.position.set(x,y,z);(parent||DOG).add(m);return m}
- shell(fs(.62,0,1.05,0,1.05,.95,1.55),2);           // body (rounded, real fur, 2 shell layers)
+ DOG.userData.bodyStart=DOG.children.length;shell(fs(.62,0,1.05,0,1.05,.95,1.55),2);           // body (rounded, real fur, 2 shell layers)
  shell(fs(.62,0,1.45,.35,1.15,.9,1.05),2);          // shaggy mane
  shell(fs(.52,0,1.12,-.8,1.05,.9,1),1);             // rump fluff
  var HEADM=new THREE.MeshStandardMaterial({map:TEX('kimpoy-head.jpg',1,false),roughness:1,metalness:0});
@@ -336,7 +336,7 @@ var RG=new THREE.Group(),DOG=new THREE.Group(),legs=[],tail,dHair,EARS=[],TONGUE
  shell(fs(.44,0,2.0,.85,1.2,.7,1.1),2);              // head tuft
  var snout=fs(.24,0,1.48,1.42,1,.8,1.1);var nose=new THREE.Mesh(new THREE.SphereGeometry(.1,8,6),mat(0x111111));nose.position.set(0,1.54,1.68);DOG.add(nose);
  [[-.45,.25],[.45,-.25]].forEach(function(e){var g=new THREE.Group();g.position.set(e[0],1.85,.85);var m=fs(.2,0,-.24,0,1,1.5,.6,g);shell(m,1);g.rotation.z=e[1];DOG.add(g);EARS.push(g)}); // ears (pivot at top)
- TONGUE=bx(.22,.08,.3,0xd2546e,0,1.3,1.5);           // tongue (shows on boost)
+ DOG.userData.bodyEnd=DOG.children.length;TONGUE=bx(.22,.08,.3,0xd2546e,0,1.3,1.5);           // tongue (shows on boost)
  [[-.32,.6],[.32,.6],[-.32,-.6],[.32,-.6]].forEach(function(p){var g=new THREE.Group();g.position.set(p[0],.75,p[1]);var l=new THREE.Mesh(new THREE.CylinderGeometry(.14,.16,.75,8),FURM);l.position.y=-.35;g.add(l);var paw=new THREE.Mesh(new THREE.SphereGeometry(.17,8,6),FURM);paw.position.set(0,-.72,.05);g.add(paw);DOG.add(g);legs.push(g)});
  tail=new THREE.Group();tail.position.set(0,1.35,-.9);var t=new THREE.Mesh(new THREE.CylinderGeometry(.07,.11,.7,7),FURM);t.position.y=.3;tail.add(t);var tt=fs(.14,0,.66,0,1,1,1,tail);shell(tt,1);tail.rotation.x=-.9;DOG.add(tail);
  // Dianna sits on the back
@@ -353,14 +353,18 @@ var RG=new THREE.Group(),DOG=new THREE.Group(),legs=[],tail,dHair,EARS=[],TONGUE
  var BH=new THREE.Mesh(new THREE.BoxGeometry(.64,.7,.2),HRM);BH.position.set(0,-.2,-.3);HAIR.add(BH);   // long hair down the back
  [[-.33,0],[.33,0]].forEach(function(q){var st=new THREE.Mesh(new THREE.BoxGeometry(.14,.6,.2),HRM);st.position.set(q[0],-.12,-.05);HAIR.add(st)});   // side strands
 })();
-// ===== real 3D Dianna (AI shape from her photo + photo projected as vertex colors); procedural rig = fallback =====
-var FIG={dia:null,DIAROT:.35,diaH:1.85,diaY:.95,diaZ:-.3,lean:.12}; // DIAROT verified by screenshot: arms point +z (forward)
-function projColors(g,img,y0,y1){var pa=g.attributes.position;g.computeBoundingBox();var b=g.boundingBox,sz=b.getSize(new THREE.Vector3()),c=b.getCenter(new THREE.Vector3());var cv2=document.createElement('canvas');cv2.width=img.width;cv2.height=img.height;var cx=cv2.getContext('2d');cx.drawImage(img,0,0);var px=cx.getImageData(0,0,img.width,img.height).data;var col=new Float32Array(pa.count*3);for(var i=0;i<pa.count;i++){var U=(pa.getX(i)-c.x)/sz.x+.5,V=1-(pa.getY(i)-b.min.y)/sz.y;var ix=Math.max(0,Math.min(img.width-1,Math.round(U*img.width))),iy=Math.max(0,Math.min(img.height-1,Math.round(y0+V*(y1-y0))));var k=(iy*img.width+ix)*4;col[i*3]=px[k]/255;col[i*3+1]=px[k+1]/255;col[i*3+2]=px[k+2]/255}g.setAttribute('color',new THREE.BufferAttribute(col,3))} // ponytail: front projection only, back mirrors the front (hair + jacket back look right anyway)
-function loadFigures(){var img=new Image();img.onload=function(){GL.load('models/dianna.glb',function(gl){var o=gl.scene,mesh=null;o.traverse(function(m){if(m.isMesh&&!mesh)mesh=m});if(!mesh)return;
- var g=mesh.geometry;g.rotateY(FIG.DIAROT);g.computeVertexNormals();projColors(g,img,58,512);g.computeBoundingBox();var b=g.boundingBox,sz=b.getSize(new THREE.Vector3()),c=b.getCenter(new THREE.Vector3());var sc=FIG.diaH/sz.y;
- mesh.material=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.85,metalness:0});mesh.castShadow=true;mesh.position.set(-c.x*sc,-b.min.y*sc,-c.z*sc);mesh.scale.setScalar(sc);
- var wrap=new THREE.Group();wrap.position.set(0,FIG.diaY,FIG.diaZ);wrap.rotation.x=FIG.lean;wrap.add(mesh);FIG.dia=wrap;DOG.add(wrap);
- DOG.children.forEach(function(ch){if(ch.userData.dianna)ch.visible=false})},undefined,function(){})};img.src='tex/proj-dianna-fill.jpg'}
+// ===== real 3D figures: Hunyuan3D-2.1 shapes with baked vertex colours (world/bake.py); procedural rig = fallback =====
+var FIG={kim:null,dia:null,kimH:2.35,kimY:.05,kimZ:.05,diaH:1.8,diaY:1.0,diaZ:-.5,lean:.1};
+function figMesh(gl,h,dy,dz){var mesh=null;gl.scene.traverse(function(m){if(m.isMesh&&!mesh)mesh=m});if(!mesh)return null;var g=mesh.geometry;g.computeVertexNormals();g.computeBoundingBox();var bb=g.boundingBox,sz=bb.getSize(new THREE.Vector3()),c=bb.getCenter(new THREE.Vector3()),sc=h/sz.y;
+ mesh.material=new THREE.MeshStandardMaterial({vertexColors:!!g.attributes.color,color:0xffffff,roughness:.95,metalness:0});mesh.castShadow=true;mesh.position.set(-c.x*sc,-bb.min.y*sc+(dy||0),-c.z*sc+(dz||0));mesh.scale.setScalar(sc);return mesh}
+function loadFigures(){
+ GL.load('models/kimpoy.glb',function(gl){var mesh=figMesh(gl,FIG.kimH,FIG.kimY,FIG.kimZ);if(!mesh)return;var wrap=new THREE.Group();wrap.add(mesh);
+  var s2=new THREE.Mesh(mesh.geometry,SHELLM);s2.userData.shell=true;s2.position.copy(mesh.position);s2.scale.copy(mesh.scale).multiplyScalar(1.035);wrap.add(s2); // one fur shell on the real mesh (ponytail: 2 shells = 280k tris)
+  var hats=Object.keys(HATM).map(function(k){return HATM[k]});DOG.children.forEach(function(ch){if(ch!==FIG.dia&&hats.indexOf(ch)<0&&!ch.userData.dianna)ch.visible=false});FIG.kim=wrap;DOG.add(wrap); // hide the whole procedural dog (legs/tail included: the real mesh has its own)
+ },undefined,function(){});
+ GL.load('models/dianna.glb',function(gl){var mesh=figMesh(gl,FIG.diaH,0,0);if(!mesh)return;var wrap=new THREE.Group();wrap.position.set(0,FIG.diaY,FIG.diaZ);wrap.rotation.x=FIG.lean;wrap.add(mesh);FIG.dia=wrap;DOG.add(wrap);
+  DOG.children.forEach(function(ch){if(ch.userData.dianna)ch.visible=false})},undefined,function(){});
+}
 loadFigures();
 var shadow=new THREE.Mesh(new THREE.CircleGeometry(1.4,16),new THREE.MeshBasicMaterial({color:0x000,transparent:true,opacity:.28}));shadow.rotation.x=-Math.PI/2;S.add(shadow);
 var P={x:0,z:10,y:0,vy:0,head:Math.PI,speed:0,frame:0,ft:0,air:false,face:1,vx:0,vz:0,squash:0,slide:0,lastFr:0,dustT:0,gpj:false,turnV:0};

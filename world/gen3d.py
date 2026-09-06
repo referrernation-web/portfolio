@@ -1,13 +1,20 @@
 """Image -> textured GLB via the free Hunyuan3D-2.1 Hugging Face Space (ZeroGPU).
-usage: python gen3d.py <image> <out.glb> [steps] [octree]
+usage: python gen3d.py <image> <out.glb> [steps] [octree] [--mv=front.png,back.png,left.png,right.png] [--shape]  (use - for a missing view)
 Token: optional, read from ~/.hf-token if present (raises the ZeroGPU quota).
 """
 import os, sys, shutil, time, json
 from gradio_client import Client, handle_file
 
+SHAPE='--shape' in sys.argv  # untextured /shape_generation (fits the anonymous quota)
+args=[a for a in sys.argv[1:] if not a.startswith('--')]
+mv=[None]*4
+for a in sys.argv[1:]:
+    if a.startswith('--mv='):
+        mv=[None if p in('-','') else p for p in a[5:].split(',')]+[None]*4; mv=mv[:4]
+sys.argv=[sys.argv[0]]+args
 img, out = sys.argv[1], sys.argv[2]
-steps = float(sys.argv[3]) if len(sys.argv) > 3 else 30
-octree = float(sys.argv[4]) if len(sys.argv) > 4 else 256
+steps = int(sys.argv[3]) if len(sys.argv) > 3 else 30
+octree = int(sys.argv[4]) if len(sys.argv) > 4 else 256
 tok = None
 tp = os.path.expanduser('~/.hf-token')
 if os.path.exists(tp):
@@ -23,9 +30,12 @@ try:
     c.predict(value="Low", api_name="/on_decode_mode_change")
 except Exception as e:
     print("mode set skipped:", str(e)[:120])
-res = c.predict(image=handle_file(img), mv_image_front=None, mv_image_back=None, mv_image_left=None, mv_image_right=None,
+def hf(p):
+    return handle_file(p) if p else None
+print('views:', mv)
+res = c.predict(image=handle_file(img), mv_image_front=hf(mv[0]), mv_image_back=hf(mv[1]), mv_image_left=hf(mv[2]), mv_image_right=hf(mv[3]),
                 steps=steps, guidance_scale=5.0, seed=1234, octree_resolution=octree, check_box_rembg=True,
-                api_name="/generation_all")
+                api_name="/shape_generation" if SHAPE else "/generation_all")
 print("result:", json.dumps(res, default=str)[:800])
 paths = []
 def walk(v):

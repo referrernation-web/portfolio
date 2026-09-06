@@ -354,6 +354,7 @@ var RG=new THREE.Group(),DOG=new THREE.Group(),legs=[],tail,dHair,EARS=[],TONGUE
  [[-.33,0],[.33,0]].forEach(function(q){var st=new THREE.Mesh(new THREE.BoxGeometry(.14,.6,.2),HRM);st.position.set(q[0],-.12,-.05);HAIR.add(st)});   // side strands
 })();
 // ===== real 3D figures (Rodin meshes + UniRig skeletons); roles detected from bone positions; procedural rig = fallback =====
+var FIGV='20a';   // bump when a rig file changes (GitHub Pages CDN caches GLBs ~10 min)
 var FIG={kim:null,dia:null,K:null,D:null,hats:null,kimH:2.35,kimY:.05,kimZ:.05,diaH:1.9,diaY:1.22,diaZ:-.45,lean:.08};
 var _q1=new THREE.Quaternion(),_q2=new THREE.Quaternion(),_q3=new THREE.Quaternion(),_AX=new THREE.Vector3(1,0,0),_AY=new THREE.Vector3(0,1,0),_AZ=new THREE.Vector3(0,0,1),_m4=new THREE.Matrix4(),_v3=new THREE.Vector3();
 function rotW(bone,axis,ang,root){bone.parent.getWorldQuaternion(_q1);root.getWorldQuaternion(_q2);var prel=_q2.invert().multiply(_q1);_q3.setFromAxisAngle(axis,ang);var d=prel.clone().invert().multiply(_q3).multiply(prel);bone.quaternion.copy(d).multiply(bone.userData.rest)}
@@ -400,11 +401,11 @@ function fitRoot(root,h,dy,dz){root.updateMatrixWorld(true);var bb=new THREE.Box
 function skinMat(mesh,rough){var old=mesh.material;mesh.material=new THREE.MeshStandardMaterial({map:old.map||null,color:0xffffff,roughness:rough,metalness:0,skinning:true});mesh.castShadow=true;mesh.frustumCulled=false}
 function bakePose(list,root){list.forEach(function(p){if(!p[0])return;rotW(p[0],p[1],p[2],root);p[0].userData.rest.copy(p[0].quaternion);root.updateMatrixWorld(true)})}
 function loadFigures(){
- GL.load('models/kimpoy-rig.glb',function(gl){var root=gl.scene,mesh=null;root.traverse(function(m){if(m.isSkinnedMesh)mesh=m});if(!mesh)return;
+ GL.load('models/kimpoy-rig.glb?v='+FIGV,function(gl){var root=gl.scene,mesh=null;root.traverse(function(m){if(m.isSkinnedMesh)mesh=m});if(!mesh)return;
   fitRoot(root,FIG.kimH,FIG.kimY,FIG.kimZ);skinMat(mesh,1.0);var wrap=new THREE.Group();wrap.add(root);DOG.add(wrap);FIG.kim=root;FIG.K=dogRoles(root);
   var hats=Object.keys(HATM).map(function(k){return HATM[k]});FIG.hats=hats;DOG.children.forEach(function(ch){if(ch!==wrap&&ch!==FIG.dia&&hats.indexOf(ch)<0&&!ch.userData.dianna)ch.visible=false});
  },undefined,function(){});
- GL.load('models/dianna-rig.glb',function(gl){var root=gl.scene,mesh=null;root.traverse(function(m){if(m.isSkinnedMesh)mesh=m});if(!mesh)return;
+ GL.load('models/dianna-rig.glb?v='+FIGV,function(gl){var root=gl.scene,mesh=null;root.traverse(function(m){if(m.isSkinnedMesh)mesh=m});if(!mesh)return;
   fitRoot(root,FIG.diaH,0,0);skinMat(mesh,.85);var wrap=new THREE.Group();wrap.position.set(0,FIG.diaY,FIG.diaZ);wrap.rotation.x=FIG.lean;wrap.add(root);DOG.add(wrap);FIG.dia=root;var D=girlRoles(root);FIG.D=D;
   // riding pose baked into the rest pose: shoulders forward-down (hands on the fur), elbows bent, legs spread over the flanks, knees back
   bakePose([[pick(D.arms[0]||[],0),_AZ,D.arms[0]&&D.arms[0].right?-1.15:1.15],[pick(D.arms[1]||[],0),_AZ,D.arms[1]&&D.arms[1].right?-1.15:1.15],[pick(D.arms[0]||[],0),_AX,.55],[pick(D.arms[1]||[],0),_AX,.55],[pick(D.arms[0]||[],2),_AX,.4],[pick(D.arms[1]||[],2),_AX,.4],   // T-pose arms: drop to the sides (about the forward axis), then forward to hold the fur

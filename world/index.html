@@ -195,46 +195,97 @@ function board(x,z,ry,name,img,line){var y=ground(x,z);SHB.push([x,z,3.4,4]);var
  var tex=new THREE.TextureLoader().load('../assets/img/thumb-'+img+'.webp');tex.encoding=THREE.sRGBEncoding;var p=new THREE.Mesh(new THREE.PlaneGeometry(6,3.2),new THREE.MeshBasicMaterial({map:tex}));p.position.set(x+Math.sin(ry)*.17,y+4,z+Math.cos(ry)*.17);p.rotation.y=ry;S.add(p);
  var c=document.createElement('canvas');c.width=512;c.height=64;var q=c.getContext('2d');q.fillStyle='#111';q.font='900 40px Inter';q.textAlign='center';q.fillText(name,256,46);var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;var tm=new THREE.Mesh(new THREE.PlaneGeometry(6,.75),new THREE.MeshBasicMaterial({map:t,transparent:true}));tm.position.set(x+Math.sin(ry)*.17,y+1.9,z+Math.cos(ry)*.17);tm.rotation.y=ry;S.add(tm);COL.push({x:x,z:z,r:3.2})}
 
-// ===== landmarks =====
+// ===== landmarks (v2, merged geometry per landmark) =====
+var MB=null;function mbStart(){MB={p:[],n:[],c:[]}}
+function mp(g,col,x,y,z,rx,ry,rz,sx,sy,sz){if(g.index)g=g.toNonIndexed();var pa=g.attributes.position,minY=1e9,maxY=-1e9;for(var i=0;i<pa.count;i++){var yy=pa.getY(i);if(yy<minY)minY=yy;if(yy>maxY)maxY=yy}var ys=[];for(var i=0;i<pa.count;i++)ys.push(pa.getY(i));
+ var m=new THREE.Matrix4().compose(new THREE.Vector3(x,y,z),new THREE.Quaternion().setFromEuler(new THREE.Euler(rx||0,ry||0,rz||0)),new THREE.Vector3(sx||1,sy||1,sz||1));g.applyMatrix4(m);var na=g.attributes.normal,cc=new THREE.Color(col);
+ for(var i=0;i<pa.count;i++){var f=maxY>minY?.76+.24*((ys[i]-minY)/(maxY-minY)):1;MB.p.push(pa.getX(i),pa.getY(i),pa.getZ(i));MB.n.push(na.getX(i),na.getY(i),na.getZ(i));MB.c.push(cc.r*f,cc.g*f,cc.b*f)}}
+function mbEnd(){var bg=new THREE.BufferGeometry();bg.setAttribute('position',new THREE.Float32BufferAttribute(MB.p,3));bg.setAttribute('normal',new THREE.Float32BufferAttribute(MB.n,3));bg.setAttribute('color',new THREE.Float32BufferAttribute(MB.c,3));var mm=new THREE.MeshToonMaterial({vertexColors:true,gradientMap:GRAD});mm.flatShading=true;var mesh=new THREE.Mesh(bg,mm);S.add(mesh);OCC.push(mesh);MB=null;return mesh}
+function BX(w,h,d){return new THREE.BoxGeometry(w,h,d)}function CY(rt,rb,h,sg){return new THREE.CylinderGeometry(rt,rb,h,sg||10)}function CN(r,h,sg){return new THREE.CylinderGeometry(0,r,h,sg||8)}function SP(r){return new THREE.SphereGeometry(r,8,6)}
+// small reusable things
+function tower(x,z,w,h,c,roofc){var y=ground(x,z);mp(BX(w,h,w),c,x,y+h/2,z);for(var f=1;f<h/1.4;f++){mp(BX(w+.06,.35,w*.42),0x2c3e50,x,y+f*1.4,z+w*.3);mp(BX(w+.06,.35,w*.42),0x2c3e50,x,y+f*1.4,z-w*.3)}mp(BX(w*.5,.6,w*.5),0x6b7b8a,x-w*.15,y+h+.3,z);mp(BX(w+.3,.3,w+.3),roofc||0x8a1c2b,x,y+h+.15,z);SHB.push([x,z,w*.9,h]);COL.push({x:x,z:z,r:w*.75})}
+function vehicle(x,z,ry,c,len){var y=ground(x,z);var L=len||4.2;mp(BX(L,1.1,2),c,x,y+1.15,z,0,ry);mp(BX(L*.55,.9,1.9),0xe9eef2,x,y+2.05,z,0,ry);mp(BX(L*.55+.3,.15,2.1),0xc0392b,x,y+2.55,z,0,ry);[[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(w){mp(CY(.42,.42,.3,8),0x222222,x+Math.cos(ry)*w[0]*L*.32-Math.sin(ry)*w[1]*1.05,y+.42,z-Math.sin(ry)*w[0]*L*.32-Math.cos(ry)*w[1]*1.05,Math.PI/2,ry)});mp(BX(.3,.3,.5),0xfff1a8,x+Math.cos(ry)*L*.5,y+1.2,z-Math.sin(ry)*L*.5,0,ry);COL.push({x:x,z:z,r:2.3});SHB.push([x,z,2.4,2.5])}
+function hut(x,z,ry,sc){sc=sc||1;var y=ground(x,z);mp(BX(2.4*sc,1.6*sc,2.2*sc),0xa9814f,x,y+1.2*sc,z,0,ry);mp(CN(2.1*sc,1.5*sc,4),0x6e4a2a,x,y+2.75*sc,z,0,ry+Math.PI/4);[[-.9,-.9],[.9,-.9],[-.9,.9],[.9,.9]].forEach(function(p){mp(CY(.08,.1,.6*sc,5),0x5a3a1a,x+p[0]*sc,y+.3*sc,z+p[1]*sc)});COL.push({x:x,z:z,r:1.6*sc});SHB.push([x,z,1.8*sc,3*sc])}
+function lamp(x,z){var y=ground(x,z);mp(CY(.06,.09,3.2,6),0x2f3b45,x,y+1.6,z);mp(SP(.28),0xfff2b0,x,y+3.35,z)}
+function animal(x,z,ry,c,hd){var y=ground(x,z);mp(BX(1.6,.9,.8),c,x,y+1.05,z,0,ry);mp(BX(.6,.5,.55),c,x+Math.cos(ry)*1.0,y+1.35,z-Math.sin(ry)*1.0,0,ry);for(var i=0;i<4;i++)mp(CY(.09,.11,.7,5),c,x+Math.cos(ry)*(i<2?.55:-.55)-Math.sin(ry)*(i%2?.28:-.28),y+.35,z-Math.sin(ry)*(i<2?.55:-.55)-Math.cos(ry)*(i%2?.28:-.28));if(hd)hd(x+Math.cos(ry)*1.0,y+1.35,z-Math.sin(ry)*1.0,ry)}
 (function build(){
- // MANILA: towers + jeepney-ish + welcome board
- var h0=ground(0,0);[[-14,-16,9],[-8,-19,12],[3,-20,10],[12,-16,8],[-19,-8,7]].forEach(function(t){SHB.push([t[0],t[1],2.6,t[2]]);box(3,t[2],3,0xdedbd3,t[0],h0+t[2]/2,t[1]);box(3.2,.3,3.2,0x8a1c2b,t[0],h0+t[2]+.15,t[1]);COL.push({x:t[0],z:t[1],r:2.2})});
- var jp=box(4.2,1.6,2,0xf0b323,-6,h0+1.3,6,.4);box(4.4,.2,2.2,0xc0392b,-6,h0+2.2,6,.4);COL.push({x:-6,z:6,r:2.4});
+ // ---------- MANILA: BGC-style towers, jeepney, sari-sari store, Rizal monument, bangka ----------
+ var h0=ground(0,0);mbStart();
+ [[-14,-16,3,9,0xdedbd3],[-8,-19,3.4,13,0xcfd6dd],[3,-20,3,11,0xe6e2da],[12,-16,2.8,8,0xd8d2c8],[-19,-8,2.6,7,0xe0dcd4],[19,-22,3.2,15,0xc9d2da]].forEach(function(t){tower(t[0],t[1],t[2],t[3],t[4])});
+ vehicle(-6,6,.4,0xf0b323,4.6); // jeepney
+ // sari-sari store
+ mp(BX(3.2,2.2,2.6),0xf4e2c0,-16,h0+1.1,4);mp(BX(3.6,.2,1.2),0xc0392b,-16,h0+2.3,5.6);mp(BX(3.6,.2,1.2),0xffffff,-16,h0+2.32,5.0);mp(BX(2.6,.9,.3),0x8a6a3a,-16,h0+.9,5.35);COL.push({x:-16,z:4,r:2});SHB.push([-16,4,2,2.4]);
+ // Rizal-style monument
+ mp(BX(3,.6,3),0x9aa5a0,-13,h0+.3,-5);mp(BX(1.2,5,1.2),0xbfc7c2,-13,h0+2.8,-5,0,0,0,1,1,1);mp(CY(.35,.35,1.6,7),0x3a3f44,-13,h0+6.1,-5);mp(SP(.35),0x3a3f44,-13,h0+7.2,-5);COL.push({x:-13,z:-5,r:1.8});SHB.push([-13,-5,1.8,7]);
+ // bangka on the nearest water west of the plaza
+ for(var bxx=-24;bxx>-60;bxx-=2){if(hgt(bxx,10)<.8){mp(BX(4,.7,1.1),0x8a5a2b,bxx,1.05,10,0,.3);mp(BX(4.2,.12,.3),0xe8dcc2,bxx,1.45,10,0,.3);mp(BX(3,.15,.15),0x6b4a2a,bxx,1.1,10-1.6,0,.3);mp(BX(3,.15,.15),0x6b4a2a,bxx,1.1,10+1.6,0,.3);mp(BX(.1,2.4,.1),0x6b4a2a,bxx,2.4,10);mp(BX(1.4,1.6,.04),0xfbf7f1,bxx+.8,2.6,10);break}}
+ mbEnd();
  label('MANILA',0,h0+20,-8,'HOME · start here',1.4);
  sign(4,4,['← Banaue W','Giza E →','Paris N ↑','Boracay S ↓']);
- // BANAUE: rice terraces = stepped cylinders on the hill
- var s=ST[1];for(var i=0;i<6;i++){var y=ground(s.x,s.z);cyl(14-i*2.1,15-i*2.1,1.1,i%2?0x5aa63c:0x7cc24f,s.x,y+.55+i*1.1,s.z,24);cyl(14.2-i*2.1,14.2-i*2.1,.25,0x9a7a4a,s.x,y+i*1.1,s.z,24);}
- SHB.push([s.x,s.z,15.5,7]);COL.push({x:s.x,z:s.z,r:3});label('BANAUE',s.x,ground(s.x,s.z)+13,s.z,'JOURNEY · rice terraces',1.3);
+ lampsAround(0,0,10,6);
+ // ---------- BANAUE: irregular terraces, nipa huts, kalabaw, irrigation ----------
+ var s=ST[1],y=ground(s.x,s.z);mbStart();
+ for(var i=0;i<6;i++){var r=14.5-i*2.1,ex=1+Math.sin(i*1.7)*.12,ez=1+Math.cos(i*2.3)*.12;mp(CY(r-.4,r,1.1,26),i%2?0x5aa63c:0x7cc24f,s.x+Math.sin(i)*.8,y+.55+i*1.1,s.z+Math.cos(i)*.8,0,i*.4,0,ex,1,ez);mp(CY(r-.2,r-.2,.22,26),0x9a7a4a,s.x+Math.sin(i)*.8,y+i*1.1,s.z+Math.cos(i)*.8,0,i*.4,0,ex,1,ez);mp(CY(r-1.4,r-1.4,.12,26),0x6fb7e6,s.x+Math.sin(i)*.8,y+1.05+i*1.1,s.z+Math.cos(i)*.8,0,i*.4,0,ex*.96,1,ez*.96)}
+ mp(CY(2.2,2.6,1.2,10),0x7cc24f,s.x,y+7.1,s.z);
+ hut(s.x+8,s.z+9,.4,1);hut(s.x-10,s.z+6,-.6,.9);hut(s.x+2,s.z-11,.2,.8);
+ animal(s.x-6,s.z+13,.5,0x555555,function(hx,hy,hz,ry){mp(BX(.9,.12,.12),0xdddddd,hx,hy+.4,hz,0,ry+Math.PI/2)});animal(s.x+12,s.z-3,2.4,0x666666,function(hx,hy,hz,ry){mp(BX(.9,.12,.12),0xdddddd,hx,hy+.4,hz,0,ry+Math.PI/2)});
+ mbEnd();
+ SHB.push([s.x,s.z,15.5,7]);COL.push({x:s.x,z:s.z,r:3});label('BANAUE',s.x,y+13,s.z,'JOURNEY · rice terraces',1.3);
  for(var a=0;a<10;a++){var ang=a*.63;tree(s.x+Math.cos(ang)*(19+a%3*2),s.z+Math.sin(ang)*(19+a%3*2),.8)}
- // GIZA: 4 pyramids + sphinx-ish
- s=ST[2];[[0,0,11],[14,10,8],[-13,9,7],[-2,-15,6]].forEach(function(p){SHB.push([s.x+p[0],s.z+p[1],p[2]*1.2,p[2]*1.4]);var y=ground(s.x+p[0],s.z+p[1]);cone(p[2]*1.1,p[2]*1.4,0xe0b97a,s.x+p[0],y+p[2]*.7,s.z+p[1],4).rotation.y=Math.PI/4;COL.push({x:s.x+p[0],z:s.z+p[1],r:p[2]*.9})});
- box(5,2,2,0xd9a86a,s.x+10,ground(s.x+10,s.z-8)+1,s.z-8);sph(1.1,0xd9a86a,s.x+12.4,ground(s.x+10,s.z-8)+2.6,s.z-8);
+ // ---------- GIZA: stepped pyramids with capstones, Sphinx, oasis, camels ----------
+ s=ST[2];mbStart();
+ [[0,0,11],[14,10,8],[-13,9,7],[-2,-15,6]].forEach(function(p){var px=s.x+p[0],pz=s.z+p[1],py=ground(px,pz),sz=p[2];SHB.push([px,pz,sz*1.2,sz*1.4]);for(var k=0;k<4;k++){var f=1-k*.22;mp(CN(sz*1.1*f,sz*1.4*.32,4),k%2?0xe6c088:0xdcb274,px,py+sz*1.4*.32*k*.95+sz*1.4*.16,pz,0,Math.PI/4)}mp(CN(sz*.22,sz*.4,4),0xf3d27a,px,py+sz*1.4*.32*3.9+sz*.15,pz,0,Math.PI/4);COL.push({x:px,z:pz,r:sz*.9})});
+ var qx=s.x+10,qz=s.z-8,qy=ground(qx,qz);mp(BX(5.5,2.2,2.2),0xd9a86a,qx,qy+1.1,qz);mp(BX(2.2,.9,.9),0xd9a86a,qx+2.6,qy+.45,qz-.7);mp(BX(2.2,.9,.9),0xd9a86a,qx+2.6,qy+.45,qz+.7);mp(BX(1.6,1.9,2.2),0xd9a86a,qx+2.4,qy+2.9,qz);mp(BX(1.5,1.6,1.5),0xe0b97a,qx+2.9,qy+3.1,qz);mp(BX(.9,.3,1.3),0x8a6a3a,qx+3.6,qy+3.1,qz);COL.push({x:qx,z:qz,r:3.2});SHB.push([qx,qz,3.4,4]);
+ var ox=s.x-12,oz=s.z+18;mp(CY(4.2,4.2,.16,16),0x5fb0e0,ox,ground(ox,oz)+.1,oz);
+ animal(s.x+4,s.z+18,.9,0xc9a06a,function(hx,hy,hz,ry){mp(BX(.5,1.2,.5),0xc9a06a,hx,hy+.4,hz,0,ry)});animal(s.x+9,s.z+22,-.5,0xbf9560,function(hx,hy,hz,ry){mp(BX(.5,1.2,.5),0xbf9560,hx,hy+.4,hz,0,ry)});
+ mbEnd();
  label('GIZA',s.x,ground(s.x,s.z)+22,s.z,'EXPERTISE · 4 pyramids',1.3);
- for(var a=0;a<8;a++)palm(s.x-24+a*6,s.z+20);
- // PARIS: Eiffel tower on the plateau
- s=ST[3];var y=ground(s.x,s.z);for(var i=0;i<4;i++){var q=[[1,1],[1,-1],[-1,1],[-1,-1]][i];var leg=cyl(.25,.6,14,0x6b5a4a,s.x+q[0]*3.2,y+7,s.z+q[1]*3.2,6);leg.rotation.z=-q[0]*.18;leg.rotation.x=q[1]*.18;}
- SHB.push([s.x,s.z,4.6,14]);box(7,1,7,0x6b5a4a,s.x,y+7,s.z);box(4,1,4,0x6b5a4a,s.x,y+14,s.z);cyl(.5,1.2,12,0x6b5a4a,s.x,y+20,s.z,6);cyl(.08,.3,4,0x6b5a4a,s.x,y+28,s.z,4);COL.push({x:s.x,z:s.z,r:3.8});
- label('PARIS',s.x,y+33,s.z,'TECHNICAL STACK',1.3);for(var a=0;a<6;a++)tree(s.x-12+a*5,s.z+12,.7);
- // BORACAY: boardwalk with 7 project boards + palms + moai
+ for(var a=0;a<8;a++)palm(s.x-24+a*6,s.z+22);for(var a=0;a<5;a++)palm(ox+Math.cos(a*1.26)*5.5,oz+Math.sin(a*1.26)*5.5);
+ // ---------- PARIS: Eiffel with lattice legs, arch, platforms; café with striped awning; lamps ----------
+ s=ST[3];y=ground(s.x,s.z);mbStart();
+ var EC=0x6b5a4a;[[1,1],[1,-1],[-1,1],[-1,-1]].forEach(function(q){for(var k=0;k<7;k++){var t=k/7,x0=s.x+q[0]*(4-2.6*t),z0=s.z+q[1]*(4-2.6*t),y0=y+k*2.1+1;mp(BX(.5-.25*t,2.3,.5-.25*t),EC,x0,y0,z0,q[1]*.12*(1-t),0,-q[0]*.12*(1-t));mp(BX(.12,2.4,.12),0x8a7a66,x0+q[0]*.35,y0,z0,0,0,q[0]*.9);mp(BX(.12,2.4,.12),0x8a7a66,x0,y0,z0+q[1]*.35,q[1]*-.9,0,0)}});
+ for(var k=0;k<9;k++){var aa=k/8*Math.PI;mp(BX(.5,.5,.5),EC,s.x+Math.cos(aa)*3.4,y+3.2+Math.sin(aa)*3.2,s.z+4,0,0,aa)}
+ mp(BX(8,.7,8),EC,s.x,y+7.2,s.z);mp(BX(8.4,.25,8.4),0x8a7a66,s.x,y+7.7,s.z);mp(BX(4.6,.6,4.6),EC,s.x,y+15.2,s.z);
+ for(var k=0;k<5;k++){var t=k/5;mp(BX(2.6-1.9*t,2.2,2.6-1.9*t),EC,s.x,y+16.5+k*2.2,s.z)}mp(BX(1.2,1.2,1.2),EC,s.x,y+28,s.z);mp(CY(.06,.12,4,5),0x8a7a66,s.x,y+30.5,s.z);mp(SP(.3),0xfff2b0,s.x,y+32.6,s.z);
+ SHB.push([s.x,s.z,4.6,14]);COL.push({x:s.x,z:s.z,r:4.2});
+ var cx=s.x+12,cz=s.z+8,cy=ground(cx,cz);mp(BX(6,3.2,4),0xf1e4d0,cx,cy+1.6,cz);mp(BX(6.2,.5,4.2),0x6b4a3a,cx,cy+3.45,cz);for(var k=0;k<6;k++)mp(BX(1,.12,1.6),k%2?0xc0392b:0xffffff,cx-2.5+k,cy+2.4,cz+2.6,-.35);mp(BX(1.2,1.8,.1),0x3a4a5a,cx,cy+1.2,cz+2.02);for(var k=0;k<3;k++){mp(CY(.5,.5,.08,10),0xffffff,cx-3+k*3,cy+.9,cz+5);mp(CY(.06,.06,.9,5),0x555555,cx-3+k*3,cy+.45,cz+5);mp(CN(1.1,.5,8),k%2?0xc0392b:0xffffff,cx-3+k*3,cy+2.2,cz+5);mp(CY(.05,.05,1.5,5),0x555555,cx-3+k*3,cy+1.5,cz+5)}COL.push({x:cx,z:cz,r:3.6});SHB.push([cx,cz,3.6,3.5]);
+ mbEnd();
+ label('PARIS',s.x,y+35,s.z,'TECHNICAL STACK',1.3);for(var a=0;a<6;a++)tree(s.x-14+a*5,s.z+14,.7);lampsAround(s.x,s.z,9,4);
+ // ---------- BORACAY: boards, receipts, palms, paraw sailboat, umbrellas, lifeguard tower, moai ----------
  s=ST[4];var bx=s.x-24;for(var i=0;i<PROJECTS.length;i++){board(bx+i*8,s.z-6,0,PROJECTS[i][0],PROJECTS[i][1]);receipt(bx+i*8,s.z-12,PROJECTS[i][4])}
  for(var a=0;a<9;a++)palm(s.x-28+a*7,s.z+8);
- var my=ground(s.x+30,s.z);box(2,4,1.6,0x7d7a70,s.x+30,my+2,s.z);box(2.2,.6,1.8,0x6a675e,s.x+30,my+3.9,s.z);COL.push({x:s.x+30,z:s.z,r:1.5});
+ mbStart();
+ for(var pw=s.z+18;pw<s.z+40;pw+=2){if(hgt(s.x-20,pw)<.8){mp(BX(5,.8,1.3),0xe8dcc2,s.x-20,1.1,pw,0,.5);mp(BX(4,.12,.18),0x6b4a2a,s.x-20,1.15,pw-2.2,0,.5);mp(BX(4,.12,.18),0x6b4a2a,s.x-20,1.15,pw+2.2,0,.5);mp(BX(.12,5,.12),0x6b4a2a,s.x-20,3.6,pw);mp(CN(1.3,4.2,3),0x2f8fd6,s.x-20+.5,3.8,pw,0,0,-.4,1,1,.15);break}}
+ for(var k=0;k<4;k++){var ux=s.x+4+k*5,uz=s.z+6,uy=ground(ux,uz);mp(CY(.05,.05,2.6,5),0x777777,ux,uy+1.3,uz);mp(CN(1.5,.6,8),k%2?0xc0392b:0x2f8fd6,ux,uy+2.8,uz);mp(BX(1.4,.25,.6),0xfbf7f1,ux+.6,uy+.2,uz+.8)}
+ var lx=s.x+22,lz=s.z-2,ly=ground(lx,lz);[[-.9,-.9],[.9,-.9],[-.9,.9],[.9,.9]].forEach(function(p){mp(CY(.1,.12,3.2,5),0xe8dcc2,lx+p[0],ly+1.6,lz+p[1])});mp(BX(2.6,.2,2.6),0xe8dcc2,lx,ly+3.3,lz);mp(BX(2.2,1.4,2),0xffffff,lx,ly+4.1,lz);mp(CN(2,1,4),0xc0392b,lx,ly+5.3,lz,0,Math.PI/4);COL.push({x:lx,z:lz,r:1.8});SHB.push([lx,lz,1.8,5]);
+ var my=ground(s.x+30,s.z);mp(BX(2,4,1.6),0x7d7a70,s.x+30,my+2,s.z);mp(BX(2.2,.6,1.8),0x6a675e,s.x+30,my+3.9,s.z);mp(BX(.6,1.2,.4),0x6a675e,s.x+30,my+2.4,s.z+.9);COL.push({x:s.x+30,z:s.z,r:1.5});SHB.push([s.x+30,s.z,1.4,4]);
+ mbEnd();
  label('BORACAY',s.x,ground(s.x,s.z)+12,s.z,'PROJECTS · 7 boards',1.3);
- // ROME: colosseum ring of arches
- s=ST[5];y=ground(s.x,s.z);for(var a=0;a<28;a++){var ang=a/28*Math.PI*2;var hh=a<20?7:4.5;cyl(.55,.6,hh,0xe2cfa8,s.x+Math.cos(ang)*11,y+hh/2,s.z+Math.sin(ang)*11,6);}
- SHB.push([s.x,s.z,12.6,7]);var ring=new THREE.Mesh(new THREE.TorusGeometry(11,.7,6,28),mat(0xd9c39a));ring.rotation.x=Math.PI/2;ring.position.set(s.x,y+7.2,s.z);S.add(ring);
- var ring2=ring.clone();ring2.position.y=y+3.8;S.add(ring2);for(var a=0;a<28;a++){var ang=a/28*Math.PI*2;COL.push({x:s.x+Math.cos(ang)*11,z:s.z+Math.sin(ang)*11,r:.9})}
- label('ROME',s.x,y+14,s.z,'CERTIFICATIONS · 29',1.3);
- // NEW YORK: Statue of Liberty + skyline
- s=ST[6];y=ground(s.x,s.z);SHB.push([s.x,s.z,3.6,15]);box(5,3,5,0x9aa5a0,s.x,y+1.5,s.z);cyl(1.3,1.8,7,0x6fb8a6,s.x,y+6.5,s.z,8);sph(1,0x6fb8a6,s.x,y+10.6,s.z);var arm=cyl(.3,.4,5,0x6fb8a6,s.x+1.4,y+11.5,s.z,6);arm.rotation.z=-.25;cone(.7,1.4,0xf5c542,s.x+2.2,y+14.6,s.z,5);
- for(var a=0;a<7;a++){var cx=s.x-12+a*4,cz=s.z-12;var th=6+((a*7)%9);box(3,th,3,0x8d99a6,cx,ground(cx,cz)+th/2,cz);SHB.push([cx,cz,2.3,th]);COL.push({x:cx,z:cz,r:2.1})}COL.push({x:s.x,z:s.z,r:3.5});
- label('NEW YORK',s.x,y+19,s.z,'CONTACT · hire me',1.3);
- // scenery: trees, rocks, torii near home, chocolate hills trees
+ // ---------- ROME: 3-tier Colosseum of arches with a broken side, plaza, columns ----------
+ s=ST[5];y=ground(s.x,s.z);mbStart();
+ mp(CY(14,14.5,.5,32),0xd9c9a8,s.x,y+.25,s.z);
+ for(var tier=0;tier<3;tier++){var th=4.2,by=y+.5+tier*th;for(var a=0;a<28;a++){if(tier>0&&a>=20&&a<27)continue;var ang=a/28*Math.PI*2,rx=s.x+Math.cos(ang)*11,rz=s.z+Math.sin(ang)*11,ry=-ang;var stone=tier%2?0xe2cfa8:0xd8c39a;mp(BX(.8,th,.9),stone,rx,by+th/2,rz,0,ry);mp(BX(2.6,.6,.9),0xcdb98e,rx,by+th-.3,rz,0,ry);mp(BX(1.2,.35,.9),0xc9b285,rx,by+th-.85,rz,0,ry)}var rr2=new THREE.TorusGeometry(11,.45,5,32);mp(rr2,0xcdb98e,s.x,by+th,s.z,Math.PI/2)}
+ for(var a=0;a<28;a++){var ang=a/28*Math.PI*2;COL.push({x:s.x+Math.cos(ang)*11,z:s.z+Math.sin(ang)*11,r:.9})}
+ [[-16,4],[-17,-2],[16,6]].forEach(function(c){mp(CY(.5,.6,4,8),0xe2cfa8,s.x+c[0],ground(s.x+c[0],s.z+c[1])+2,s.z+c[1]);mp(BX(1.4,.4,1.4),0xcdb98e,s.x+c[0],ground(s.x+c[0],s.z+c[1])+4.2,s.z+c[1]);COL.push({x:s.x+c[0],z:s.z+c[1],r:.8});SHB.push([s.x+c[0],s.z+c[1],.9,4])});
+ mbEnd();
+ SHB.push([s.x,s.z,12.6,7]);label('ROME',s.x,y+16,s.z,'CERTIFICATIONS · 29',1.3);
+ // ---------- NEW YORK: Statue of Liberty with pedestal, crown, torch; skyline with setbacks; taxi ----------
+ s=ST[6];y=ground(s.x,s.z);mbStart();
+ mp(BX(7,1.2,7),0x8f9a95,s.x,y+.6,s.z);mp(BX(5,2.6,5),0x9aa5a0,s.x,y+2.5,s.z);mp(BX(4,1,4),0xa8b3ae,s.x,y+4.3,s.z);
+ var LG=0x6fb8a6;mp(CY(1.5,2.1,6,10),LG,s.x,y+7.8,s.z);for(var k=0;k<8;k++){var aa=k/8*Math.PI*2;mp(BX(.35,5.6,.25),0x5fa894,s.x+Math.cos(aa)*1.7,y+7.6,s.z+Math.sin(aa)*1.7,0,-aa)}
+ mp(SP(.95),LG,s.x,y+11.6,s.z);for(var k=0;k<7;k++){var aa=-1.2+k*.4;mp(BX(.16,1.4,.16),LG,s.x+Math.sin(aa)*.9,y+12.9,s.z-Math.cos(aa)*.9,aa*.5,0,0)}
+ mp(BX(.5,4.6,.5),LG,s.x+1.5,y+12.6,s.z,0,0,-.3);mp(CY(.35,.5,1,7),0xc9a24a,s.x+2.2,y+15.2,s.z);mp(SP(.6),0xffd166,s.x+2.2,y+16,s.z);mp(BX(1.2,1.6,.3),LG,s.x-1.3,y+8.8,s.z+.6,0,.3,.2);
+ SHB.push([s.x,s.z,3.6,16]);COL.push({x:s.x,z:s.z,r:3.8});
+ for(var a=0;a<9;a++){var cx2=s.x-16+a*4,cz2=s.z-12-(a%2)*3,th2=6+((a*7)%10),cy2=ground(cx2,cz2);mp(BX(3,th2,3),a%3?0x8d99a6:0x7c8896,cx2,cy2+th2/2,cz2);mp(BX(2.2,th2*.35,2.2),0x9aa6b3,cx2,cy2+th2+th2*.17,cz2);if(a%2)mp(CY(.05,.15,3,5),0xb8c2cc,cx2,cy2+th2*1.35+1.5,cz2);for(var f=1;f<th2/1.3;f++){mp(BX(3.06,.3,1.2),0x2c3e50,cx2,cy2+f*1.3,cz2+.9);mp(BX(3.06,.3,1.2),0x2c3e50,cx2,cy2+f*1.3,cz2-.9)}SHB.push([cx2,cz2,2.3,th2]);COL.push({x:cx2,z:cz2,r:2.1})}
+ vehicle(s.x-8,s.z+6,1.2,0xf4c430,4);
+ mbEnd();
+ label('NEW YORK',s.x,y+20,s.z,'CONTACT · hire me',1.3);lampsAround(s.x,s.z,12,5);
+ // ---------- scenery: trees, rocks, torii ----------
  for(var i=0;i<170;i++){var x=(Math.random()-.5)*230,z=(Math.random()-.5)*230;if(Math.hypot(x,z)<18)continue;var near=ST.some(function(s){return Math.hypot(x-s.x,z-s.z)<s.r+2});if(near)continue;if(hgt(x,z)<1.3)continue;if(x>60&&z<-10)rock(x,z,1+Math.random()*1.5);else tree(x,z,.7+Math.random()*.8)}
- var ty=ground(0,-22);cyl(.3,.35,6,0xc0392b,-2.5,ty+3,-22,6);cyl(.3,.35,6,0xc0392b,2.5,ty+3,-22,6);box(7,.5,.6,0xc0392b,0,ty+6.2,-22);box(6,.4,.5,0xc0392b,0,ty+5.2,-22);COL.push({x:-2.5,z:-22,r:.6});COL.push({x:2.5,z:-22,r:.6});
+ mbStart();var ty=ground(0,-22);mp(CY(.3,.35,6,6),0xc0392b,-2.5,ty+3,-22);mp(CY(.3,.35,6,6),0xc0392b,2.5,ty+3,-22);mp(BX(7,.5,.6),0xc0392b,0,ty+6.2,-22);mp(BX(6,.4,.5),0xc0392b,0,ty+5.2,-22);mp(BX(7.4,.2,.7),0x222222,0,ty+6.55,-22);mbEnd();COL.push({x:-2.5,z:-22,r:.6});COL.push({x:2.5,z:-22,r:.6});
 })();
+function lampsAround(x,z,r,n){mbStart();for(var i=0;i<n;i++){var a=i/n*Math.PI*2+.4;lamp(x+Math.cos(a)*r,z+Math.sin(a)*r)}mbEnd()}
 
-// ===== rider (Dianna on Kimpoy) =====
 // ===== stone paths (Bruno's "tiles"): guide from Manila to every landmark =====
 (function(){var pts=[];ST.slice(1).forEach(function(s){var len=Math.hypot(s.x,s.z),n=Math.floor(len/2.3),ux=s.x/len,uz=s.z/len,tx=-uz,tz=ux;
  for(var i=6;i<n-Math.floor(s.r/2.3);i++){var x=ux*i*2.3+tx*(i%2?.45:-.45)+(Math.random()-.5)*.4,z=uz*i*2.3+tz*(i%2?.45:-.45)+(Math.random()-.5)*.4;var g=ground(x,z);pts.push([x,Math.max(g,.95)+.07,z,.55+Math.random()*.35,Math.random()*Math.PI])}});

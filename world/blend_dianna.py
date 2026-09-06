@@ -5,7 +5,8 @@ import bpy, sys, math, numpy as np
 from mathutils import Vector
 argv=sys.argv[sys.argv.index('--')+1:]; IN,OUT=argv[0],argv[1]
 M='C:/Users/DELL/AppData/Local/Temp/claude/C--Users-DELL-Desktop/4879bca3-2969-4557-8e5f-72e02e23c64c/scratchpad/mascots/'
-ATLAS='C:/Users/DELL/Desktop/FOLDER/mark-portfolio/world/tex/dianna-atlas.jpg'   # front | back(hair over face) | skin
+ATLAS='C:/Users/DELL/Desktop/FOLDER/mark-portfolio/world/tex/dianna-atlas.jpg'
+T='C:/Users/DELL/Desktop/FOLDER/mark-portfolio/world/tex/'   # front | back(hair over face) | skin
 bpy.ops.wm.read_factory_settings(use_empty=True)
 bpy.ops.import_scene.gltf(filepath=IN)
 obj=[o for o in bpy.context.scene.objects if o.type=='MESH'][0]
@@ -60,11 +61,17 @@ front=tex(uF,vF,0,W)
 uP=m('FRACT',m('MULTIPLY',X,2.2)); vP=m('FRACT',m('MULTIPLY',Z,2.5)); puff=tex(m('ADD',m('MULTIPLY',uP,100/W),310/W),m('SUBTRACT',1-262/H,m('MULTIPLY',vP,135/H)),0,W)   # pure puffer area, no hand/belt edge
 uH=m('FRACT',m('MULTIPLY',m('ADD',X,Y),1.2)); vH=m('SUBTRACT',1-70/H,m('MULTIPLY',m('FRACT',m('MULTIPLY',Z,3.0)),220/H)); hair=tex(m('ADD',m('MULTIPLY',uH,60/W),135/W),vH,0,W)
 isHead=m('GREATER_THAN',Z,.78)
-mixS=node('ShaderNodeMix',data_type='RGBA'); ln.new(isHead,mixS.inputs[0]); ln.new(puff,mixS.inputs[6]); ln.new(hair,mixS.inputs[7]); side=mixS.outputs[2]
+# real photos of the figure: side (gs_2, faces left = forward) and back (gallery_img03); forward = -X so u = X puts the nose at the left edge
+imgS=bpy.data.images.load(T+'diana-side.png'); imgS.colorspace_settings.name='sRGB'; imgB=bpy.data.images.load(T+'diana-back.png'); imgB.colorspace_settings.name='sRGB'
+def photo(im,u,v):
+    comb=node('ShaderNodeCombineXYZ'); ln.new(u,comb.inputs[0]); ln.new(v,comb.inputs[1]); t=node('ShaderNodeTexImage',image=im,extension='EXTEND'); ln.new(comb.outputs[0],t.inputs['Vector']); return t.outputs['Color']
+sideL=photo(imgS,X,Z); sideR=photo(imgS,m('SUBTRACT',1.0,X),Z)
+isL=m('GREATER_THAN',NY,0.0); mixLR=node('ShaderNodeMix',data_type='RGBA'); ln.new(isL,mixLR.inputs[0]); ln.new(sideR,mixLR.inputs[6]); ln.new(sideL,mixLR.inputs[7]); side=mixLR.outputs[2]
+back=photo(imgB,m('SUBTRACT',1.0,Y),Z)
 # blend by normal: front (NY<-.15) / back (NY>.15) / side
-fF=m('MULTIPLY',m('SUBTRACT',m('MULTIPLY',NX,-1.0),.25),2.0,clamp=True); fB=m('MULTIPLY',m('SUBTRACT',NX,.1),2.5,clamp=True)   # PROBE: front faces -X
+fF=m('MULTIPLY',m('SUBTRACT',m('MULTIPLY',NX,-1.0),.25),2.0,clamp=True); fB=m('MULTIPLY',m('SUBTRACT',NX,.2),2.5,clamp=True)   # PROBE: front faces -X
 mix1=node('ShaderNodeMix',data_type='RGBA'); ln.new(fF,mix1.inputs[0]); ln.new(side,mix1.inputs[6]); ln.new(front,mix1.inputs[7])
-mix2=node('ShaderNodeMix',data_type='RGBA'); ln.new(fB,mix2.inputs[0]); ln.new(mix1.outputs[2],mix2.inputs[6]); ln.new(side,mix2.inputs[7])
+mix2=node('ShaderNodeMix',data_type='RGBA'); ln.new(fB,mix2.inputs[0]); ln.new(mix1.outputs[2],mix2.inputs[6]); ln.new(back,mix2.inputs[7])
 # hands: forward-most 14% in the arm band -> skin
 armZ=m('MULTIPLY',m('GREATER_THAN',Z,.5),m('LESS_THAN',Z,.86)); arm=m('MULTIPLY',m('LESS_THAN',X,.3),armZ)   # forward arms: sleeves, not the face projection
 mixA=node('ShaderNodeMix',data_type='RGBA'); ln.new(arm,mixA.inputs[0]); ln.new(mix2.outputs[2],mixA.inputs[6]); ln.new(puff,mixA.inputs[7])

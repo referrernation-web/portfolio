@@ -395,7 +395,7 @@ function loadFigures(){
   var hats=Object.keys(HATM).map(function(k){return HATM[k]});FIG.hats=hats;DOG.children.forEach(function(ch){if(ch!==FIG.dia&&hats.indexOf(ch)<0&&!ch.userData.dianna)ch.visible=false});
   FIG.kim=root;DOG.add(root);
  },undefined,function(){});
- GL.load('models/dianna.glb',function(gl){var mesh=figMesh(gl,FIG.diaH,0,0);if(!mesh)return;var bb=mesh.geometry.boundingBox;FIG.d.uMin.value.copy(bb.min);FIG.d.uSize.value.copy(bb.getSize(new THREE.Vector3()));diaShader(mesh.material);var wrap=new THREE.Group();wrap.position.set(0,FIG.diaY,FIG.diaZ);wrap.rotation.x=FIG.lean;wrap.add(mesh);FIG.dia=wrap;DOG.add(wrap);
+ GL.load('models/dianna.glb',function(gl){var mesh=figMesh(gl,FIG.diaH,0,0);if(!mesh)return;var bb=mesh.geometry.boundingBox;FIG.d.uMin.value.copy(bb.min);FIG.d.uSize.value.copy(bb.getSize(new THREE.Vector3()));diaShader(mesh.material);var wrap=new THREE.Group();wrap.position.set(0,FIG.diaY,FIG.diaZ);wrap.rotation.x=FIG.lean;wrap.rotation.y=Math.PI;wrap.add(mesh);FIG.dia=wrap;DOG.add(wrap);
   DOG.children.forEach(function(ch){if(ch.userData.dianna)ch.visible=false})},undefined,function(){});
 }
 loadFigures();

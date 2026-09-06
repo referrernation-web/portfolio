@@ -188,9 +188,38 @@ function board(x,z,ry,name,img,line){var y=ground(x,z);var fr=box(6.4,4.4,.3,0xf
 })();
 
 // ===== rider (Dianna on Kimpoy) =====
-var rtex=new THREE.TextureLoader().load('rider.webp',function(){});rtex.encoding=THREE.sRGBEncoding;rtex.magFilter=THREE.LinearFilter;rtex.repeat.set(1/8,1);
-var RW=263,RH=330,rider=new THREE.Mesh(new THREE.PlaneGeometry(4.6*RW/RH,4.6),new THREE.MeshBasicMaterial({map:rtex,transparent:true,alphaTest:.15,side:THREE.DoubleSide}));S.add(rider);
-var shadow=new THREE.Mesh(new THREE.CircleGeometry(1.1,16),new THREE.MeshBasicMaterial({color:0x000,transparent:true,opacity:.28}));shadow.rotation.x=-Math.PI/2;S.add(shadow);
+// ===== low-poly Kimpoy (dog) + Dianna (rider): +z = forward, rotates with heading like Bruno's car =====
+var RG=new THREE.Group(),DOG=new THREE.Group(),legs=[],tail,dHair;S.add(RG);RG.add(DOG);
+(function(){function bx(w,h,d,c,x,y,z,parent){var m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(c));m.position.set(x,y,z);(parent||DOG).add(m);return m}
+ function sp(r,c,x,y,z,parent){var m=new THREE.Mesh(new THREE.SphereGeometry(r,9,7),mat(c));m.position.set(x,y,z);(parent||DOG).add(m);return m}
+ var fur=0x4a4640,fur2=0x5b5464,fur3=0x3a3632;
+ bx(1.0,.9,1.8,fur,0,1.05,0);                        // body
+ sp(.55,fur2,0,1.45,.25).scale.set(1.1,.8,1.1);      // shaggy mane
+ bx(.8,.72,.75,fur,0,1.6,.95);                       // head
+ sp(.42,fur2,0,1.98,.9).scale.set(1.15,.7,1.1);      // head tuft
+ bx(.42,.3,.4,fur3,0,1.45,1.42);                     // snout
+ sp(.11,0x111111,0,1.53,1.63);                       // nose
+ bx(.22,.5,.36,fur3,-.45,1.55,.8).rotation.z=.25;    // ears
+ bx(.22,.5,.36,fur3,.45,1.55,.8).rotation.z=-.25;
+ sp(.09,0xffffff,-.2,1.7,1.33);sp(.09,0xffffff,.2,1.7,1.33);sp(.05,0x111111,-.2,1.7,1.41);sp(.05,0x111111,.2,1.7,1.41);
+ bx(.22,.1,.28,0xd2546e,0,1.27,1.5);                 // tongue
+ [[-.32,.6],[.32,.6],[-.32,-.6],[.32,-.6]].forEach(function(p){var g=new THREE.Group();g.position.set(p[0],.75,p[1]);var l=new THREE.Mesh(new THREE.CylinderGeometry(.13,.15,.75,7),mat(fur));l.position.y=-.35;g.add(l);var paw=new THREE.Mesh(new THREE.SphereGeometry(.16,7,6),mat(fur3));paw.position.set(0,-.72,.05);g.add(paw);DOG.add(g);legs.push(g)});
+ tail=new THREE.Group();tail.position.set(0,1.35,-.9);var t=new THREE.Mesh(new THREE.CylinderGeometry(.06,.1,.7,6),mat(fur2));t.position.y=.3;tail.add(t);tail.rotation.x=-.9;DOG.add(tail);
+ // Dianna sits on the back
+ var D=new THREE.Group();D.position.set(0,1.5,-.25);DOG.add(D);
+ bx(.6,.62,.5,0x2a4fd6,0,.5,0,D);                    // blue puffer jacket
+ bx(.62,.12,.52,0x1d3aa8,0,.24,0,D);                 // belt
+ bx(.2,.45,.22,0x2a4fd6,-.4,.15,.25,D).rotation.x=-.5; // legs hugging Kimpoy
+ bx(.2,.45,.22,0x2a4fd6,.4,.15,.25,D).rotation.x=-.5;
+ bx(.16,.42,.16,0x2a4fd6,-.36,.45,.28,D).rotation.x=.9; // arms holding the mane
+ bx(.16,.42,.16,0x2a4fd6,.36,.45,.28,D).rotation.x=.9;
+ sp(.3,0xf1c9a5,0,1.06,0,D);                         // head
+ dHair=sp(.34,0xf3d27a,0,1.16,-.05,D);dHair.scale.set(1.05,.9,1.05); // blonde hair
+ bx(.62,.6,.22,0xf3d27a,0,.85,-.28,D);               // long hair down the back
+ sp(.04,0x111111,-.1,1.08,.28,D);sp(.04,0x111111,.1,1.08,.28,D);
+ bx(.14,.05,.03,0xc0392b,0,.95,.3,D);                // smile
+})();
+var shadow=new THREE.Mesh(new THREE.CircleGeometry(1.4,16),new THREE.MeshBasicMaterial({color:0x000,transparent:true,opacity:.28}));shadow.rotation.x=-Math.PI/2;S.add(shadow);
 var P={x:0,z:10,y:0,vy:0,head:Math.PI,speed:0,frame:0,ft:0,air:false,face:1,vx:0,vz:0,squash:0,slide:0,lastFr:0,dustT:0,gpj:false,turnV:0};
 
 // ===== audio (WebAudio synth, walang assets) =====
@@ -258,7 +287,7 @@ function step(dt){
  var gps=navigator.getGamepads&&navigator.getGamepads(),pad=null;if(gps)for(var i=0;i<gps.length;i++)if(gps[i]&&gps[i].connected){pad=gps[i];break}
  if(pad){var ax=pad.axes[0]||0,ay=pad.axes[1]||0;if(Math.hypot(ax,ay)>.18){ix=ax;iy=-ay}if(pad.buttons[0]&&pad.buttons[0].pressed){if(!P.gpj)jump();P.gpj=true}else P.gpj=false;if(pad.buttons[7]&&pad.buttons[7].value>.3)boost=true}
  // screen axes on the ground plane (camera sits at +x,+z looking back)
- var CFx=-0.5,CFz=-0.9,cl=Math.hypot(CFx,CFz);CFx/=cl;CFz/=cl; // screen-up
+ var CFx=-0.45,CFz=-0.85,cl=Math.hypot(CFx,CFz);CFx/=cl;CFz/=cl; // screen-up
  var CRx=-CFz,CRz=CFx;                                          // screen-right
  var dx=CFx*iy+CRx*ix,dz=CFz*iy+CRz*ix,mag=Math.min(1,Math.hypot(dx,dz));
  var max=boost?26:16;
@@ -283,17 +312,18 @@ function step(dt){
  P.squash=Math.max(0,P.squash-dt*1.1);
  sp=P.speed;P.ft+=dt*(sp>.4?(6+sp*.8):0);var fr=sp>.4?Math.floor(P.ft)%8:0;if(P.air)fr=3;
  if(fr!==P.lastFr){if(!P.air&&sp>3&&(fr===0||fr===4))blip(90,55,.06,'triangle',Math.min(.11,.05+sp*.003));P.lastFr=fr}
- rtex.offset.x=fr/8;
  if(!P.air&&!inWater&&(sp>9||(Math.abs(P.turnV)>.6&&sp>5))){P.dustT-=dt;if(P.dustT<=0){P.dustT=.07;puff(P.x-fx*1.2,g+.35,P.z-fz*1.2,'#d8c9a8',.7,-fx*2+(Math.random()-.5)*2,1.2,-fz*2+(Math.random()-.5)*2)}}
- rider.position.set(P.x,P.y+2.35+(P.air?0:Math.abs(Math.sin(P.ft*Math.PI))*.14*(sp>.4?1:0)),P.z);
- rider.quaternion.copy(CAM.quaternion);
- rider.rotateZ(-P.turnV*.28*P.face);
- var camR=new THREE.Vector3(1,0,0).applyQuaternion(CAM.quaternion);var vx2=fx*camR.x+fz*camR.z;if(sp>.5)P.face=vx2>=0?1:-1;
- rider.scale.set(P.face*(1+P.squash*.7),1-P.squash,1);
+ RG.position.set(P.x,P.y,P.z);RG.rotation.set(P.air?Math.max(-.5,Math.min(.5,-P.vy*.05)):0,P.head,-P.turnV*.22);
+ var RS=1.35;RG.scale.set(RS*(1+P.squash*.5),RS*(1-P.squash*.9),RS*(1+P.squash*.5));
+ var run=Math.min(1,sp/8),sw=Math.sin(P.ft*Math.PI)*run*.95;
+ if(P.air){legs[0].rotation.x=legs[1].rotation.x=-.9;legs[2].rotation.x=legs[3].rotation.x=.9}else{legs[0].rotation.x=sw;legs[3].rotation.x=sw;legs[1].rotation.x=-sw;legs[2].rotation.x=-sw}
+ DOG.position.y=P.air?0:Math.abs(Math.sin(P.ft*Math.PI))*.16*run;
+ DOG.rotation.x=P.air?0:Math.sin(P.ft*Math.PI*2)*.06*run;
+ tail.rotation.z=Math.sin(performance.now()*(sp>.4?.012:.02))*.55;
  shadow.position.set(P.x,g+.06,P.z);var sh=Math.max(.35,1-(P.y-g)*.12);shadow.scale.set(sh,sh,1);
  var la=Math.min(7,sp*.32);
  camT.x+=((P.x+fx*la)-camT.x)*Math.min(1,dt*3.5);camT.y+=(P.y-camT.y)*Math.min(1,dt*3.5);camT.z+=((P.z+fz*la)-camT.z)*Math.min(1,dt*3.5);
- var dist=24+zoom*26+sp*.3;CAM.position.set(camT.x+dist*.5,camT.y+dist*.72,camT.z+dist*.9);CAM.lookAt(camT.x,camT.y+1.2,camT.z);
+ var dist=24+zoom*26+sp*.3;CAM.position.set(camT.x+dist*.45,camT.y+dist*.85,camT.z+dist*.85);CAM.lookAt(camT.x,camT.y+1.2,camT.z);
  S.children.forEach(function(o){if(o.userData.face){o.lookAt(CAM.position.x,o.position.y,CAM.position.z)}});
  stepProps(dt);stepDust(dt);
  zones(dt);minimap();

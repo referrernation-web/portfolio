@@ -399,6 +399,9 @@ function figAnim(sp,run,boost){var t=performance.now()/1000,ph=P.ft*Math.PI,air=
    var dir=c.front?-1:1;   // negative X swings a front leg forward
    var amp=run*(1-air);rotW(pick(c,0),_AX,dir*g.sw*1.1*amp+(c.front?-.9:.9)*air,r);rotW(pick(c,1),_AX,(c.front?1:-1)*g.knee*.9*amp+(c.front?-.55:.55)*air,r);rotW(pick(c,2),_AX,(c.front?-1:1)*g.lift*.5*amp,r)});
   if(K.head.length>1){rotW(K.head[0],_AX,-Math.sin(cyc*Math.PI*2)*.18*gallop*run,r)}   // neck dips with the gallop
+  var ik=(typeof IDLE!=='undefined'&&IDLE.k)||0,sit=(IDLE&&IDLE.st==='sit')?ik:0,slp=(IDLE&&IDLE.st==='sleep')?ik:0;   // sit / sleep on the real skeleton
+  if(sit+slp>0){K.legs.forEach(function(c){if(!c.front){rotW(pick(c,0),_AX,1.25*(sit+slp),r);rotW(pick(c,1),_AX,-1.6*(sit+slp),r);rotW(pick(c,2),_AX,1.1*(sit+slp),r)}else if(slp){rotW(pick(c,0),_AX,-1.2*slp,r);rotW(pick(c,1),_AX,1.5*slp,r)}});
+   if(K.head.length>1){rotW(K.head[0],_AX,.35*slp,r)}}
   var vy=Math.max(-1,Math.min(1,(P.vy||0)/9)),earS=spring(SPR.ear,vy*.6-air*.3-run*.3,120,10,dt);
   if(K.head.length>1)rotW(K.head[0],_AX,Math.sin(ph*2+.5)*.06*run,r);   // neck flexes with the gallop
   var wag=Math.sin(t*(sp>.4?7:11))*(.22+.1*(boost?1:0))-turn*.5,lift=-.25-.3*(boost?1:0)-.15*run+vy*.2;   // physics: tail swings out of a turn, lifts on the way up

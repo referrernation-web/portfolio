@@ -399,16 +399,20 @@ function figAnim(sp,run,boost){var t=performance.now()/1000,ph=P.ft*Math.PI,air=
 }
 function fitRoot(root,h,dy,dz){root.updateMatrixWorld(true);var bb=new THREE.Box3().setFromObject(root),sz=bb.getSize(new THREE.Vector3()),c=bb.getCenter(new THREE.Vector3()),sc=h/sz.y;root.scale.setScalar(sc);root.position.set(-c.x*sc,-bb.min.y*sc+(dy||0),-c.z*sc+(dz||0));root.updateMatrixWorld(true)}
 function skinMat(mesh,rough){var old=mesh.material;mesh.material=new THREE.MeshStandardMaterial({map:old.map||null,color:0xffffff,roughness:rough,metalness:0,skinning:true});mesh.castShadow=true;mesh.frustumCulled=false}
+function dropArm(c,root){if(!c||!c.length)return;var sh=pick(c,0),hand=c[c.length-1],inv=new THREE.Matrix4(),w=new THREE.Vector3(),best=0,bestY=1e9;
+ for(var a=-2.6;a<=2.6;a+=.1){sh.quaternion.copy(sh.userData.rest);rotW(sh,_AZ,a,root);root.updateMatrixWorld(true);inv.copy(root.matrixWorld).invert();hand.getWorldPosition(w);w.applyMatrix4(inv);if(w.y<bestY){bestY=w.y;best=a}}
+ sh.quaternion.copy(sh.userData.rest);rotW(sh,_AZ,best,root);sh.userData.rest.copy(sh.quaternion);root.updateMatrixWorld(true)}
 function bakePose(list,root){list.forEach(function(p){if(!p[0])return;rotW(p[0],p[1],p[2],root);p[0].userData.rest.copy(p[0].quaternion);root.updateMatrixWorld(true)})}
 function loadFigures(){
  GL.load('models/kimpoy-rig.glb?v='+FIGV,function(gl){var root=gl.scene,mesh=null;root.traverse(function(m){if(m.isSkinnedMesh)mesh=m});if(!mesh)return;
   fitRoot(root,FIG.kimH,FIG.kimY,FIG.kimZ);skinMat(mesh,1.0);var wrap=new THREE.Group();wrap.add(root);DOG.add(wrap);FIG.kim=root;FIG.K=dogRoles(root);
-  var hats=Object.keys(HATM).map(function(k){return HATM[k]});FIG.hats=hats;DOG.children.forEach(function(ch){if(ch!==wrap&&ch!==FIG.dia&&hats.indexOf(ch)<0&&!ch.userData.dianna)ch.visible=false});
+  var hats=Object.keys(HATM).map(function(k){return HATM[k]});FIG.hats=hats;DOG.children.forEach(function(ch){if(ch!==wrap&&!ch.userData.rider&&hats.indexOf(ch)<0&&!ch.userData.dianna)ch.visible=false});   // hide the procedural dog only (never the rider's wrap: load order is a race)
  },undefined,function(){});
  GL.load('models/dianna-rig.glb?v='+FIGV,function(gl){var root=gl.scene,mesh=null;root.traverse(function(m){if(m.isSkinnedMesh)mesh=m});if(!mesh)return;
-  fitRoot(root,FIG.diaH,0,0);skinMat(mesh,.85);var wrap=new THREE.Group();wrap.position.set(0,FIG.diaY,FIG.diaZ);wrap.rotation.x=FIG.lean;wrap.add(root);DOG.add(wrap);FIG.dia=root;var D=girlRoles(root);FIG.D=D;
+  fitRoot(root,FIG.diaH,0,0);skinMat(mesh,.85);var wrap=new THREE.Group();wrap.userData.rider=true;wrap.position.set(0,FIG.diaY,FIG.diaZ);wrap.rotation.x=FIG.lean;wrap.add(root);DOG.add(wrap);FIG.dia=root;var D=girlRoles(root);FIG.D=D;
   // riding pose baked into the rest pose: shoulders forward-down (hands on the fur), elbows bent, legs spread over the flanks, knees back
-  bakePose([[pick(D.arms[0]||[],0),_AZ,D.arms[0]&&D.arms[0].right?-1.15:1.15],[pick(D.arms[1]||[],0),_AZ,D.arms[1]&&D.arms[1].right?-1.15:1.15],[pick(D.arms[0]||[],0),_AX,.55],[pick(D.arms[1]||[],0),_AX,.55],[pick(D.arms[0]||[],2),_AX,.4],[pick(D.arms[1]||[],2),_AX,.4],   // T-pose arms: drop to the sides (about the forward axis), then forward to hold the fur
+  D.arms.forEach(function(c){dropArm(c,root)});   // whatever the rest pose (T, raised, waving): search the Z angle that hangs the hand lowest
+  bakePose([[pick(D.arms[0]||[],0),_AX,.55],[pick(D.arms[1]||[],0),_AX,.55],[pick(D.arms[0]||[],2),_AX,.4],[pick(D.arms[1]||[],2),_AX,.4],
    [pick(D.legs[0]||[],0),_AZ,D.legs[0]&&D.legs[0].right?-.32:.32],[pick(D.legs[1]||[],0),_AZ,D.legs[1]&&D.legs[1].right?-.32:.32],[pick(D.legs[0]||[],1),_AX,-.7],[pick(D.legs[1]||[],1),_AX,-.7]],root);
   DOG.children.forEach(function(ch){if(ch.userData.dianna)ch.visible=false})},undefined,function(){});
 }

@@ -182,9 +182,9 @@ section{padding:100px 0}
 .rleft h2{font-size:clamp(34px,4.2vw,54px);font-weight:900;line-height:1.05;letter-spacing:-.03em;margin-bottom:18px}
 .rleft p{color:var(--mut);font-size:17px;max-width:460px}
 .rleft .note{text-align:left;margin-top:30px}
-.rright{position:relative;display:flex;flex-direction:column;gap:56px;padding:20px 0 20px}
+.rright{position:relative;display:flex;flex-direction:column;gap:88px;padding:20px 0 20px}
 .rpath{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
-.pin{position:relative;width:min(350px,88%);background:#fff;border:1px solid var(--line);border-radius:22px;padding:34px 26px 28px;box-shadow:0 18px 40px rgba(0,0,0,.08);transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s}
+.pin{position:relative;width:min(330px,88%);background:#fff;border:1px solid var(--line);border-radius:22px;padding:34px 26px 28px;box-shadow:0 18px 40px rgba(0,0,0,.08);transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s}
 .pin.r1,.pin.r3{align-self:flex-end;transform:rotate(var(--rot))}.pin.r2,.pin.r4{align-self:flex-start;transform:rotate(var(--rot))}
 .pin:hover{box-shadow:0 26px 60px rgba(0,0,0,.14)}
 .pin.solid{background:var(--acc);color:#fff;border-color:var(--acc);box-shadow:0 22px 50px rgba(138,28,43,.35)}
@@ -390,6 +390,20 @@ body.modal-open .hero video,body.modal-open .proofband{filter:blur(6px) saturate
 .dsel{position:absolute;top:6px;left:6px;height:calc(100% - 12px);width:64px;border-radius:99px;background:linear-gradient(180deg,#a02538,#7a1424);box-shadow:0 8px 18px rgba(138,28,43,.35),inset 0 1px 0 rgba(255,255,255,.35);transition:left .4s cubic-bezier(.2,.7,.2,1),width .4s;z-index:0}
 @media(max-width:980px){.dock{display:none}}
 @media(prefers-reduced-motion:reduce){.dock a:hover{transform:none}.badge,.flabel.tr{animation:none}}
+
+/* ---- mascot game (patch18) ---- */
+.pin .ledge{position:absolute;left:6px;right:6px;top:-7px;height:11px;border-radius:8px;background:linear-gradient(180deg,#fff,#efe3e5);border:1px solid rgba(255,255,255,.95);box-shadow:0 5px 10px rgba(138,28,43,.18),inset 0 -3px 5px rgba(0,0,0,.08),inset 0 1px 0 #fff;transform:rotate(calc(var(--rot,0deg)*-1))}
+.pin.solid .ledge{background:linear-gradient(180deg,#b23445,#8a1c2b);border-color:rgba(255,255,255,.35)}
+.pin .tack{top:-13px;z-index:2}
+#mg{position:absolute;inset:0;pointer-events:none;z-index:5;overflow:visible}
+.mg-spr{position:absolute;background-repeat:no-repeat;will-change:transform}
+.mg-sh{position:absolute;background:radial-gradient(ellipse,rgba(90,20,30,.28),transparent 70%);border-radius:50%;width:64px;height:11px;transform:translateX(-50%)}
+.mg-tag{position:absolute;left:0;top:0;background:rgba(255,255,255,.94);border:1px solid rgba(138,28,43,.3);border-radius:99px;padding:4px 10px;font:700 10px/1 'JetBrains Mono',monospace;color:var(--acc);box-shadow:0 8px 18px rgba(0,0,0,.12);white-space:nowrap;opacity:0;transition:opacity .4s;will-change:transform}
+#mg.tagon .mg-tag{opacity:1}
+.mg-dust,.mg-spark{position:absolute;width:7px;height:7px;border-radius:50%;background:rgba(160,90,100,.5);animation:mgpuff .5s ease-out forwards;pointer-events:none}
+.mg-spark{width:4px;height:4px;background:rgba(200,140,90,.85)}
+@keyframes mgpuff{to{transform:translate(var(--dx),var(--dy,-14px)) scale(.2);opacity:0}}
+@media(max-width:980px){#mg{display:none}}
 </style></head><body>
 
 <a class="skip" href="#about">Skip to content</a>
@@ -452,7 +466,7 @@ body.modal-open .hero video,body.modal-open .proofband{filter:blur(6px) saturate
   </div>
   <div class="rright" id="rright">
     <svg class="rpath" id="rpath" aria-hidden="true"><defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#111"/></marker></defs><path id="rline" d="" fill="none" stroke="#111" stroke-width="1.5" stroke-dasharray="5 6" marker-end="url(#arr)"/></svg>
-    <article class="pin r1 solid" data-rv="right"><span class="tack"></span><div class="xnum">01</div><h3>WordPress Development</h3><p>Building fast, responsive WordPress and Elementor Pro sites: custom and child themes, WooCommerce stores, migrations, staging to production, Core Web Vitals.</p></article><article class="pin r2" data-rv="left"><span class="tack"></span><div class="xnum">02</div><h3>Technical SEO</h3><p>Audits, JSON-LD structured data, XML sitemaps, crawl and indexation fixes, internal linking, local and multi-location SEO with Google Business Profile.</p></article><article class="pin r3" data-rv="right"><span class="tack"></span><div class="xnum">03</div><h3>AEO / GEO</h3><p>Making brands the cited answer in ChatGPT, Perplexity, Claude, Gemini, Copilot and Google AI Overviews. Citation tracking in Profound, AI-crawler management, llms.txt.</p></article><article class="pin r4" data-rv="left"><span class="tack"></span><div class="xnum">04</div><h3>Automation & AI</h3><p>Node.js and Claude API content engines, programmatic SEO, Google Indexing API, 25+ API integrations, automated QA and validation pipelines.</p></article>
+    <article class="pin r1 solid" data-rv="right"><span class="ledge"></span><span class="tack"></span><div class="xnum">01</div><h3>WordPress Development</h3><p>Building fast, responsive WordPress and Elementor Pro sites: custom and child themes, WooCommerce stores, migrations, staging to production, Core Web Vitals.</p></article><article class="pin r2" data-rv="left"><span class="ledge"></span><span class="tack"></span><div class="xnum">02</div><h3>Technical SEO</h3><p>Audits, JSON-LD structured data, XML sitemaps, crawl and indexation fixes, internal linking, local and multi-location SEO with Google Business Profile.</p></article><article class="pin r3" data-rv="right"><span class="ledge"></span><span class="tack"></span><div class="xnum">03</div><h3>AEO / GEO</h3><p>Making brands the cited answer in ChatGPT, Perplexity, Claude, Gemini, Copilot and Google AI Overviews. Citation tracking in Profound, AI-crawler management, llms.txt.</p></article><article class="pin r4" data-rv="left"><span class="ledge"></span><span class="tack"></span><div class="xnum">04</div><h3>Automation & AI</h3><p>Node.js and Claude API content engines, programmatic SEO, Google Indexing API, 25+ API integrations, automated QA and validation pipelines.</p></article>
   </div>
 </div></section>
 
@@ -534,6 +548,66 @@ var dock=document.getElementById('dock'),dsel=document.getElementById('dsel');if
 var secs=[].slice.call(document.querySelectorAll('section[id],header[id]'));var sio=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting)setD(x.target.id)})},{rootMargin:'-45% 0px -50% 0px'});secs.forEach(function(s){sio.observe(s)});setD('home');}
 var dlg=document.getElementById('csd');if(dlg){new MutationObserver(function(){document.body.classList.toggle('modal-open',dlg.open)}).observe(dlg,{attributes:true,attributeFilter:['open']});}
 if(!rm){var layers=[].slice.call(document.querySelectorAll('.jtree,.rpath'));var tick=0;function par(){tick=0;var vh=innerHeight;layers.forEach(function(l){var r=l.parentElement.getBoundingClientRect();var p=(r.top+r.height/2-vh/2)/vh;l.style.transform='translate3d(0,'+(p*28).toFixed(1)+'px,0)';});}window.addEventListener('scroll',function(){if(!tick)tick=requestAnimationFrame(par)},{passive:true});par();}
+})();
+(function(){if(matchMedia('(prefers-reduced-motion:reduce)').matches||innerWidth<981||(navigator.connection&&navigator.connection.saveData))return;
+var host=document.getElementById('rright');if(!host)return;
+var META={'d-run':[240,240],'d-jump':[136,240],'d-cling':[136,240],'p-run':[150,150],'p-jump':[129,150],'p-cling':[221,150]};
+var G=2600,FALL=1.6,Wp=[],started=false,mg,sec=document.getElementById('expertise');
+function fx(cls,x,y,n,spread,dy){for(var i=0;i<n;i++){var d=document.createElement('div');d.className=cls;d.style.left=(x+(Math.random()*spread-spread/2))+'px';d.style.top=(y-4)+'px';d.style.setProperty('--dx',(Math.random()*36-18)+'px');if(dy)d.style.setProperty('--dy',dy);mg.appendChild(d);setTimeout(function(el){return function(){el.remove()}}(d),520);}}
+function way(){Wp=[];var hr=host.getBoundingClientRect();[].forEach.call(host.querySelectorAll('.pin'),function(p){var l=p.querySelector('.ledge');var r=(l||p).getBoundingClientRect();Wp.push({x:r.left-hr.left+r.width/2,y:r.top-hr.top-2,el:p});});}
+function Ent(pre,h){var el=document.createElement('div');el.className='mg-spr';var sh=document.createElement('div');sh.className='mg-sh';mg.appendChild(sh);mg.appendChild(el);
+this.el=el;this.sh=sh;this.pre=pre;this.h=h;this.cur=0;this.x=0;this.y=0;this.vx=0;this.vy=0;this.on=true;this.st='idle';this.stT=0;this.fr=0;this.ft=0;this.face=1;this.sk='';this.w=0;this.log=[];}
+Ent.prototype.setSprite=function(n){if(this.sk===n)return;this.sk=n;var m=META[this.pre+n];var sc=this.h/m[1];this.w=m[0]*sc;this.el.style.width=this.w+'px';this.el.style.height=this.h+'px';this.el.style.backgroundImage='url(assets/spr/'+this.pre+n+'.png)';this.el.style.backgroundSize=(m[0]*8*sc)+'px '+this.h+'px';};
+Ent.prototype.showFrame=function(fr){var m=META[this.pre+this.sk];var sc=this.h/m[1];this.el.style.backgroundPosition=(-Math.max(0,Math.min(7,fr))*m[0]*sc)+'px 0';};
+Ent.prototype.go=function(st){if(this.st!==st){this.st=st;this.stT=0;this.log.push(st);if(this.log.length>30)this.log.shift();}};
+Ent.prototype.launchUp=function(){var n=this.cur-1;if(n<0)return;var B=Wp[n];this.tgt=n;this.climb=true;this.on=false;
+this.vx=(B.x+(Wp[this.cur].x<B.x?-1:1)*171-this.x)*2.2;this.vy=-540;this.go('jump');};
+Ent.prototype.step=function(dt,target){this.stT+=dt;var t=this;var NB=Wp.length;if(!NB)return;
+var want=Math.round(Math.max(0,Math.min(NB-1,target)));
+if(t.st==='idle'||t.st==='run'){t.on=true;t.y=Wp[t.cur].y;
+ if(want>t.cur)t.go('crouch');else if(want<t.cur)t.launchUp();
+ else{t.setSprite('run');t.ft+=dt;if(t.ft>0.10){t.ft=0;t.fr=(t.fr+1)%8;}t.showFrame(t.fr);}}
+if(t.st==='crouch'){t.setSprite('jump');t.showFrame(0);
+ if(t.stT>0.09){var n=t.cur+1,A=Wp[t.cur],B=Wp[n];t.vx=(B.x-A.x)/0.55;t.vy=-620;t.on=false;t.go('jump');t.tgt=n;}}
+if(t.st==='jump'||t.st==='fall'||t.st==='kick'){
+ t.vy+=G*(t.vy>0?FALL:1)*dt;t.x+=t.vx*dt;var py=t.y;t.y+=t.vy*dt;
+ if(t.vy>0&&t.st==='jump')t.go('fall');
+ t.setSprite('jump');var ph=t.vy<-300?1:(t.vy<0?2:(t.vy<400?4:6));t.showFrame(t.st==='kick'?2:ph);
+ var B=Wp[t.tgt];
+ if(t.climb&&t.st!=='kick'&&t.vy>-420){var face=B.x+(t.x<B.x?-1:1)*171;
+  if(Math.abs(t.x-face)<24&&t.y>B.y+4){t.x=face;t.vx=0;t.go('slide');}}
+ if(t.vy>0&&py<=B.y&&t.y>=B.y&&Math.abs(t.x-B.x)<190){t.y=B.y;t.vy=0;t.vx=0;t.on=true;t.cur=t.tgt;t.climb=false;t.go('land');
+  fx('mg-dust',B.x,B.y+4,5,40);var el=B.el;el.style.transition='transform .18s cubic-bezier(.3,1.6,.4,1)';el.style.transform='rotate(var(--rot)) translateY(4px)';setTimeout(function(){el.style.transform=''},190);}
+ if(t.y>Wp[NB-1].y+420){t.y=Wp[t.cur].y;t.x=Wp[t.cur].x;t.vy=0;t.vx=0;t.on=true;t.climb=false;t.go('idle');}}
+if(t.st==='slide'){t.setSprite('cling');t.ft+=dt;if(t.ft>0.06){t.ft=0;t.fr=(t.fr+1)%8;fx('mg-spark',t.x,t.y-t.h*0.4,1,8,'-6px');}t.showFrame(t.fr);
+ t.vy=Math.min(t.vy+G*dt,120);t.y+=t.vy*dt;
+ if(t.stT>0.16){var B=Wp[t.tgt];t.y=Math.min(t.y,B.y+60);t.vx=(B.x-t.x)*3.0;t.vy=-940;t.go('kick');}}
+if(t.st==='land'){t.setSprite('jump');t.showFrame(7);if(t.stT>0.10)t.go('idle');}
+t.face=t.vx>10?1:(t.vx<-10?-1:t.face);
+var sq=1,sw=1;
+if(t.st==='crouch'){sq=0.85;sw=1.1}else if(t.st==='land'){sq=0.82;sw=1.14}else if(!t.on&&Math.abs(t.vy)>500){sq=1.07;sw=0.95}
+t.el.style.transform='translate('+(t.x-t.w/2)+'px,'+(t.y-t.h+4)+'px) scaleX('+(t.face*sw)+') scaleY('+sq+')';
+var gb=Wp[Math.max(0,Math.min(NB-1,t.on?t.cur:t.tgt||0))];
+t.sh.style.left=t.x+'px';t.sh.style.top=(gb.y+6)+'px';var air=Math.min(1,Math.abs(gb.y-t.y)/220);t.sh.style.transform='translateX(-50%) scale('+(1-air*0.55)+')';};
+var Dn,Pp,tag,lastT=0,sched=0;
+function start(){if(started)return;started=true;mg=document.createElement('div');mg.id='mg';host.appendChild(mg);way();
+Dn=new Ent('d-',96);Pp=new Ent('p-',58);Dn.setSprite('run');Pp.setSprite('run');
+Dn.x=Wp[0].x;Dn.y=Wp[0].y;Pp.x=Wp[0].x-60;Pp.y=Wp[0].y;
+tag=document.createElement('div');tag.className='mg-tag';tag.textContent='DIANNA AI';mg.appendChild(tag);mg.classList.add('tagon');setTimeout(function(){mg.classList.remove('tagon')},3500);
+host.addEventListener('mouseenter',function(){mg.classList.add('tagon')});host.addEventListener('mouseleave',function(){mg.classList.remove('tagon')});
+window.addEventListener('resize',way);setTimeout(way,700);setTimeout(way,2200);
+lastT=performance.now();sched=requestAnimationFrame(tick);
+window.__mg={D:Dn,P:Pp,Wp:Wp,tick:tick,way:way};}
+function prog(){var r=sec.getBoundingClientRect();var vh=innerHeight;var p=(vh*0.8-r.top)/(r.height+vh*0.6);return Math.max(0,Math.min(1,p));}
+function tick(now){var dt=Math.min(0.05,(now-lastT)/1000);lastT=now;if(!isFinite(dt)||dt<=0)dt=0.016;
+var r=sec.getBoundingClientRect();
+if(r.bottom<-100||r.top>innerHeight+100||document.hidden){sched=requestAnimationFrame(tick);return;}
+var target=prog()*(Wp.length-1);
+Dn.step(dt,target);Pp.step(dt,Math.max(0,Dn.cur-0.6));
+tag.style.transform='translate('+(Dn.x-32)+'px,'+(Dn.y-Dn.h-20)+'px)';
+sched=requestAnimationFrame(tick);}
+addEventListener('scroll',function(){if(started){cancelAnimationFrame(sched);tick(performance.now());}},{passive:true});
+var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){start();io.disconnect();}})},{rootMargin:'200px'});io.observe(sec);
 })();
 (function(){var wrap=document.querySelector('.jwrap'),svg=document.getElementById('jtree'),trunk=document.getElementById('jtrunk'),gb=document.getElementById('jbr'),gt=document.getElementById('jtw');if(!wrap||!svg)return;
 function draw(){var W=wrap.getBoundingClientRect();svg.setAttribute('viewBox','0 0 '+W.width+' '+W.height);var mob=innerWidth<761;var tx=mob?14:W.width/2;var dots=[].map.call(wrap.querySelectorAll('.jdot'),function(d){var r=d.getBoundingClientRect();return {x:r.left-W.left+r.width/2,y:r.top-W.top+r.height/2}});if(!dots.length)return;

@@ -55,16 +55,16 @@ def tex(u,v,tile_off,tile_w):   # sample the atlas tile: u,v in 0..1 of the tile
 # front image: u = FACE_CX + (x-hc)*sx ; v(bottom-up) = 1 - box1/H - (1-z)*bh
 uF=m('ADD',m('MULTIPLY',m('SUBTRACT',Y,hc),sx),FACE_CX); vF=m('SUBTRACT',1-box[1]/H,m('MULTIPLY',m('SUBTRACT',1.0,Z),bh))
 front=tex(uF,vF,0,W)
-uB=m('ADD',m('MULTIPLY',m('SUBTRACT',hc,Y),sx),FACE_CX); back=tex(uB,vF,W,W)     # back tile, mirrored
+# back: clean puffer tile + hair (the render's zipper/belts must not mirror onto the back)
 # side patches (tiled): puffer for the body, hair for the head
-uP=m('FRACT',m('MULTIPLY',X,2.2)); vP=m('FRACT',m('MULTIPLY',Z,2.5)); puff=tex(m('ADD',m('MULTIPLY',uP,140/W),300/W),m('SUBTRACT',1-250/H,m('MULTIPLY',vP,190/H)),0,W)
-uH=m('FRACT',m('MULTIPLY',X,1.5)); vH=m('SUBTRACT',1-70/H,m('MULTIPLY',m('DIVIDE',m('SUBTRACT',1.0,Z),.22),220/H)); hair=tex(m('ADD',m('MULTIPLY',uH,60/W),135/W),vH,0,W)
+uP=m('FRACT',m('MULTIPLY',X,2.2)); vP=m('FRACT',m('MULTIPLY',Z,2.5)); puff=tex(m('ADD',m('MULTIPLY',uP,100/W),310/W),m('SUBTRACT',1-262/H,m('MULTIPLY',vP,135/H)),0,W)   # pure puffer area, no hand/belt edge
+uH=m('FRACT',m('MULTIPLY',m('ADD',X,Y),1.2)); vH=m('SUBTRACT',1-70/H,m('MULTIPLY',m('FRACT',m('MULTIPLY',Z,3.0)),220/H)); hair=tex(m('ADD',m('MULTIPLY',uH,60/W),135/W),vH,0,W)
 isHead=m('GREATER_THAN',Z,.78)
 mixS=node('ShaderNodeMix',data_type='RGBA'); ln.new(isHead,mixS.inputs[0]); ln.new(puff,mixS.inputs[6]); ln.new(hair,mixS.inputs[7]); side=mixS.outputs[2]
 # blend by normal: front (NY<-.15) / back (NY>.15) / side
-fF=m('MULTIPLY',m('SUBTRACT',m('MULTIPLY',NX,-1.0),.1),2.5,clamp=True); fB=m('MULTIPLY',m('SUBTRACT',NX,.1),2.5,clamp=True)   # PROBE: front faces -X
+fF=m('MULTIPLY',m('SUBTRACT',m('MULTIPLY',NX,-1.0),.25),2.0,clamp=True); fB=m('MULTIPLY',m('SUBTRACT',NX,.1),2.5,clamp=True)   # PROBE: front faces -X
 mix1=node('ShaderNodeMix',data_type='RGBA'); ln.new(fF,mix1.inputs[0]); ln.new(side,mix1.inputs[6]); ln.new(front,mix1.inputs[7])
-mix2=node('ShaderNodeMix',data_type='RGBA'); ln.new(fB,mix2.inputs[0]); ln.new(mix1.outputs[2],mix2.inputs[6]); ln.new(back,mix2.inputs[7])
+mix2=node('ShaderNodeMix',data_type='RGBA'); ln.new(fB,mix2.inputs[0]); ln.new(mix1.outputs[2],mix2.inputs[6]); ln.new(side,mix2.inputs[7])
 # hands: forward-most 14% in the arm band -> skin
 armZ=m('MULTIPLY',m('GREATER_THAN',Z,.5),m('LESS_THAN',Z,.86)); arm=m('MULTIPLY',m('LESS_THAN',X,.3),armZ)   # forward arms: sleeves, not the face projection
 mixA=node('ShaderNodeMix',data_type='RGBA'); ln.new(arm,mixA.inputs[0]); ln.new(mix2.outputs[2],mixA.inputs[6]); ln.new(puff,mixA.inputs[7])

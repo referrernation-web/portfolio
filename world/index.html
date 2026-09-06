@@ -389,7 +389,7 @@ function loadFigures(){
   root.updateMatrixWorld(true);var bb=new THREE.Box3().setFromObject(root),sz=bb.getSize(new THREE.Vector3()),c=bb.getCenter(new THREE.Vector3()),sc=FIG.kimH/sz.y;
   root.scale.setScalar(sc);root.position.set(-c.x*sc,-bb.min.y*sc+FIG.kimY,-c.z*sc+FIG.kimZ);
   var old=mesh.material;mesh.material=new THREE.MeshStandardMaterial({vertexColors:!!mesh.geometry.attributes.color,map:old.map||null,color:0xffffff,roughness:.95,metalness:0,skinning:true});mesh.castShadow=true;mesh.frustumCulled=false;
-  var shell=new THREE.SkinnedMesh(mesh.geometry,SHELLM.clone());shell.material.skinning=true;shell.userData.shell=true;shell.frustumCulled=false;shell.scale.setScalar(1.03);mesh.parent.add(shell);shell.bind(mesh.skeleton,mesh.bindMatrix); // fur shell rides the same skeleton
+  // ponytail: no fur shell on the rigged dog (fur detail + AO are baked into the texture; the shell drew streaks over the rider)
   var B={};root.traverse(function(x){if(x.isBone){B[x.name]=x;x.userData.rest=x.quaternion.clone()}});FIG.B=B;
   var hats=Object.keys(HATM).map(function(k){return HATM[k]});DOG.children.forEach(function(ch){if(ch!==FIG.dia&&hats.indexOf(ch)<0&&!ch.userData.dianna)ch.visible=false});
   FIG.kim=root;DOG.add(root);

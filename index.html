@@ -13,7 +13,7 @@ Ent.prototype.setSprite=function(n){var key=this.pre+n;if(!READY[key]){if(this.s
 else if(want<t.cur){if(-back>=2)t.launchDirect(want);else{t.fast=false;t.launchUp();}}
 else if(t.hopReq){t.hopReq=false;t.tgt=t.cur;t.climb=false;t.vx=0;t.vy=-430;t.on=false;t.fast=false;t.go('jump');}
 else if(t.sit){if(t.bouncy&&!t.sleepy){t.setSprite('run');t.showFrame(0);}else{t.setSprite('jump');t.showFrame(t.sleepy?7:0);}}
-else if(t.pat){var span=140;t.x+=t.pdir*62*dt;if(t.x>Wp[t.cur].x+span){t.x=Wp[t.cur].x+span;t.pdir=-1;}if(t.x<Wp[t.cur].x-span){t.x=Wp[t.cur].x-span;t.pdir=1;}t.face=t.pdir;t.walk(dt,12);}
+else if(t.pat){var span=140;if(t.pause>0){t.pause-=dt;t.setSprite('run');t.showFrame(0);}else{t.x+=t.pdir*62*dt;if(t.x>Wp[t.cur].x+span){t.x=Wp[t.cur].x+span;t.pdir=-1;t.pause=1.2+Math.random()*1.4;}if(t.x<Wp[t.cur].x-span){t.x=Wp[t.cur].x-span;t.pdir=1;t.pause=1.2+Math.random()*1.4;}t.face=t.pdir;t.walk(dt,12);}}
 else if(t.seek!==undefined&&t.seek!==null){var dx=t.seek-t.x;if(Math.abs(dx)>6){t.x+=Math.sign(dx)*Math.min(Math.abs(dx),110*dt);t.face=dx>0?1:-1;t.walk(dt,12);}else if(t.bouncy){t.setSprite('run');t.showFrame(0);}else{t.setSprite('jump');t.showFrame(0);}}
 else{if(t.bouncy){t.setSprite('run');t.showFrame(0);}else{t.setSprite('run');t.ft+=dt;if(t.ft>0.10){t.ft=0;t.fr=(t.fr+1)%8;}t.showFrame(t.fr);}}}
 if(t.st==='crouch'){t.setSprite('jump');t.showFrame(0);if(t.stT>(t.fast?0.02:0.09)){var n=(t.longTo!=null)?t.longTo:t.cur+1,A=Wp[t.cur],B=Wp[n];var dy=Math.max(0,B.y-A.y);var T=(t.fast?0.38:0.55)+dy/1400;t.vx=(B.x+(t.off||0)-t.x)/T;t.vy=-620;t.on=false;t.climb=false;t.go('jump');t.tgt=n;t.longTo=null;}}

@@ -43,10 +43,41 @@ canvas#c{display:block;width:100%;height:100%;touch-action:none;cursor:grab}canv
 .tags{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 12px}.tags span{background:#fff;border:1px solid #e6dccf;border-radius:99px;padding:5px 10px;font:600 11px 'JetBrains Mono',monospace}
 .cta{display:inline-block;background:var(--maroon);color:#fff;text-decoration:none;border-radius:99px;padding:11px 18px;font-weight:800;font-size:13px;box-shadow:0 8px 16px rgba(138,28,43,.3),inset 0 -3px 0 rgba(0,0,0,.25);margin:6px 8px 6px 0}
 .cta.alt2{background:#fff;color:var(--ink);box-shadow:inset 0 -3px 0 rgba(0,0,0,.1);border:1px solid #ddd}
-#prog{position:fixed;left:16px;bottom:18px;z-index:5;display:flex;gap:6px;flex-wrap:wrap;max-width:320px;pointer-events:none}
+#prog{display:none!important;position:fixed;left:16px;bottom:18px;z-index:5;display:flex;gap:6px;flex-wrap:wrap;max-width:320px;pointer-events:none}
 #prog span{background:rgba(251,247,241,.88);border-radius:99px;padding:6px 10px;font:700 10px 'JetBrains Mono',monospace;letter-spacing:.05em;color:#777;box-shadow:0 4px 10px rgba(0,0,0,.12)}
 #prog span.done{background:var(--maroon);color:#fff}
 @media(pointer:coarse){#prog{left:16px;top:64px;bottom:auto;max-width:190px}}
+#obj{position:fixed;left:16px;top:74px;z-index:5;width:172px;background:rgba(251,247,241,.9);border-radius:14px;padding:10px 12px;box-shadow:0 8px 20px rgba(0,0,0,.14),inset 0 -3px 0 rgba(0,0,0,.06);pointer-events:none;font:600 11px/1.5 'JetBrains Mono',monospace;color:#333}
+#obj h4{margin:0 0 6px;font:800 10px Inter;letter-spacing:.14em;color:#8a1c2b}
+#obj div{display:flex;gap:6px;align-items:center;color:#777}#obj div.done{color:#111}#obj div i{width:12px;height:12px;border-radius:50%;border:2px solid #bbb;display:inline-block;flex:none;font-style:normal;font-size:8px;line-height:9px;text-align:center}#obj div.done i{background:#8a1c2b;border-color:#8a1c2b;color:#fff}
+#obj .next{margin-top:8px;padding-top:6px;border-top:1px dashed #d9cbb9;color:#8a1c2b}
+#sub{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);z-index:6;max-width:min(680px,90vw);background:rgba(17,17,17,.78);color:#fff;border-radius:12px;padding:10px 16px;font:600 14px/1.4 Inter;text-align:center;display:none;pointer-events:none}
+#sub.on{display:block}
+#obj button{pointer-events:auto;margin-top:8px;width:100%;background:#8a1c2b;color:#fff;border:0;border-radius:99px;padding:8px 10px;font:800 11px Inter;letter-spacing:.06em;cursor:pointer;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25)}
+#obj button.on{background:#111}
+.form input,.form textarea{width:100%;box-sizing:border-box;border:1px solid #ddd;border-radius:10px;padding:9px 11px;font:500 13px Inter;margin:4px 0 8px;background:#fff;color:#111}
+.form textarea{min-height:80px;resize:vertical}
+.form label{font:700 11px 'JetBrains Mono',monospace;color:#8a1c2b;letter-spacing:.08em}
+#status{position:fixed;left:16px;bottom:16px;z-index:5;display:flex;gap:8px;pointer-events:none;font:600 11px 'JetBrains Mono',monospace}
+#status span{background:rgba(17,17,17,.78);color:#fff;border-radius:8px;padding:6px 10px}
+#toasts{position:fixed;left:50%;bottom:64px;transform:translateX(-50%);z-index:7;display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none}
+.toast{background:#fbf7f1;color:#111;border-radius:12px;padding:9px 14px;font:700 12px Inter;box-shadow:0 10px 24px rgba(0,0,0,.22),inset 0 -3px 0 rgba(0,0,0,.08);animation:tin .3s ease}
+@keyframes tin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+#tip{position:fixed;z-index:8;pointer-events:none;background:#111;color:#fff;border-radius:8px;padding:6px 10px;font:600 11px Inter;max-width:220px;display:none;transform:translate(14px,14px)}
+#tip small{display:block;color:#bbb;font-weight:500}
+#fade{position:fixed;inset:0;background:#0f1518;opacity:0;pointer-events:none;z-index:15;transition:opacity .35s}
+#menu{position:fixed;inset:0;z-index:18;display:none;align-items:center;justify-content:center;background:rgba(17,17,17,.45);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+#menu.on{display:flex}
+#menu .card{text-align:left;max-width:560px}
+#menu h2{margin:0 0 4px;font-size:26px;font-weight:900}
+#menu .row{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+#menu button{background:#fff;border:1px solid #ddd;border-bottom-width:3px;border-radius:10px;padding:9px 13px;font:700 12px Inter;cursor:pointer}
+#menu button.on{background:#8a1c2b;color:#fff;border-color:#8a1c2b}
+#menu .go{margin-top:6px}
+#menu .keys{justify-content:flex-start}
+#map{cursor:pointer;pointer-events:auto}
+@media(pointer:coarse){#status{display:none}#obj{top:64px;width:150px;font-size:10px}}
+@media(pointer:coarse) and (orientation:landscape){#panel{top:14px;bottom:14px;height:auto;width:44%;right:14px}#obj{display:none}#hint{bottom:14px}#map{width:110px;height:110px}}
 #stick{position:fixed;left:26px;bottom:26px;width:120px;height:120px;border-radius:50%;background:rgba(17,17,17,.18);z-index:5;display:none;touch-action:none}
 #stick i{position:absolute;left:35px;top:35px;width:50px;height:50px;border-radius:50%;background:rgba(251,247,241,.95);box-shadow:0 6px 14px rgba(0,0,0,.25)}
 #jump{position:fixed;right:26px;bottom:26px;width:70px;height:70px;border-radius:50%;background:var(--maroon);color:#fff;border:0;font:800 12px Inter;z-index:5;display:none;box-shadow:0 8px 16px rgba(0,0,0,.3),inset 0 -4px 0 rgba(0,0,0,.25)}
@@ -59,12 +90,21 @@ canvas#c{display:block;width:100%;height:100%;touch-action:none;cursor:grab}canv
 <canvas id="map" width="300" height="300"></canvas>
 <div id="hint"></div>
 <div id="prog"></div>
+<div id="obj"><h4>OBJECTIVES</h4><div id="objl"></div><div class="next" id="objn"></div><button id="tourBtn">&#9654; STORY TOUR</button></div>
+<div id="sub"></div>
+<div id="status"><span id="stLoc">MANILA</span><span id="stSpd">0 m/s</span><span id="stKey">WASD · drag to pan</span></div>
+<div id="toasts"></div><div id="tip"></div><div id="fade"></div>
+<div id="menu"><div class="card">
+<h2>Paused</h2><p>Settings are saved on this device.</p>
+<div class="row"><button id="mRes">Resume</button><button id="mSnd">Sound</button><button id="mEdge">Edge scroll</button><button id="mVoice">Voice</button><button id="mQ">Quality: auto</button><button id="mTour">Restart</button><a class="go" href="../" style="text-decoration:none;display:inline-block">Classic resume</a></div>
+<div class="keys"><span>W A S D / arrows = move on screen</span><span>SHIFT boost</span><span>SPACE jump</span><span>ENTER / E / click = use pad</span><span>Q / E rotate camera · C reset</span><span>H center on Kimpoy · B bark</span><span>Double-click ground = walk there</span><span>Drag / right-drag = pan · wheel = zoom</span><span>Minimap: click = peek · double-click = teleport</span><span>ESC menu · F1 help · L mute · R respawn</span><span>Gamepad: stick move, A jump, X use, RT boost, Start menu</span></div>
+</div></div>
 <aside id="panel"><header><div><em id="pk"></em><h2 id="pt"></h2></div><button id="px" aria-label="Close">×</button></header><div class="body" id="pb"></div></aside>
 <div id="stick"><i></i></div><button id="jump">JUMP</button>
 <div id="load"><div class="card">
 <h1>Mark's <span>World</span></h1>
 <p>Dianna rides Kimpoy across the wonders of the world. Every landmark is one part of my resume. Drive in and the sign opens. Plow through the letters, bowl the pins, kick the coconuts.</p>
-<div class="keys"><span>W A S D = direction on screen</span><span>SHIFT boost</span><span>SPACE jump</span><span>ENTER open pad</span><span>H bark</span><span>R respawn</span><span>L sound</span><span>&#127918; gamepad</span></div>
+<div class="keys"><span>W A S D = direction on screen</span><span>SHIFT boost</span><span>SPACE jump</span><span>ENTER open pad</span><span>Q/E rotate</span><span>double-click = walk there</span><span>ESC menu</span><span>R respawn</span><span>L sound</span><span>&#127918; gamepad</span></div>
 <div id="bar"><i></i></div>
 <button class="go" id="go" disabled>Loading…</button>
 <span class="alt">Prefer the classic page? <a href="../">Open the standard resume →</a></span>
@@ -73,22 +113,22 @@ canvas#c{display:block;width:100%;height:100%;touch-action:none;cursor:grab}canv
 <script>
 // ===== content (same facts as the classic resume) =====
 var DATA={
-home:{k:'MANILA · HOME',t:'Hi, I’m Mark Edcel Lopez',h:'<p>Full-stack developer based in Makati who also owns the SEO and AI-search results of the sites he builds. Five years across US, Canadian and Australian clients. One hire covering developer, SEO specialist and AEO specialist.</p><div class="stat"><div><b>#2</b><small>AI visibility, Coggno · Profound</small></div><div><b>2.7</b><small>avg. position, Bytown Bath · GSC</small></div><div><b>44/day</b><small>peak AI citations, Aire One</small></div><div><b>11</b><small>live client builds</small></div></div><p>Ride to each landmark: <b>Banaue</b> (journey), <b>Giza</b> (expertise), <b>Paris</b> (stack), <b>Boracay</b> (projects), <b>Rome</b> (certificates), <b>New York</b> (contact).</p><a class="cta" href="#" data-go="contact">Hire me</a><a class="cta alt2" href="../">Classic resume</a>'},
+home:{k:'MANILA · HOME',t:'Hi, I’m Mark Edcel Lopez',h:'<p>Full-stack developer based in Makati who also owns the SEO and AI-search results of the sites he builds. Five years across US, Canadian and Australian clients. One hire covering developer, SEO specialist and AEO specialist.</p><div class="stat"><div><b>#2</b><small>AI visibility, Coggno · Profound</small></div><div><b>2.7</b><small>avg. position, Bytown Bath · GSC</small></div><div><b>44/day</b><small>peak AI citations, Aire One</small></div><div><b>11</b><small>live client builds</small></div></div><p>Ride to each landmark: <b>Banaue</b> (journey), <b>Giza</b> (expertise), <b>Paris</b> (stack), <b>Boracay</b> (projects), <b>Rome</b> (certificates), <b>New York</b> (contact).</p><a class="cta" href="#" data-go="contact">Hire me</a><a class="cta alt2" href="../assets/Mark-Edcel-Lopez-Resume-2026.pdf" target="_blank" rel="noopener">Resume PDF</a><a class="cta alt2" href="../">Classic resume</a>'},
 journey:{k:'BANAUE RICE TERRACES · JOURNEY',t:'From Service Crew to Search Engineer',h:'<p>“Jensen Huang started as a dishwasher at Denny’s before building NVIDIA. I started as a service crew at Greenwich before building ReferNation.”</p><ul class="tl"><li><i>2015</i><b>Service Crew, Greenwich Pizza</b>PESO Program. First job, first paycheck.</li><li><i>2016</i><b>Co-Founder & Project Lead, Craft Tech Design PH</b>First venture, client design projects from scratch.</li><li><i>2016–2022</i><b>Headhunter, Marche Recruitment</b>Six years placing healthcare, technical and sales talent in the UK, US and Australia.</li><li><i>2018–2023</i><b>B.E. Civil Engineering, University of Makati</b>Engineering discipline that became systems thinking for the web.</li><li><i>2020</i><b>Co-Founded ReferNation</b>Recruitment platform for Filipino BPO talent. PHP 3.6M platform value.</li><li><i>2022–2025</i><b>Accounts Receivable, Alorica</b>99.9% accuracy; company record 543 qualified hires in one month as top referrer.</li><li><i>2025</i><b>AEO & SEO Specialist, Coggno</b>95,000-page marketplace to #2 AI visibility; organic revenue $300 → $5,000 a day.</li><li><i>2026</i><b>Senior Web Developer, Bytown Bath · AEO Specialist, Futurebloom</b>Elementor Pro builds, multi-location SEO, monthly AEO for 9 accounts.</li></ul>'},
 expertise:{k:'GIZA · EXPERTISE',t:'Four pyramids, four things I do',h:'<h4>01 WordPress Development</h4><p>Fast, responsive WordPress and Elementor Pro sites: custom and child themes, WooCommerce, migrations, staging to production, Core Web Vitals.</p><h4>02 Technical SEO</h4><p>Audits, JSON-LD structured data, XML sitemaps, crawl and indexation fixes, internal linking, multi-location local SEO with Google Business Profile.</p><h4>03 AEO / GEO</h4><p>Making brands the cited answer in ChatGPT, Perplexity, Claude, Gemini, Copilot and Google AI Overviews. Citation tracking in Profound, AI-crawler management, llms.txt.</p><h4>04 Automation & AI</h4><p>Node.js and Claude API content engines, programmatic SEO, Google Indexing API, 25+ API integrations, automated QA pipelines.</p>'},
 skills:{k:'PARIS · TECHNICAL STACK',t:'Technologies I work with daily',h:'<h4>WordPress</h4><div class="tags"><span>WordPress</span><span>Elementor</span><span>WooCommerce</span><span>PHP</span><span>MySQL</span><span>Cloudflare</span></div><h4>SEO & Analytics</h4><div class="tags"><span>Search Console</span><span>GA4</span><span>Tag Manager</span><span>Semrush</span><span>Shopify</span><span>Lighthouse</span></div><h4>AEO / AI Search</h4><div class="tags"><span>ChatGPT</span><span>Claude</span><span>Gemini</span><span>Perplexity</span><span>JSON-LD</span><span>AI Crawlers</span></div><h4>Dev & Cloud</h4><div class="tags"><span>JavaScript</span><span>Node.js</span><span>React</span><span>Git</span><span>GitHub</span><span>Vercel</span></div>'},
 projects:{k:'BORACAY BOARDWALK · PROJECTS',t:'Work that defines the journey',h:''},
 certs:{k:'ROME · CERTIFICATIONS',t:'29 credentials in the Colosseum',h:'<p>26 Coursera certificates plus OnlineJobs.ph verification, all linked on the classic page.</p><h4>Engineering & PM</h4><p>Engineering Project Management Specialization (4 courses) · Project Management Principles and Practices Specialization (5 courses) · Project Management: The Basics for Success</p><h4>Business</h4><p>Fundamentals of Management · Finance for Non-Financial Professionals · Effective Problem-Solving and Decision-Making · The Art of Negotiation · Essentials of Entrepreneurship · Time Management</p><h4>Communication & English</h4><p>Communication in the 21st Century Workplace · High-Impact Business Writing · Improve Your English Communication Skills Specialization (5 courses) · English for Career Development · Career Success Specialization</p><h4>Verified</h4><p>OnlineJobs.ph ID Proof 70 · English C2 · IQ 118</p><a class="cta alt2" href="../#certifications">See every certificate ↗</a>'},
-contact:{k:'NEW YORK · CONTACT',t:'Let’s build something that gets found',h:'<p><b>Status:</b> open to opportunities, full-time, immediate start.<br><b>Region:</b> Makati, Philippines · full US ET/PT overlap · worldwide.</p><p><b>markedcel06@gmail.com</b><br>+63 916 688 1758</p><a class="cta" href="mailto:markedcel06@gmail.com">Email me</a><a class="cta alt2" href="https://www.linkedin.com/in/mark-edcel-lopez-513509216/" target="_blank" rel="noopener">LinkedIn</a><a class="cta alt2" href="https://www.onlinejobs.ph/jobseekers/info/4576592" target="_blank" rel="noopener">OnlineJobs.ph</a><a class="cta alt2" href="https://github.com/referrernation-web" target="_blank" rel="noopener">GitHub</a><a class="cta alt2" href="https://referrernation-web.github.io/proof/" target="_blank" rel="noopener">Case studies</a>'}
+contact:{k:'NEW YORK · CONTACT',t:'Let’s build something that gets found',h:'<p><b>Status:</b> open to opportunities, full-time, immediate start.<br><b>Region:</b> Makati, Philippines · full US ET/PT overlap · worldwide.</p><p><b>markedcel06@gmail.com</b><br>+63 916 688 1758</p><form class="form" action="https://formsubmit.co/markedcel06@gmail.com" method="POST" target="_blank"><input type="hidden" name="_subject" value="Mark&#39;s World contact"><label>NAME</label><input name="name" required placeholder="Your name"><label>EMAIL</label><input name="email" type="email" required placeholder="you@company.com"><label>MESSAGE</label><textarea name="message" required placeholder="What are we building?"></textarea><button class="cta" type="submit">Send message</button></form><a class="cta alt2" href="../assets/Mark-Edcel-Lopez-Resume-2026.pdf" target="_blank" rel="noopener">Download resume (PDF)</a><a class="cta alt2" href="mailto:markedcel06@gmail.com">Email</a><a class="cta alt2" href="https://www.linkedin.com/in/mark-edcel-lopez-513509216/" target="_blank" rel="noopener">LinkedIn</a><a class="cta alt2" href="https://www.onlinejobs.ph/jobseekers/info/4576592" target="_blank" rel="noopener">OnlineJobs.ph</a><a class="cta alt2" href="https://github.com/referrernation-web" target="_blank" rel="noopener">GitHub</a><a class="cta alt2" href="https://referrernation-web.github.io/proof/" target="_blank" rel="noopener">Case studies</a>'}
 };
 var PROJECTS=[
-['ReferNation.ai','refernation.ai','Recruitment platform I co-founded. PHP 3.6M platform value; partnerships with Alorica, Infosys, TDCX, Teleperformance.','https://refernation.ai'],
-['NPSKit','npskit.com','Programmatic AEO: 12,000+ AI citations within 30 days (Profound).','https://npskit.com'],
-['Hamuq','hamuq.com','Shopify buying-intent article program, 5 articles shipped in one week (Sept 2026).','https://hamuq.com'],
-['Coggno','coggno.com','#2 AI visibility for “free compliance audits”, 37.7% share (Profound, Dec 2025).','https://coggno.com'],
-['Bytown Bath','bytownbath.ca','Elementor Pro build; top 3 for “bathroom renovations ottawa”, avg. position 2.7.','https://bytownbath.ca'],
-['Aire One','aireone.com','Three-domain HVAC group; brand queries at 1.8–2.2, AI citations peaked 44/day.','https://aireone.com'],
-['Blazer2Role','blazer2role.com','Full GoHighLevel build: site, funnels, CRM, booking, nurture automation.','https://blazer2role.com']];
+['ReferNation.ai','refernation.ai','Recruitment platform I co-founded. PHP 3.6M platform value; partnerships with Alorica, Infosys, TDCX, Teleperformance.','https://refernation.ai',['PHP 3.6M','platform value','co-founder']],
+['NPSKit','npskit.com','Programmatic AEO: 12,000+ AI citations within 30 days (Profound).','https://npskit.com',['12,000+','AI citations in 30 days','Profound']],
+['Hamuq','hamuq.com','Shopify buying-intent article program, 5 articles shipped in one week (Sept 2026).','https://hamuq.com',['5 / week','articles shipped','Shopify + GSC, Sept 2026']],
+['Coggno','coggno.com','#2 AI visibility for “free compliance audits”, 37.7% share (Profound, Dec 2025).','https://coggno.com',['#2','AI visibility · 37.7% share','Profound, Dec 2025']],
+['Bytown Bath','bytownbath.ca','Elementor Pro build; top 3 for “bathroom renovations ottawa”, avg. position 2.7.','https://bytownbath.ca',['2.7','avg. position, bathroom renovations ottawa','Search Console, Aug 2026']],
+['Aire One','aireone.com','Three-domain HVAC group; brand queries at 1.8–2.2, AI citations peaked 44/day.','https://aireone.com',['44 / day','peak AI citations','GSC + AI export, Aug 2026']],
+['Blazer2Role','blazer2role.com','Full GoHighLevel build: site, funnels, CRM, booking, nurture automation.','https://blazer2role.com',['LIVE','GoHighLevel build in production','blazer2role.com']]];
 DATA.projects.h=PROJECTS.map(function(p){return '<div class="pj"><img src="../assets/img/thumb-'+p[1]+'.webp" alt=""><div><b>'+p[0]+'</b><small>'+p[2]+'</small><a href="'+p[3]+'" target="_blank" rel="noopener">Visit ↗</a></div></div>'}).join('')+'<p>Also: BestHumanize, PillowPays, Apollo Electric, The Beer Garage, Commercial Mortgage Connection, Gurley Leadership Solutions.</p><a class="cta alt2" href="https://referrernation-web.github.io/proof/" target="_blank" rel="noopener">Case studies with sources ↗</a>';
 
 // ===== world layout: stations = landmarks =====
@@ -103,7 +143,7 @@ var ST=[
 
 // ===== three setup =====
 var W=innerWidth,H=innerHeight,cv=document.getElementById('c');
-var R=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true,powerPreference:'high-performance'});R.setPixelRatio(Math.min(devicePixelRatio,1.75));R.setSize(W,H);R.outputEncoding=THREE.sRGBEncoding;
+var R;try{if(!window.WebGLRenderingContext)throw new Error('no webgl');R=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true,powerPreference:'high-performance'})}catch(err){document.querySelector('#load .card').innerHTML='<h1>Mark\'s <span>World</span></h1><p>This device can\'t run the 3D ride (WebGL is off or unsupported). The classic resume has everything.</p><a class="go" href="../" style="text-decoration:none;display:inline-block">Open the classic resume</a>';throw err}R.setPixelRatio(Math.min(devicePixelRatio,1.75));R.setSize(W,H);R.outputEncoding=THREE.sRGBEncoding;
 var S=new THREE.Scene();S.background=null;R.setClearColor(0x000000,0);S.fog=new THREE.Fog(0xcfe8f5,90,210);
 var CAM=new THREE.PerspectiveCamera(42,W/H,.5,400);
 S.add(new THREE.HemisphereLight(0xfff4e0,0x7a9a6a,.9));var sun=new THREE.DirectionalLight(0xffffff,.85);sun.position.set(40,70,20);S.add(sun);
@@ -132,10 +172,10 @@ var water=new THREE.Mesh(new THREE.PlaneGeometry(900,900),new THREE.MeshPhongMat
 // ===== helpers =====
 var M={};function mat(c){return M[c]||(M[c]=new THREE.MeshPhongMaterial({color:c,flatShading:true,shininess:8}))}
 var COL=[];// collision circles {x,z,r}
-function box(w,h,d,c,x,y,z,ry){var m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(c));m.position.set(x,y,z);if(ry)m.rotation.y=ry;S.add(m);return m}
-function cyl(rt,rb,h,c,x,y,z,seg){var m=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,seg||10),mat(c));m.position.set(x,y,z);S.add(m);return m}
+var OCC=[];function box(w,h,d,c,x,y,z,ry){var m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(c));m.position.set(x,y,z);if(ry)m.rotation.y=ry;S.add(m);OCC.push(m);return m}
+function cyl(rt,rb,h,c,x,y,z,seg){var m=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,seg||10),mat(c));m.position.set(x,y,z);S.add(m);OCC.push(m);return m}
 function cone(r,h,c,x,y,z,seg){return cyl(0,r,h,c,x,y,z,seg)}
-function sph(r,c,x,y,z){var m=new THREE.Mesh(new THREE.SphereGeometry(r,10,8),mat(c));m.position.set(x,y,z);S.add(m);return m}
+function sph(r,c,x,y,z){var m=new THREE.Mesh(new THREE.SphereGeometry(r,10,8),mat(c));m.position.set(x,y,z);S.add(m);OCC.push(m);return m}
 function ground(x,z){return hgt(x,z)}
 function tree(x,z,s){s=s||1;var y=ground(x,z);cyl(.25*s,.35*s,1.6*s,0x7a4b2a,x,y+.8*s,z,6);cone(1.5*s,3*s,0x2f7a3a,x,y+3*s,z,7);cone(1.1*s,2.4*s,0x3c9a48,x,y+4.5*s,z,7);COL.push({x:x,z:z,r:.9*s})}
 function palm(x,z){var y=ground(x,z);var t=cyl(.18,.3,5,0x9a6b3a,x,y+2.5,z,6);t.rotation.z=.12;for(var a=0;a<6;a++){var l=box(3,.12,.7,0x2f9a4a,x+Math.cos(a)*1.3,y+5,z+Math.sin(a)*1.3,-a);l.rotation.z=.35;}COL.push({x:x,z:z,r:.5})}
@@ -144,6 +184,8 @@ function label(txt,x,y,z,sub,scale){var c=document.createElement('canvas');c.wid
  var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,depthTest:false}));sp.position.set(x,y,z);var k=scale||1;sp.scale.set(10*k,(sub?3.1:2.1)*k,1);S.add(sp);return sp}
 function rr(q,x,y,w,h,r){q.beginPath();q.moveTo(x+r,y);q.arcTo(x+w,y,x+w,y+h,r);q.arcTo(x+w,y+h,x,y+h,r);q.arcTo(x,y+h,x,y,r);q.arcTo(x,y,x+w,y,r);q.closePath()}
 function sign(x,z,lines){var y=ground(x,z);cyl(.12,.15,3,0x7a4b2a,x,y+1.5,z,6);var c=document.createElement('canvas');c.width=512;c.height=64*lines.length+24;var q=c.getContext('2d');q.fillStyle='#d9b27a';rr(q,0,0,512,c.height,18);q.fill();q.fillStyle='#3a2410';q.font='700 40px JetBrains Mono, monospace';q.textAlign='left';lines.forEach(function(l,i){q.fillText(l,26,52+i*64)});var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;var m=new THREE.Mesh(new THREE.PlaneGeometry(6,6*c.height/512),new THREE.MeshBasicMaterial({map:t,side:THREE.DoubleSide}));m.position.set(x,y+3.2,z);m.lookAt(0,y+3.2,0);m.rotation.y+=Math.PI;S.add(m);m.userData.face=true}
+function receipt(x,z,r){var y=ground(x,z);var c=document.createElement('canvas');c.width=512;c.height=300;var q=c.getContext('2d');q.fillStyle='#fbf7f1';rr(q,0,0,512,300,26);q.fill();q.fillStyle='#8a1c2b';q.fillRect(0,0,512,14);q.font='900 96px Inter,sans-serif';q.fillStyle='#111';q.textAlign='center';q.fillText(r[0],256,130);q.font='700 30px Inter,sans-serif';q.fillStyle='#333';q.fillText(r[1],256,190);q.font='600 24px JetBrains Mono,monospace';q.fillStyle='#8a1c2b';q.fillText('RECEIPT · '+r[2],256,250);q.font='600 22px JetBrains Mono,monospace';q.fillStyle='#777';q.fillText('VERIFIED SOURCE',256,285);
+ var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;var m=new THREE.Mesh(new THREE.PlaneGeometry(5.2,3.05),new THREE.MeshBasicMaterial({map:t}));m.position.set(x,y+3.2,z);S.add(m);var bk=box(5.4,3.25,.25,0xd9c9a8,x,y+3.2,z-.16);cyl(.1,.1,3,0x7a4b2a,x-2.4,y+1.5,z-.1,6);cyl(.1,.1,3,0x7a4b2a,x+2.4,y+1.5,z-.1,6);COL.push({x:x,z:z,r:2.6})}
 function board(x,z,ry,name,img,line){var y=ground(x,z);var fr=box(6.4,4.4,.3,0xfbf7f1,x,y+3.6,z,ry);cyl(.12,.12,3.4,0x7a4b2a,x-Math.cos(ry)*2.8,y+1.7,z+Math.sin(ry)*2.8,6);cyl(.12,.12,3.4,0x7a4b2a,x+Math.cos(ry)*2.8,y+1.7,z-Math.sin(ry)*2.8,6);
  var tex=new THREE.TextureLoader().load('../assets/img/thumb-'+img+'.webp');tex.encoding=THREE.sRGBEncoding;var p=new THREE.Mesh(new THREE.PlaneGeometry(6,3.2),new THREE.MeshBasicMaterial({map:tex}));p.position.set(x+Math.sin(ry)*.17,y+4,z+Math.cos(ry)*.17);p.rotation.y=ry;S.add(p);
  var c=document.createElement('canvas');c.width=512;c.height=64;var q=c.getContext('2d');q.fillStyle='#111';q.font='900 40px Inter';q.textAlign='center';q.fillText(name,256,46);var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;var tm=new THREE.Mesh(new THREE.PlaneGeometry(6,.75),new THREE.MeshBasicMaterial({map:t,transparent:true}));tm.position.set(x+Math.sin(ry)*.17,y+1.9,z+Math.cos(ry)*.17);tm.rotation.y=ry;S.add(tm);COL.push({x:x,z:z,r:3.2})}
@@ -169,7 +211,7 @@ function board(x,z,ry,name,img,line){var y=ground(x,z);var fr=box(6.4,4.4,.3,0xf
  box(7,1,7,0x6b5a4a,s.x,y+7,s.z);box(4,1,4,0x6b5a4a,s.x,y+14,s.z);cyl(.5,1.2,12,0x6b5a4a,s.x,y+20,s.z,6);cyl(.08,.3,4,0x6b5a4a,s.x,y+28,s.z,4);COL.push({x:s.x,z:s.z,r:3.8});
  label('PARIS',s.x,y+33,s.z,'TECHNICAL STACK',1.3);for(var a=0;a<6;a++)tree(s.x-12+a*5,s.z+12,.7);
  // BORACAY: boardwalk with 7 project boards + palms + moai
- s=ST[4];var bx=s.x-24;for(var i=0;i<PROJECTS.length;i++){board(bx+i*8,s.z-6,0,PROJECTS[i][0],PROJECTS[i][1])}
+ s=ST[4];var bx=s.x-24;for(var i=0;i<PROJECTS.length;i++){board(bx+i*8,s.z-6,0,PROJECTS[i][0],PROJECTS[i][1]);receipt(bx+i*8,s.z-12,PROJECTS[i][4])}
  for(var a=0;a<9;a++)palm(s.x-28+a*7,s.z+8);
  var my=ground(s.x+30,s.z);box(2,4,1.6,0x7d7a70,s.x+30,my+2,s.z);box(2.2,.6,1.8,0x6a675e,s.x+30,my+3.9,s.z);COL.push({x:s.x+30,z:s.z,r:1.5});
  label('BORACAY',s.x,ground(s.x,s.z)+12,s.z,'PROJECTS · 7 boards',1.3);
@@ -261,7 +303,7 @@ addProp('ball',14,12,{tag:'pins'});
 for(var row=0;row<4;row++){var wc=row%2?4:5;for(var j=0;j<wc;j++)addProp('brick',24,2+(j-(wc-1)/2)*1.55,{yo:row*.7,tag:'wall',rest:true})}
 for(var ci=0;ci<8;ci++)addProp('coco',-30+Math.random()*40,93+Math.random()*6);
 addProp('box',78,66,{c:0xb98a4a});addProp('box',80.4,67.4,{c:0xa87b3e});addProp('box',76.4,68.2,{c:0xc09455});
-function unrest(p){if(!p.rest&&p.yo===0)return;p.rest=false;for(var k=0;k<PROPS.length;k++){var o=PROPS[k];if(o!==p&&o.tag===p.tag&&o.yo>p.yo&&Math.abs(o.x-p.x)<1.3&&Math.abs(o.z-p.z)<1.3)o.rest=false}}
+var wallT=false;function unrest(p){if(!p.rest&&p.yo===0)return;if(p.tag==='wall'&&!wallT){wallT=true;toast('Wall smashed! RESET WALL pad puts it back.')}p.rest=false;for(var k=0;k<PROPS.length;k++){var o=PROPS[k];if(o!==p&&o.tag===p.tag&&o.yo>p.yo&&Math.abs(o.x-p.x)<1.3&&Math.abs(o.z-p.z)<1.3)o.rest=false}}
 function stepProps(dt){
  for(var i=0;i<PROPS.length;i++){var p=PROPS[i];
   var dx=p.x-P.x,dz=p.z-P.z,d=Math.hypot(dx,dz),mr=p.r+1;
@@ -290,21 +332,22 @@ function stepPads(dt){padHint=null;for(var i=0;i<PADS.length;i++){var p=PADS[i];
  p.fy+=(ty-p.fy)*Math.min(1,dt*(ty>p.fy?9:6));p.f.position.y=p.fy;
  var ls=p.in?.7:.5;p.lab.scale.x+=(10*ls-p.lab.scale.x)*Math.min(1,dt*8);p.lab.scale.y+=(2.1*ls-p.lab.scale.y)*Math.min(1,dt*8);
  if(p.in)padHint='ENTER / TAP → '+p.txt}}
-var mouseNeeds=false,mx=0,my=0;
-addEventListener('pointermove',function(e){mx=e.clientX;my=e.clientY;mouseNeeds=true});
-function padHover(){mouseNeeds=false;mv.set(mx/W*2-1,-(my/H)*2+1);ray.setFromCamera(mv,CAM);var hits=ray.intersectObjects(PADS.map(function(p){return p.hp}));var hp=hits.length?hits[0].object.userData.pad:null;PADS.forEach(function(p){p.hover=(p===hp)});cv.style.cursor=hp?'pointer':''}
+var mouseNeeds=false,mx=-1,my=-1,mxT=0;
+addEventListener('pointermove',function(e){mx=e.clientX;my=e.clientY;mxT=performance.now();mouseNeeds=true});
+function padHover(){mouseNeeds=false;mv.set(mx/W*2-1,-(my/H)*2+1);ray.setFromCamera(mv,CAM);var hits=ray.intersectObjects(PADS.map(function(p){return p.hp}));var hp=hits.length?hits[0].object.userData.pad:null;PADS.forEach(function(p){p.hover=(p===hp)});cv.style.cursor=hp?'pointer':'';if(hp){tip('<b>'+hp.txt+'</b><small>Enter, E or click</small>',mx,my);return}var sh=null;ST.forEach(function(st){var v=new THREE.Vector3(st.x,ground(st.x,st.z)+6,st.z).project(CAM);var sx=(v.x+1)/2*W,sy=(1-v.y)/2*H;if(Math.hypot(sx-mx,sy-my)<70)sh=st});tip(sh?'<b>'+sh.n+'</b><small>'+DATA[sh.id].t+'</small>':null,mx,my)}
 function padClick(cx,cy){mv.set(cx/W*2-1,-(cy/H)*2+1);ray.setFromCamera(mv,CAM);var hits=ray.intersectObjects(PADS.map(function(p){return p.hp}));if(hits.length){padGo(hits[0].object.userData.pad);return true}return false}
 // OPEN pads in front of every Boracay board, contact pads in New York, reset pads in the Manila playground
 (function(){var s=ST[4],bx=s.x-24;PROJECTS.forEach(function(pj,i){pad(bx+i*8,s.z-1.2,2.4,1.4,'OPEN '+pj[0].toUpperCase(),function(){window.open(pj[3],'_blank','noopener')})});
  var n=ST[6];[['EMAIL','mailto:markedcel06@gmail.com'],['LINKEDIN','https://www.linkedin.com/in/mark-edcel-lopez-513509216/'],['ONLINEJOBS.PH','https://www.onlinejobs.ph/jobseekers/info/4576592'],['GITHUB','https://github.com/referrernation-web']].forEach(function(l,i){pad(n.x-10.5+i*7,n.z+9,2.4,1.5,l[0],function(){if(l[1].indexOf('mailto')===0)location.href=l[1];else window.open(l[1],'_blank','noopener')})});
  pad(14,17,2.2,1.6,'RESET PINS',function(){resetGroup('pins')});
+ var ny=ST[6];pad(ny.x+3,ny.z+15,3,1.6,'RESUME PDF',function(){window.open('../assets/Mark-Edcel-Lopez-Resume-2026.pdf','_blank','noopener')});
  pad(24,11,2.2,1.6,'RESET WALL',function(){resetGroup('wall')});
- pad(-9,10,2.4,1.6,'CLASSIC RESUME',function(){location.href='../'});})();
+ pad(-9,10,2.4,1.6,'CLASSIC RESUME',function(){if(confirm('Leave the 3D world and open the classic resume?'))location.href='../'});})();
 // ===== progress =====
 var SEEN={};
 (function(){var pr=document.getElementById('prog');ST.forEach(function(st){var el=document.createElement('span');el.dataset.id=st.id;el.textContent=st.n;pr.appendChild(el)})})();
-function visit(id){if(SEEN[id])return;SEEN[id]=1;var el=document.querySelector('#prog [data-id="'+id+'"]');if(el)el.classList.add('done');if(Object.keys(SEEN).length===ST.length){confetti();blip(520,1040,.5,'sine',.16);hint.textContent='ALL 7 WONDERS VISITED - HEAD TO NEW YORK TO HIRE ME';hint.classList.add('on')}}
-var K={};addEventListener('keydown',function(e){K[e.code]=true;if(e.code==='KeyH')bark();konami(e.code);if(e.code==='Enter'||e.code==='KeyE'||e.code==='KeyF'){PADS.forEach(function(p){if(p.in)padGo(p)})}if(e.code==='Space')jump();if(e.code==='KeyR')respawn();if(e.code==='KeyL')mute=!mute;if(e.code==='Escape')closeP();if(['Space','ArrowUp','ArrowDown'].indexOf(e.code)>-1)e.preventDefault()});addEventListener('keyup',function(e){K[e.code]=false});
+function visit(id){if(SEEN[id])return;SEEN[id]=1;var stn=ST.filter(function(s){return s.id===id})[0];toast('Landmark discovered: '+stn.n+' ('+(Object.keys(SEEN).length)+'/7)');objUpdate();var el=document.querySelector('#prog [data-id="'+id+'"]');if(el)el.classList.add('done');if(Object.keys(SEEN).length===ST.length){confetti();blip(520,1040,.5,'sine',.16);hint.textContent='ALL 7 WONDERS VISITED - HEAD TO NEW YORK TO HIRE ME';hint.classList.add('on')}}
+var K={};addEventListener('keydown',function(e){if(e.target&&/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;if(MENU.on&&e.code!=='Escape'&&e.code!=='F1')return;K[e.code]=true;if(e.code==='KeyB')bark();if(e.code==='KeyH')centerCam();if(e.code==='KeyQ')ANG.yaw+=Math.PI/4;if(e.code==='KeyE'&&!PADS.some(function(p){return p.in}))ANG.yaw-=Math.PI/4;if(e.code==='KeyC'){ANG.yaw=0;zoom=.5}if(e.code==='F1'){e.preventDefault();menuToggle()}konami(e.code);if(e.code==='Enter'||e.code==='KeyE'||e.code==='KeyF'){PADS.forEach(function(p){if(p.in)padGo(p)})}if(e.code==='Space')jump();if(e.code==='KeyR')respawn();if(e.code==='KeyL')mute=!mute;if(e.code==='Escape'){if(panel.classList.contains('on'))closeP();else menuToggle()}if(['Space','ArrowUp','ArrowDown'].indexOf(e.code)>-1)e.preventDefault()});addEventListener('keyup',function(e){K[e.code]=false});
 function jump(){if(!P.air){P.vy=9.2;P.air=true;blip(170,330,.16,'sine',.14)}}function respawn(){P.x=0;P.z=10;P.speed=0;P.vx=P.vz=0;P.head=Math.PI;P.vy=0}
 // touch stick
 var stick=document.getElementById('stick'),knob=stick.firstElementChild,SV={x:0,y:0},sid=null;
@@ -315,24 +358,87 @@ document.getElementById('jump').addEventListener('pointerdown',function(e){e.pre
 var zoom=.5;addEventListener('wheel',function(e){zoom=Math.min(1,Math.max(0,zoom+e.deltaY*.0008))},{passive:true});
 var camT=new THREE.Vector3(0,0,10);
 var HS={x:0,z:0,vx:0,vz:0}; // hair spring state
-var ANG={def:new THREE.Vector3(.45,.85,.85),proj:new THREE.Vector3(.12,1.15,.75),cur:new THREE.Vector3(.45,.85,.85)};
+var ANG={def:new THREE.Vector3(.45,.85,.85),proj:new THREE.Vector3(.12,1.15,.75),cur:new THREE.Vector3(.45,.85,.85),yaw:0,yawC:0};var YUP=new THREE.Vector3(0,1,0);
+var TOUCH=matchMedia('(pointer:coarse)').matches;
+// settings (localStorage) + pause menu
+var SET={sound:true,voice:true,edge:!TOUCH,quality:'auto',seen:false};try{Object.assign(SET,JSON.parse(localStorage.getItem('mw.settings')||'{}'))}catch(e){}
+function saveSet(){try{localStorage.setItem('mw.settings',JSON.stringify(SET))}catch(e){}}
+function applyQ(){var pr=SET.quality==='low'?1:SET.quality==='high'?Math.min(devicePixelRatio,2):Math.min(devicePixelRatio,TOUCH?1.5:1.75);R.setPixelRatio(pr);document.getElementById('mQ').textContent='Quality: '+SET.quality}
+var MENU={on:false},menuEl=document.getElementById('menu');
+function menuToggle(){MENU.on=!MENU.on;menuEl.classList.toggle('on',MENU.on);K={};document.getElementById('mVoice').classList.toggle('on',SET.voice);document.getElementById('mSnd').classList.toggle('on',SET.sound);document.getElementById('mEdge').classList.toggle('on',SET.edge)}
+document.getElementById('mRes').onclick=menuToggle;
+document.getElementById('mSnd').onclick=function(){SET.sound=!SET.sound;mute=!SET.sound;saveSet();this.classList.toggle('on',SET.sound)};
+document.getElementById('mEdge').onclick=function(){SET.edge=!SET.edge;saveSet();this.classList.toggle('on',SET.edge)};
+document.getElementById('mVoice').onclick=function(){SET.voice=!SET.voice;saveSet();this.classList.toggle('on',SET.voice);if(!SET.voice)stopVO()};
+document.getElementById('mQ').onclick=function(){SET.quality=SET.quality==='auto'?'high':SET.quality==='high'?'low':'auto';saveSet();applyQ()};
+document.getElementById('mTour').onclick=function(){menuToggle();respawn();centerCam()};
+mute=!SET.sound;applyQ();
+// Mark's voice per landmark (HeyGen v1 clone, MP3 in world/vo) + subtitles
+var VOT={home:"Welcome to Manila. I'm Mark Edcel Lopez, full-stack developer, SEO and AEO specialist. Ride Kimpoy to any landmark and I'll tell you the story behind the numbers.",journey:"Banaue. Every terrace here is a step: service crew at Greenwich, six years as a headhunter, civil engineering at the University of Makati, then ReferNation, Alorica, Coggno, and now Bytown Bath and Futurebloom.",expertise:"Giza. Four pyramids, four things I do: WordPress development, technical SEO, answer engine optimization, and automation with Node and the Claude API. One hire, not two.",skills:"Paris. This is the stack I work with every day: WordPress and Elementor, Search Console and GA4, JSON-LD schema, and Node, React and Vercel.",projects:"Boracay. Seven boards, seven receipts. Coggno at number two in AI visibility. Bytown Bath at position two point seven. Aire One with forty-four AI citations a day. Press Enter on any board to open the live site.",certs:"Rome. Twenty-nine credentials in the Colosseum: engineering project management, business, communication, and English at C2. Every one links to its certificate.",contact:"New York. If you want a site that ranks on Google and gets cited by ChatGPT, this is the stop. Email me, or press Enter on a pad. I work US, Canada and Australia hours."};
+var VO={},voCur=null,subEl=document.getElementById('sub');
+function stopVO(){if(voCur){voCur.pause();voCur=null}subEl.classList.remove('on')}
+function say(id){stopVO();if(!SET.sound||!SET.voice||!VOT[id])return;var a=VO[id]||(VO[id]=new Audio('vo/'+id+'.mp3'));a.volume=.95;a.currentTime=0;voCur=a;subEl.textContent='“'+VOT[id]+'”';subEl.classList.add('on');a.onended=function(){if(voCur===a){voCur=null;subEl.classList.remove('on')}};a.play().catch(function(){subEl.classList.remove('on')})}
+// Dianna's lines (bubble) when a landmark opens
+var DL={home:'Tara, Kimpoy! Ipakita natin ang mundo ni Papa.',journey:'Dito nagsimula si Papa, sa pizza counter!',expertise:'Apat na pyramid, apat na trabaho ni Papa.',skills:'Ang daming tools! Gusto ko rin matuto.',projects:'Mga tunay na website ito, may resibo!',certs:'Dalawampu’t siyam na certificate, Kimpoy!',contact:'Dito ka mag-message kay Papa. Woof!'};
+// story-mode tour: walks Kimpoy to every landmark in order, waits for the voice, then moves on
+var TOUR={on:false,i:0,wait:0},tourBtn=document.getElementById('tourBtn');
+var TORDER=['home','journey','expertise','skills','projects','certs','contact'];
+function tourStart(){TOUR.on=true;TOUR.i=0;TOUR.wait=0;tourBtn.textContent='■ STOP TOUR';tourBtn.classList.add('on');toast('Story tour: sit back, Kimpoy drives.');tourNext()}
+function tourStop(){TOUR.on=false;AUTO=null;AUTOm.visible=false;tourBtn.textContent='▶ STORY TOUR';tourBtn.classList.remove('on')}
+function tourNext(){if(TOUR.i>=TORDER.length){tourStop();toast('Tour complete. Ready to hire?');return}var st=ST.filter(function(s){return s.id===TORDER[TOUR.i]})[0];var ang=Math.atan2(P.x-st.x,P.z-st.z);AUTO={x:st.x+Math.sin(ang)*Math.max(2,st.r-6),z:st.z+Math.cos(ang)*Math.max(2,st.r-6)};AUTOm.visible=true;AUTOm.position.set(AUTO.x,ground(AUTO.x,AUTO.z)+.1,AUTO.z);TOUR.wait=0}
+function tourStep(dt){if(!TOUR.on)return;var id=TORDER[TOUR.i];if(cur&&cur.id===id){TOUR.wait+=dt;if(!voCur&&TOUR.wait>3.5||TOUR.wait>22){TOUR.i++;tourNext()}}else if(!AUTO){TOUR.wait+=dt;if(TOUR.wait>6)tourNext()}}
+tourBtn.onclick=function(){if(TOUR.on)tourStop();else tourStart()};
+// deep links: /world/#giza etc.
+var HASHID={manila:'home',banaue:'journey',giza:'expertise',paris:'skills',boracay:'projects',rome:'certs',newyork:'contact'};
+function applyHash(){var h=(location.hash||'').replace('#','').toLowerCase();var id=HASHID[h]||(DATA[h]?h:null);if(!id)return null;var st=ST.filter(function(s){return s.id===id})[0];P.x=st.x;P.z=st.z+Math.max(0,st.r-8);P.vx=P.vz=0;return st}
+// Kimpoy idle AI (sit -> sleep) when nobody is driving
+var IDLE={t:0,st:'run',bark:0};
+function idleStep(dt,manual){if(manual||AUTO||P.air||P.speed>.5){IDLE.t=0;IDLE.k=0;if(IDLE.st!=='run'){IDLE.st='run';DOG.rotation.x=0;DOG.rotation.z=0}return}IDLE.t+=dt;var ns=IDLE.t>26?'sleep':IDLE.t>6?'sit':'run';if(ns!==IDLE.st){IDLE.st=ns;if(ns==='sit')showBub(['Hmm?','Tara na?','...'][Math.floor(Math.random()*3)]);if(ns==='sleep')showBub('Zzz')}
+ if(IDLE.st==='sit'){IDLE.k=Math.min(1,(IDLE.k||0)+dt*2.5);legs[2].rotation.x=1.35*IDLE.k;legs[3].rotation.x=1.35*IDLE.k;legs[0].rotation.x=-.25*IDLE.k;legs[1].rotation.x=-.25*IDLE.k;DOG.rotation.x=-.28*IDLE.k;DOG.position.y-=.25*IDLE.k;IDLE.bark+=dt;if(IDLE.bark>9){IDLE.bark=0;if(Math.random()<.6)bark()}}
+ else if(IDLE.st==='sleep'){IDLE.k=Math.min(1,(IDLE.k||0)+dt*1.5);DOG.rotation.z=1.25*IDLE.k;DOG.rotation.x=0;DOG.position.y-=.6*IDLE.k;legs.forEach(function(l,i){l.rotation.x=(i<2?-.6:.9)*IDLE.k});if(Math.random()<dt*.4)showBub('Zzz')}}
+// toasts + tooltip + status
+var toastsEl=document.getElementById('toasts');
+function toast(msg){var d=document.createElement('div');d.className='toast';d.textContent=msg;toastsEl.appendChild(d);while(toastsEl.children.length>3)toastsEl.removeChild(toastsEl.firstChild);setTimeout(function(){if(d.parentNode)d.parentNode.removeChild(d)},2800)}
+var tipEl=document.getElementById('tip');function tip(html,x,y){if(!html){tipEl.style.display='none';return}tipEl.innerHTML=html;tipEl.style.display='block';tipEl.style.left=Math.min(x,W-240)+'px';tipEl.style.top=Math.min(y,H-70)+'px'}
+// objectives (RA3 mission list)
+var objl=document.getElementById('objl'),objn=document.getElementById('objn');
+function objUpdate(){objl.innerHTML=ST.map(function(s){return '<div class="'+(SEEN[s.id]?'done':'')+'"><i>'+(SEEN[s.id]?'&#10003;':'')+'</i>'+s.n+'</div>'}).join('');var n=nextObj();objn.textContent=n?'NEXT: '+n.n.toUpperCase()+' · '+Math.round(Math.hypot(P.x-n.x,P.z-n.z))+' m':'ALL 7 DONE · HIRE ME';}
+function nextObj(){var best=null,bd=1e9;ST.forEach(function(s){if(SEEN[s.id])return;var d=Math.hypot(P.x-s.x,P.z-s.z);if(d<bd){bd=d;best=s}});return best}
+// 3D objective arrow + selection ring (RA3-style)
+var ARROW=new THREE.Mesh(new THREE.ConeGeometry(.45,1.3,6),new THREE.MeshBasicMaterial({color:0x8a1c2b}));ARROW.geometry.rotateX(Math.PI/2);S.add(ARROW);
+var RING=new THREE.Mesh(new THREE.RingGeometry(1.35,1.6,32),new THREE.MeshBasicMaterial({color:0x62d65a,transparent:true,opacity:.75,depthWrite:false}));RING.rotation.x=-Math.PI/2;S.add(RING);
+// double-click to walk there
+var AUTO=null,AUTOm=new THREE.Mesh(new THREE.RingGeometry(.6,.9,24),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.8,depthWrite:false}));AUTOm.rotation.x=-Math.PI/2;AUTOm.visible=false;S.add(AUTOm);
+function centerCam(){PAN.tx=PAN.tz=0;camT.set(P.x,P.y,P.z)}
+// stuck detection
+var STK={t:0,x:0,z:0,n:0};
+function stuckCheck(dt,manual){STK.t+=dt;if(STK.t<1.2)return;STK.t=0;var moved=Math.hypot(P.x-STK.x,P.z-STK.z);STK.x=P.x;STK.z=P.z;if(!manual||moved>.6){STK.n=0;return}STK.n++;var best=null,bd=1e9;COL.forEach(function(c){var d=Math.hypot(P.x-c.x,P.z-c.z);if(d<bd){bd=d;best=c}});if(STK.n<3&&best){var dx=P.x-best.x,dz=P.z-best.z,l=Math.hypot(dx,dz)||1;P.x+=dx/l*2.2;P.z+=dz/l*2.2;if(!P.air){P.vy=6;P.air=true}}else if(STK.n>=3){var s=cur||nextObj()||ST[0];P.x=s.x;P.z=s.z+s.r+3;P.vx=P.vz=0;STK.n=0;toast('Unstuck! Back on the path.')}}
+// occlusion fade (objects between camera and Kimpoy)
+var oray=new THREE.Raycaster(),FADED=[],occF=0;
+function occl(){if((occF++)%3)return;var to=new THREE.Vector3(P.x,P.y+2,P.z),dir=to.clone().sub(CAM.position),d=dir.length();oray.set(CAM.position,dir.normalize());oray.far=d-2;var hits=oray.intersectObjects(OCC,false),now={};hits.forEach(function(h){var o=h.object;now[o.id]=1;if(!o.userData.fm){o.userData.fm=o.material;o.material=o.material.clone();o.material.transparent=true;o.material.opacity=.22;o.material.depthWrite=false;FADED.push(o)}});FADED=FADED.filter(function(o){if(now[o.id])return true;o.material.dispose();o.material=o.userData.fm;o.userData.fm=null;return false})}
+// camera rotate (middle-drag / right stick)
+var ROT={on:false,sx:0,y0:0};
+cv.addEventListener('contextmenu',function(e){e.preventDefault()});
+document.addEventListener('pointerdown',function(){audio()});
+document.addEventListener('pointerleave',function(){mx=-1;my=-1});
 // camera pan (Bruno: raycast on ground plane, target = -(hit - start), eased, reset on drive)
 var PAN={x:0,z:0,tx:0,tz:0,on:false,sx:0,sz:0,ox:0,oz:0},ray=new THREE.Raycaster(),gpl=new THREE.Plane(new THREE.Vector3(0,1,0),0),mv=new THREE.Vector2(),pt=new THREE.Vector3();
 function hitGround(cx,cy,out){mv.set(cx/W*2-1,-(cy/H)*2+1);ray.setFromCamera(mv,CAM);gpl.constant=-camT.y;return ray.ray.intersectPlane(gpl,out)}
-cv.addEventListener('pointerdown',function(e){if(!run||e.button!==0)return;if(padClick(e.clientX,e.clientY))return;if(hitGround(e.clientX,e.clientY,pt)){PAN.on=true;PAN.sx=pt.x;PAN.sz=pt.z;PAN.ox=PAN.tx;PAN.oz=PAN.tz;cv.classList.add('grabbing')}});
-addEventListener('pointermove',function(e){if(!PAN.on)return;if(hitGround(e.clientX,e.clientY,pt)){PAN.tx=PAN.ox-(pt.x-PAN.sx);PAN.tz=PAN.oz-(pt.z-PAN.sz)}});
-addEventListener('pointerup',function(){PAN.on=false;cv.classList.remove('grabbing')});
+cv.addEventListener('pointerdown',function(e){if(!run)return;if(e.button===1){ROT.on=true;ROT.sx=e.clientX;ROT.y0=ANG.yaw;e.preventDefault();return}if(e.button!==0&&e.button!==2)return;if(e.button===0&&padClick(e.clientX,e.clientY))return;if(hitGround(e.clientX,e.clientY,pt)){PAN.on=true;PAN.sx=pt.x;PAN.sz=pt.z;PAN.ox=PAN.tx;PAN.oz=PAN.tz;cv.classList.add('grabbing')}});
+addEventListener('pointermove',function(e){if(ROT.on){ANG.yaw=ROT.y0-(e.clientX-ROT.sx)*.006;return}if(!PAN.on)return;if(hitGround(e.clientX,e.clientY,pt)){PAN.tx=PAN.ox-(pt.x-PAN.sx);PAN.tz=PAN.oz-(pt.z-PAN.sz)}});
+addEventListener('pointerup',function(){PAN.on=false;ROT.on=false;cv.classList.remove('grabbing')});
+cv.addEventListener('dblclick',function(e){if(!run)return;if(hitGround(e.clientX,e.clientY,pt)){AUTO={x:pt.x,z:pt.z};AUTOm.visible=true;AUTOm.position.set(pt.x,ground(pt.x,pt.z)+.1,pt.z);AUTOm.scale.set(1,1,1);blip(700,900,.08,'sine',.08)}});
 var pinch=null;
 cv.addEventListener('touchstart',function(e){if(e.touches.length===2){pinch={d:Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY),z:zoom};PAN.on=false}},{passive:true});
 cv.addEventListener('touchmove',function(e){if(pinch&&e.touches.length===2){var d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);zoom=Math.min(1,Math.max(0,pinch.z-(d/pinch.d-1)))}},{passive:true});
 cv.addEventListener('touchend',function(){pinch=null});
 // speech bubble sprite ("Woof!")
 var BUB=new THREE.Sprite(new THREE.SpriteMaterial({transparent:true,opacity:0,depthTest:false}));BUB.scale.set(6,1.6,1);BUB.visible=false;S.add(BUB);var bubT=0;
-function showBub(t){var c=document.createElement('canvas');c.width=384;c.height=100;var q=c.getContext('2d');q.fillStyle='#fbf7f1';rr(q,4,4,376,80,24);q.fill();q.fillStyle='#111';q.font='900 44px Inter,sans-serif';q.textAlign='center';q.fillText(t,192,60);q.fillStyle='#fbf7f1';q.beginPath();q.moveTo(180,84);q.lineTo(204,84);q.lineTo(192,98);q.fill();var tx=new THREE.CanvasTexture(c);tx.encoding=THREE.sRGBEncoding;if(BUB.material.map)BUB.material.map.dispose();BUB.material.map=tx;BUB.material.needsUpdate=true;bubT=1.4;BUB.visible=true}
+function showBub(t){var c=document.createElement('canvas');var q=c.getContext('2d');q.font='900 40px Inter,sans-serif';var tw=Math.min(1100,Math.max(300,q.measureText(t).width+90));c.width=tw;c.height=100;q=c.getContext('2d');q.fillStyle='#fbf7f1';rr(q,4,4,tw-8,80,24);q.fill();q.fillStyle='#111';q.font='900 40px Inter,sans-serif';q.textAlign='center';q.fillText(t,tw/2,58);q.fillStyle='#fbf7f1';q.beginPath();q.moveTo(tw/2-12,84);q.lineTo(tw/2+12,84);q.lineTo(tw/2,98);q.fill();BUB.scale.set(tw/64,1.6,1);var tx=new THREE.CanvasTexture(c);tx.encoding=THREE.sRGBEncoding;if(BUB.material.map)BUB.material.map.dispose();BUB.material.map=tx;BUB.material.needsUpdate=true;bubT=1.4;BUB.visible=true}
 function bark(){blip(520,380,.08,'square',.14);setTimeout(function(){blip(620,430,.1,'square',.14)},90);if(!P.air){P.vy=5;P.air=true}showBub(['Woof!','Arf arf!','Woof woof!'][Math.floor(Math.random()*3)])}
 // Konami code -> coconut rain (Bruno: lemons, 3^n each time)
 var KSEQ=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','KeyB','KeyA'],KON=[],konN=0;
-function konami(code){KON.push(code);if(KON.length>KSEQ.length)KON.shift();if(KON.join()===KSEQ.join()){konN++;var n=Math.min(60,Math.pow(3,konN)*3);showBub('Coconut rain!');for(var i=0;i<n;i++)setTimeout(function(){addProp('coco',P.x+(Math.random()-.5)*10,P.z+(Math.random()-.5)*10,{yo:10+Math.random()*6})},i*60)}}
+function konami(code){KON.push(code);if(KON.length>KSEQ.length)KON.shift();if(KON.join()===KSEQ.join()){konN++;var n=Math.min(TOUCH?24:60,Math.pow(3,konN)*3);showBub('Coconut rain!');for(var i=0;i<n;i++)setTimeout(function(){addProp('coco',P.x+(Math.random()-.5)*10,P.z+(Math.random()-.5)*10,{yo:10+Math.random()*6})},i*60)}}
 // title-bar dog (Bruno: 🚗 moving with speed) + reset keys when tab hidden
 var tpos=5;setInterval(function(){if(!run)return;tpos=(tpos+Math.round(P.speed*.35))%22;document.title='_'.repeat(22-tpos)+'🐕'+'_'.repeat(tpos)},300);
 document.addEventListener('visibilitychange',function(){if(document.hidden){K={};PAN.on=false}});
@@ -349,8 +455,10 @@ function step(dt){
  var gps=navigator.getGamepads&&navigator.getGamepads(),pad=null;if(gps)for(var i=0;i<gps.length;i++)if(gps[i]&&gps[i].connected){pad=gps[i];break}
  if(pad){var ax=pad.axes[0]||0,ay=pad.axes[1]||0;if(Math.hypot(ax,ay)>.18){ix=ax;iy=-ay}if(pad.buttons[0]&&pad.buttons[0].pressed){if(!P.gpj)jump();P.gpj=true}else P.gpj=false;if(pad.buttons[7]&&pad.buttons[7].value>.3)boost=true}
  // screen axes on the ground plane (camera sits at +x,+z looking back)
- var CFx=-ANG.cur.x,CFz=-ANG.cur.z,cl=Math.hypot(CFx,CFz);CFx/=cl;CFz/=cl; // screen-up, follows the camera angle
- var CRx=-CFz,CRz=CFx;                                          // screen-right
+ var anr=ANG.cur.clone().applyAxisAngle(YUP,ANG.yawC);var CFx=-anr.x,CFz=-anr.z,cl=Math.hypot(CFx,CFz);CFx/=cl;CFz/=cl; // screen-up, follows camera angle + yaw
+ var CRx=-CFz,CRz=CFx;
+ var manual=Math.hypot(ix,iy)>0.05;if(pad&&pad.axes[2]&&Math.abs(pad.axes[2])>.3)ANG.yaw-=pad.axes[2]*dt*2;if(pad&&pad.buttons[2]&&pad.buttons[2].pressed&&!P.gpx){PADS.forEach(function(p){if(p.in)padGo(p)})}P.gpx=!!(pad&&pad.buttons[2]&&pad.buttons[2].pressed);if(pad&&pad.buttons[9]&&pad.buttons[9].pressed&&!P.gpm)menuToggle();P.gpm=!!(pad&&pad.buttons[9]&&pad.buttons[9].pressed);
+ if(AUTO&&!manual){var adx=AUTO.x-P.x,adz=AUTO.z-P.z,ad=Math.hypot(adx,adz);if(ad<1.6){AUTO=null;AUTOm.visible=false}else{adx/=ad;adz/=ad;iy=adx*CFx+adz*CFz;ix=adx*CRx+adz*CRz;var sl=Math.min(1,ad/6);ix*=sl;iy*=sl}}else if(manual&&AUTO){AUTO=null;AUTOm.visible=false;if(TOUR.on)tourStop()}                                          // screen-right
  var dx=CFx*iy+CRx*ix,dz=CFz*iy+CRz*ix,mag=Math.min(1,Math.hypot(dx,dz));
  var max=boost?26:16;if(mag>0.05){PAN.tx=PAN.tz=0}
  if(mag>0.05){var l=Math.hypot(dx,dz);dx/=l;dz/=l;
@@ -379,7 +487,7 @@ function step(dt){
  var RS=1.35;RG.scale.set(RS*(1+P.squash*.5),RS*(1-P.squash*.9),RS*(1+P.squash*.5));
  var run=Math.min(1,sp/8),sw=Math.sin(P.ft*Math.PI)*run*.95;
  if(P.air){legs[0].rotation.x=legs[1].rotation.x=-.9;legs[2].rotation.x=legs[3].rotation.x=.9}else{legs[0].rotation.x=sw;legs[3].rotation.x=sw;legs[1].rotation.x=-sw;legs[2].rotation.x=-sw}
- DOG.position.y=P.air?0:Math.abs(Math.sin(P.ft*Math.PI))*.16*run;
+ DOG.position.y=(P.air?0:Math.abs(Math.sin(P.ft*Math.PI))*.16*run)-(g<1.02&&!P.air?.55:0);
  DOG.rotation.x=P.air?0:Math.sin(P.ft*Math.PI*2)*.06*run;
  tail.rotation.z=Math.sin(performance.now()*(sp>.4?.012:.02))*.55;
  // secondary motion (Bruno's antenna spring): hair lags behind acceleration, ears fold back with speed
@@ -392,35 +500,46 @@ function step(dt){
  shadow.position.set(P.x,g+.06,P.z);var sh=Math.max(.35,1-(P.y-g)*.12);shadow.scale.set(sh,sh,1);
  var la=Math.min(7,sp*.32);
  camT.x+=((P.x+fx*la)-camT.x)*Math.min(1,dt*3.5);camT.y+=(P.y-camT.y)*Math.min(1,dt*3.5);camT.z+=((P.z+fz*la)-camT.z)*Math.min(1,dt*3.5);
+ if(SET.edge&&!TOUCH&&!PAN.on&&!manual&&mx>=0&&document.hasFocus()&&performance.now()-mxT<4000){var ex=mx<26?-1:mx>W-26?1:0,ey=my<26?1:my>H-26?-1:0;if(ex||ey){PAN.tx+=(CRx*ex+CFx*ey)*dt*34;PAN.tz+=(CRz*ex+CFz*ey)*dt*34}}
+ var lim2=SZ/2-10;PAN.tx=Math.max(-lim2-camT.x,Math.min(lim2-camT.x,PAN.tx));PAN.tz=Math.max(-lim2-camT.z,Math.min(lim2-camT.z,PAN.tz));
+ ANG.yawC+=(ANG.yaw-ANG.yawC)*Math.min(1,dt*4);
  PAN.x+=(PAN.tx-PAN.x)*Math.min(1,dt*6);PAN.z+=(PAN.tz-PAN.z)*Math.min(1,dt*6);
  ANG.cur.lerp((cur&&cur.id==='projects')?ANG.proj:ANG.def,Math.min(1,dt*1.5));
  if(bubT>0){bubT-=dt;BUB.position.set(P.x,P.y+5.4,P.z);BUB.material.opacity=Math.min(1,bubT*2);BUB.visible=bubT>0}
- var dist=30+zoom*32+sp*.35,an=ANG.cur.clone().normalize();
+ var dist=30+zoom*32+sp*.35,an=ANG.cur.clone().applyAxisAngle(YUP,ANG.yawC).normalize();
  CAM.position.set(camT.x+an.x*dist+PAN.x,camT.y+an.y*dist,camT.z+an.z*dist+PAN.z);CAM.lookAt(camT.x+PAN.x,camT.y+1.2,camT.z+PAN.z);
  S.children.forEach(function(o){if(o.userData.face){o.lookAt(CAM.position.x,o.position.y,CAM.position.z)}});
  stepProps(dt);stepDust(dt);stepPads(dt);if(mouseNeeds&&!PAN.on)padHover();
+ occl();stuckCheck(dt,manual);tourStep(dt);idleStep(dt,manual);
+ RING.position.set(P.x,g+.08,P.z);var rs=1+Math.sin(performance.now()*.004)*.06;RING.scale.set(rs,rs,1);RING.material.opacity=P.air?.25:.7;
+ var no=nextObj();if(no){ARROW.visible=true;ARROW.position.set(P.x,P.y+4.7+Math.sin(performance.now()*.005)*.15,P.z);ARROW.rotation.set(0,Math.atan2(no.x-P.x,no.z-P.z),0)}else ARROW.visible=false;
+ if(AUTOm.visible){var as=1+Math.sin(performance.now()*.008)*.15;AUTOm.scale.set(as,as,1)}
+ hudT=(hudT||0)+dt;if(hudT>.25){hudT=0;objUpdate();document.getElementById('stSpd').textContent=Math.round(sp)+' m/s';var ns=null,nd2=1e9;ST.forEach(function(s2){var d2=Math.hypot(P.x-s2.x,P.z-s2.z);if(d2<nd2){nd2=d2;ns=s2}});document.getElementById('stLoc').textContent=(cur?cur.n:ns.n).toUpperCase();document.getElementById('stKey').textContent=padHint?padHint.replace('ENTER / TAP → ','ENTER: '):(AUTO?'walking…':'WASD · Q/E rotate · dbl-click to walk')}
  zones(dt);minimap();
 }
 
 // ===== zones, panel, minimap =====
 var panel=document.getElementById('panel'),hint=document.getElementById('hint'),cur=null,dwell=0;
-function openP(id){var d=DATA[id];document.getElementById('pk').textContent=d.k;document.getElementById('pt').textContent=d.t;document.getElementById('pb').innerHTML=d.h;panel.classList.add('on');visit(id);blip(620,930,.18,'sine',.12);setTimeout(function(){blip(930,1240,.16,'sine',.1)},110);panel.querySelectorAll('[data-go]').forEach(function(a){a.onclick=function(e){e.preventDefault();var s=ST.filter(function(s){return s.id===a.dataset.go})[0];P.x=s.x;P.z=s.z+10;P.speed=0;P.vx=P.vz=0;P.head=Math.PI;}})}
-function closeP(){panel.classList.remove('on')}document.getElementById('px').onclick=closeP;
+function openP(id){var d=DATA[id];document.getElementById('pk').textContent=d.k;document.getElementById('pt').textContent=d.t;document.getElementById('pb').innerHTML=d.h;panel.classList.add('on');visit(id);say(id);setTimeout(function(){if(cur&&cur.id===id)showBub(DL[id]||'')},1400);try{history.replaceState(null,'','#'+id)}catch(e){}blip(620,930,.18,'sine',.12);setTimeout(function(){blip(930,1240,.16,'sine',.1)},110);panel.querySelectorAll('[data-go]').forEach(function(a){a.onclick=function(e){e.preventDefault();var s=ST.filter(function(s){return s.id===a.dataset.go})[0];P.x=s.x;P.z=s.z+10;P.speed=0;P.vx=P.vz=0;P.head=Math.PI;}})}
+function closeP(){panel.classList.remove('on');stopVO()}document.getElementById('px').onclick=closeP;
 function zones(dt){var inz=null;ST.forEach(function(s){if(Math.hypot(P.x-s.x,P.z-s.z)<s.r)inz=s});
  if(inz&&inz!==cur){dwell+=dt;hint.textContent='ENTERING '+inz.n.toUpperCase();hint.classList.add('on');if(dwell>.5){cur=inz;openP(inz.id);hint.classList.remove('on')}}
  else if(!inz){dwell=0;if(cur){cur=null;closeP()}var near=null,nd=1e9;ST.forEach(function(s){var d=Math.hypot(P.x-s.x,P.z-s.z)-s.r;if(d<nd){nd=d;near=s}});hint.textContent=near.n.toUpperCase()+' · '+Math.round(nd)+'m';hint.classList.add('on')}
  if(padHint){hint.textContent=padHint;hint.classList.add('on')}}
-var mc=document.getElementById('map').getContext('2d');
+var mc=document.getElementById('map').getContext('2d'),mapEl=document.getElementById('map');
+function mapWorld(e){var r=mapEl.getBoundingClientRect();var px=(e.clientX-r.left)/r.width*300,py=(e.clientY-r.top)/r.height*300;return {x:(px-150)/1.08,z:(py-150)/1.08}}
+mapEl.addEventListener('click',function(e){if(!run)return;var w=mapWorld(e);PAN.tx=w.x-camT.x;PAN.tz=w.z-camT.z;blip(600,700,.06,'sine',.06)});
+mapEl.addEventListener('dblclick',function(e){if(!run)return;var w=mapWorld(e);var f=document.getElementById('fade');f.style.opacity=1;setTimeout(function(){P.x=Math.max(-120,Math.min(120,w.x));P.z=Math.max(-120,Math.min(120,w.z));P.vx=P.vz=0;P.y=ground(P.x,P.z);centerCam();cur=null;closeP();f.style.opacity=0;toast('Teleported')},380)});
 function minimap(){mc.clearRect(0,0,300,300);mc.fillStyle='#cfe8f5';mc.fillRect(0,0,300,300);mc.fillStyle='#bfe0a8';mc.fillRect(20,20,260,260);mc.fillStyle='#f0e2b8';mc.fillRect(20,200,260,80);
  ST.forEach(function(s){var x=150+s.x*1.08,y=150+s.z*1.08;mc.fillStyle=cur===s?'#8a1c2b':'#111';mc.beginPath();mc.arc(x,y,5,0,7);mc.fill();mc.font='700 15px JetBrains Mono';mc.textAlign='center';mc.fillStyle='#111';mc.fillText(s.n,x,y-9)});
  var x=150+P.x*1.08,y=150+P.z*1.08;mc.save();mc.translate(x,y);mc.rotate(-P.head+Math.PI);mc.fillStyle='#8a1c2b';mc.beginPath();mc.moveTo(0,-9);mc.lineTo(6,6);mc.lineTo(-6,6);mc.closePath();mc.fill();mc.restore()}
 
 // ===== loop / loading =====
-var last=0,run=false;function loop(t){requestAnimationFrame(loop);var dt=Math.min(.05,(t-last)/1000||0);last=t;if(run)step(dt);R.render(S,CAM)}
+var last=0,run=false,hudT=0;function loop(t){requestAnimationFrame(loop);var dt=Math.min(.05,(t-last)/1000||0);last=t;if(run&&!document.hidden&&!MENU.on)step(dt);R.render(S,CAM)}
 THREE.DefaultLoadingManager.onProgress=function(u,l,tot){document.querySelector('#bar i').style.width=(l/tot*100)+'%'};
 THREE.DefaultLoadingManager.onLoad=function(){var b=document.getElementById('go');b.disabled=false;b.textContent='Start the ride'};
 setTimeout(THREE.DefaultLoadingManager.onLoad,2500);
-document.getElementById('go').onclick=function(){audio();document.getElementById('load').classList.add('off');run=true;P.speed=0;P.y=ground(P.x,P.z)+16;P.air=true;P.vy=0;setTimeout(function(){blip(520,780,.3,'sine',.12)},250)};
+document.getElementById('go').onclick=function(){audio();document.getElementById('load').classList.add('off');run=true;P.speed=0;P.y=ground(P.x,P.z)+16;P.air=true;P.vy=0;setTimeout(function(){blip(520,780,.3,'sine',.12)},250);var dl=applyHash();if(dl){P.y=ground(P.x,P.z)+16;centerCam();setTimeout(function(){cur=dl;openP(dl.id)},1500)}objUpdate();if(!SET.seen){SET.seen=true;saveSet();[[1200,TOUCH?'Drag the joystick to move':'W A S D = move where you point on screen'],[5200,TOUCH?'Tap JUMP to hop over things':'SPACE jumps · SHIFT boosts'],[9200,'Ride into a white pad and press ENTER / tap to open it'],[13200,'Click the minimap to peek, double-click to teleport']].forEach(function(t){setTimeout(function(){toast(t[1])},t[0])})}};
 P.y=ground(P.x,P.z);camT.set(P.x,P.y,P.z);requestAnimationFrame(loop);
 </script>
 </body>

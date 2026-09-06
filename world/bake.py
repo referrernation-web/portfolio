@@ -21,16 +21,20 @@ def load(fn,roty=0.0):
 which=sys.argv[1]
 if which=='kimpoy':
     m,n,N=load('models/kimpoy-mv.glb',0.0)           # nose already +z (verified by screenshot)
-    face=img(M+'kimpoy-face-real.jpg'); fur=img(M+'kimpoy-fur-tile.jpg')
-    # fur everywhere: pseudo-triplanar tile, body a bit darker than the head (real Kimpoy: grey head, darker body)
-    U=np.mod(n[:,0]*1.4+n[:,2]*2.2,1.0); V=np.mod(n[:,1]*1.8+n[:,2]*.3,1.0); col=samp(fur,U,V)
-    shade=np.where(n[:,1]>.55,0.5,0.36)+np.random.uniform(-.04,.04,len(n)); col=np.clip((col-.5)*1.3+.5,0,1)*shade[:,None]  # real Kimpoy is mid-grey: darken the (over-lit) video fur
-    # face: head-front vertices, ellipse inside the head box (x .05-.95, y .5-1) -> real face photo
-    hx=(n[:,0]-.05)/.9; hy=(n[:,1]-.5)/.5
-    head=(n[:,1]>.5)&(n[:,2]>.55)&(N[:,2]>.2)
-    e=((hx-.5)**2/.5**2+((1-hy)-.55)**2/.5**2)
-    sel=head&(e<1)
-    fc=samp(face,hx,1-hy); w=np.clip((1-e)*2,0,1)[:,None]; fc=np.clip((fc-.5)*1.2+.5,0,1)*.72; col[sel]=fc[sel]*w[sel]+col[sel]*(1-w[sel])
+    # sharp AI turnaround views (black dog) recoloured to Kimpoy's real mid-grey, projected by vertex normal
+    def grey(p):
+        I=img(p); lum=I[:,:,0]*.299+I[:,:,1]*.587+I[:,:,2]*.114
+        lum=np.clip((lum-.5)*.75+.5,0,1); lum=np.clip(lum*1.25+.03,0,1); return np.stack([lum*1.0,lum*.99,lum*.96],2)  # real Kimpoy: dark grey, soft contrast
+    F,L,Rr=grey('tex/proj-kimpoy-front.jpg'),grey('tex/proj-kimpoy-left.jpg'),grey('tex/proj-kimpoy-right.jpg')
+    V=1-n[:,1]
+    side=np.where(N[:,0:1]>=0, samp(L,1-n[:,2],V), samp(Rr,n[:,2],V))
+    front=samp(F,n[:,0],V)
+    w=np.clip((N[:,2]-.2)/.35,0,1)[:,None]; col=front*w+side*(1-w)
+    col*= (0.62+0.38*(N[:,1:2]*.5+.5))                # cheap AO: undersides darker
+    col*= np.where((n[:,1:2]>.55)&(n[:,2:3]>.6),1.22,1.0)  # lighter grey head like the real Kimpoy
+    col*= 1+np.random.uniform(-.06,.06,(len(n),1))    # fur speckle
+    col*=0.72                                         # overall: real Kimpoy reads dark grey in daylight
+    print('mean lum',float((col[:,0]*.299+col[:,1]*.587+col[:,2]*.114).mean()))
 else:
     m,n,N=load('models/dianna-s.glb',0.35)              # arms -> +z (verified)
     F,box=fillbg(M+'diana-render.png')

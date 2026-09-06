@@ -416,7 +416,13 @@ function figAnim(sp,run,boost){var t=performance.now()/1000,ph=P.ft*Math.PI,air=
   if(A.sit)A.sit.timeScale=1+run*.6;FIG.mixer.update(dt)}
  var D=FIG.D;if(D){var r2=FIG.dia;var RW=FIG.mixer?rotAdd:rotW;if(D.head.length){RW(pick(D.head,D.head.length-1),_AX,Math.sin(ph*2)*.06*run+Math.sin(t*.8)*.05*(1-run)-pitch*.8,r2);RW(pick(D.head,D.head.length-2),_AZ,-roll*.7,r2);RW(pick(D.head,0),_AY,Math.sin(t*.6)*.45*(1-run)+Math.max(-.5,Math.min(.5,HS.x*.3)),r2)}
   if(!FIG.mixer){
-  var ab=Math.sin(ph*2+1)*.18*run,idle=(1-run);D.arms.forEach(function(c,i){rotW(pick(c,0),_AX,ab*(i?-.8:1)-air*.5+Math.sin(t*1.3+i)*.06*idle,r2);rotW(pick(c,1),_AX,ab*(i?-.5:.6)-air*.3,r2);rotW(pick(c,2),_AX,ab*.5*(i?-1:1),r2)});   // visible arm swing while riding, slow drift at idle   // arms fly up in the air
+
+  var ab=Math.sin(ph*2+1)*.18*run,idle=(1-run);D.arms.forEach(function(c,i){rotW(pick(c,0),_AX,ab*(i?-.8:1)-air*.5+Math.sin(t*1.3+i)*.06*idle,r2);rotW(pick(c,1),_AX,ab*(i?-.5:.6)-air*.3,r2);rotW(pick(c,2),_AX,ab*.5*(i?-1:1),r2)});   // visible arm swing while riding, slow drift at idle
+   // idle behaviours (no clips yet): a wave every ~9 s with the right arm, a pat on Kimpoy with the left, slow look-around, breathing
+   FIG.idleT=(sp>.5||P.air)?0:(FIG.idleT||0)+dt;var it=FIG.idleT,cycle=it%9,wv=cycle>3&&cycle<5.4?Math.min(1,(cycle-3)*3,(5.4-cycle)*3):0,pat=cycle>6.5&&cycle<8.5?Math.sin((cycle-6.5)*Math.PI/2)*Math.max(0,Math.sin((cycle-6.5)*6)):0;
+   if(wv>0&&D.arms[1]){var c=D.arms[1];rotW(pick(c,0),_AX,1.9*wv,r2);rotAdd(pick(c,0),_AZ,.5*wv,r2);rotW(pick(c,2),_AX,.9*wv,r2);rotW(pick(c,3),_AZ,(-.4+Math.sin(t*9)*.35)*wv,r2)}   // raise, bend, wave the hand
+   if(pat>0&&D.arms[0]){var c0=D.arms[0];rotW(pick(c0,0),_AX,.4+pat*.5,r2);rotW(pick(c0,1),_AX,.3+pat*.4,r2)}   // pat the fur
+   if(D.spine.length>1){rotW(D.spine[1],_AZ,Math.sin(it*.9)*.04*(1-run),r2)}   // weight shift   // arms fly up in the air
   var sq=P.squash||0;r2.scale.y=r2.userData.sc0?r2.userData.sc0*(1-sq*.35):r2.scale.y;if(!r2.userData.sc0)r2.userData.sc0=r2.scale.y;   // landing squash
   if(D.spine.length>1){rotW(D.spine[1],_AZ,Math.max(-.25,Math.min(.25,-HS.x*.25))+Math.sin(ph)*.05*run,r2);rotW(D.spine[D.spine.length-1],_AX,Math.max(-.2,Math.min(.2,HS.z*.2))+Math.sin(ph*2)*.08*run+(1-run)*.02*Math.sin(t*2.2),r2)}   // torso rocks with the gait, breathes at idle
   D.legs.forEach(function(c,i){rotW(pick(c,1),_AX,Math.sin(ph*2)*.05*run*(i?-1:1)+air*.4,r2)})}}   // legs swing back in the air (procedural only when there are no clips)
@@ -425,7 +431,7 @@ function fitRoot(root,h,dy,dz){root.updateMatrixWorld(true);var bb=new THREE.Box
 function skinMat(mesh,rough){var old=mesh.material;mesh.material=new THREE.MeshStandardMaterial({map:old.map||null,color:0xffffff,roughness:rough,metalness:0,skinning:true});mesh.castShadow=true;mesh.frustumCulled=false}
 function dropArm(c,root){if(!c||!c.length)return;var sh=pick(c,0),hand=c[c.length-1],inv=new THREE.Matrix4(),w=new THREE.Vector3(),best=0,bestY=1e9;
  for(var a=-2.6;a<=2.6;a+=.1){sh.quaternion.copy(sh.userData.rest);rotW(sh,_AZ,a,root);root.updateMatrixWorld(true);inv.copy(root.matrixWorld).invert();hand.getWorldPosition(w);w.applyMatrix4(inv);if(w.y<bestY){bestY=w.y;best=a}}
- sh.quaternion.copy(sh.userData.rest);rotW(sh,_AZ,best,root);sh.userData.rest.copy(sh.quaternion);root.updateMatrixWorld(true)}
+ sh.quaternion.copy(sh.userData.rest);rotW(sh,_AZ,best,root);sh.userData.rest.copy(sh.quaternion);root.updateMatrixWorld(true);c.dropAng=best}
 function bakePose(list,root){list.forEach(function(p){if(!p[0])return;rotW(p[0],p[1],p[2],root);p[0].userData.rest.copy(p[0].quaternion);root.updateMatrixWorld(true)})}
 function loadFigures(){
  GL.load('models/kimpoy-rig.glb?v='+FIGV,function(gl){var root=gl.scene,mesh=null;root.traverse(function(m){if(m.isSkinnedMesh)mesh=m});if(!mesh)return;

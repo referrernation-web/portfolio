@@ -370,7 +370,7 @@ function diaShader(mat){mat.onBeforeCompile=function(sh){for(var k in FIG.d)sh.u
  'transformed=p;')};mat.needsUpdate=true}
 // --- Kimpoy skeleton: bone names from UniRig (verified by screenshot): spine 0-3, neck 4, head 5, snout 6, ears 7/9,
 // legs FR 11-15, FL 16-20, BR 21-25, BL 26-30, tail 31-35. rotW() rotates a bone about a model-space axis.
-var _q1=new THREE.Quaternion(),_q2=new THREE.Quaternion(),_q3=new THREE.Quaternion(),_AX=new THREE.Vector3(1,0,0),_AY=new THREE.Vector3(0,1,0);
+var _q1=new THREE.Quaternion(),_q2=new THREE.Quaternion(),_q3=new THREE.Quaternion(),_AX=new THREE.Vector3(1,0,0),_AY=new THREE.Vector3(0,1,0),_m4=new THREE.Matrix4(),_v3=new THREE.Vector3();
 function rotW(bone,axis,ang){bone.parent.getWorldQuaternion(_q1);FIG.kim.getWorldQuaternion(_q2);var prel=_q2.invert().multiply(_q1);_q3.setFromAxisAngle(axis,ang);var d=prel.clone().invert().multiply(_q3).multiply(prel);bone.quaternion.copy(d).multiply(bone.userData.rest)}
 function figAnim(sp,run,boost){if(FIG.dia){var d=FIG.d;d.uT.value=performance.now()/1000;d.uPh.value=P.ft;d.uRun.value=run;d.uSx.value=Math.max(-.6,Math.min(.6,-HS.x*.35));d.uSz.value=Math.max(-.6,Math.min(.6,HS.z*.35))}
  var B=FIG.B;if(!B)return;var t=performance.now()/1000,ph=P.ft*Math.PI,air=P.air?1:0;
@@ -383,6 +383,7 @@ function figAnim(sp,run,boost){if(FIG.dia){var d=FIG.d;d.uT.value=performance.no
  rotW(B.bone_5,_AX,Math.sin(ph*2)*.08*run-.15*air+Math.sin(t*.9)*.05*(1-run));rotW(B.bone_4,_AY,Math.sin(t*.7)*.25*(1-run));   // head nod with the gait, look around when idle
  rotW(B.bone_7,_AX,-.3*run+Math.sin(ph*2+1)*.25*run);rotW(B.bone_9,_AX,-.3*run+Math.sin(ph*2+1)*.25*run);                        // ears fold back with speed, flap with the gait
  rotW(B.bone_6,_AX,.12*(boost?1:0));                                                                                              // mouth opens a bit on boost
+ if(FIG.hats){_m4.copy(DOG.matrixWorld).invert();B.bone_5.getWorldPosition(_v3);_v3.applyMatrix4(_m4);FIG.hats.forEach(function(h){h.position.set(_v3.x+.1,_v3.y+.1,_v3.z+.05)})}   // hats ride the head bone
 }
 function loadFigures(){
  GL.load('models/kimpoy-rig.glb',function(gl){var root=gl.scene,mesh=null;root.traverse(function(m){if(m.isSkinnedMesh)mesh=m});if(!mesh)return;
@@ -391,7 +392,7 @@ function loadFigures(){
   var old=mesh.material;mesh.material=new THREE.MeshStandardMaterial({vertexColors:!!mesh.geometry.attributes.color,map:old.map||null,color:0xffffff,roughness:.95,metalness:0,skinning:true});mesh.castShadow=true;mesh.frustumCulled=false;
   // ponytail: no fur shell on the rigged dog (fur detail + AO are baked into the texture; the shell drew streaks over the rider)
   var B={};root.traverse(function(x){if(x.isBone){B[x.name]=x;x.userData.rest=x.quaternion.clone()}});FIG.B=B;
-  var hats=Object.keys(HATM).map(function(k){return HATM[k]});DOG.children.forEach(function(ch){if(ch!==FIG.dia&&hats.indexOf(ch)<0&&!ch.userData.dianna)ch.visible=false});
+  var hats=Object.keys(HATM).map(function(k){return HATM[k]});FIG.hats=hats;DOG.children.forEach(function(ch){if(ch!==FIG.dia&&hats.indexOf(ch)<0&&!ch.userData.dianna)ch.visible=false});
   FIG.kim=root;DOG.add(root);
  },undefined,function(){});
  GL.load('models/dianna.glb',function(gl){var mesh=figMesh(gl,FIG.diaH,0,0);if(!mesh)return;var bb=mesh.geometry.boundingBox;FIG.d.uMin.value.copy(bb.min);FIG.d.uSize.value.copy(bb.getSize(new THREE.Vector3()));diaShader(mesh.material);var wrap=new THREE.Group();wrap.position.set(0,FIG.diaY,FIG.diaZ);wrap.rotation.x=FIG.lean;wrap.add(mesh);FIG.dia=wrap;DOG.add(wrap);

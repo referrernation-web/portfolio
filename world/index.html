@@ -41,7 +41,9 @@ canvas#c{display:block;width:100%;height:100%;touch-action:none;cursor:grab}canv
 #panel header div{flex:1}#panel header em{font:700 10px 'JetBrains Mono',monospace;color:var(--maroon);letter-spacing:.14em;font-style:normal}
 #panel header h2{margin:2px 0 0;font-size:22px;font-weight:900;letter-spacing:-.02em;line-height:1.15}
 #panel header button{background:#fff;border:1px solid #ddd;border-bottom-width:3px;border-radius:10px;width:34px;height:34px;font-size:18px;cursor:pointer}
-#panel .body{padding:16px 22px 22px;overflow:auto;font-size:14px;line-height:1.55;color:#333}
+#panel .body{padding:16px 22px 22px;overflow-y:auto;overflow-x:hidden;font-size:14px;line-height:1.55;color:#333;touch-action:pan-y;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+#panel .grip{width:44px;height:5px;border-radius:99px;background:#d9cbb9;margin:8px auto 0;display:none}body.mob #panel .grip{display:block}
+#viewBtn{pointer-events:auto;margin-top:6px;width:100%;background:#fff;color:#333;border:1px solid #ddd;border-bottom-width:3px;border-radius:99px;padding:7px 10px;font:800 10px Inter;letter-spacing:.06em;cursor:pointer}
 .body p{margin:0 0 10px}.body h4{margin:16px 0 6px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--maroon)}
 .stat{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.stat div{background:#fff;border-radius:14px;padding:10px 12px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.06)}.stat b{display:block;font-size:20px;font-weight:900;letter-spacing:-.02em}.stat small{color:#666;font-size:11px}
 .tl{list-style:none;padding:0;margin:0}.tl li{position:relative;padding:0 0 12px 18px;border-left:2px solid #e2d2c3;margin-left:6px}.tl li::before{content:"";position:absolute;left:-7px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--maroon);border:2px solid var(--cream)}.tl b{display:block;font-size:13px}.tl i{font:700 11px 'JetBrains Mono',monospace;color:var(--maroon);font-style:normal}
@@ -52,7 +54,7 @@ canvas#c{display:block;width:100%;height:100%;touch-action:none;cursor:grab}canv
 #prog{display:none!important;position:fixed;left:16px;bottom:18px;z-index:5;display:flex;gap:6px;flex-wrap:wrap;max-width:320px;pointer-events:none}
 #prog span{background:rgba(251,247,241,.88);border-radius:99px;padding:6px 10px;font:700 10px 'JetBrains Mono',monospace;letter-spacing:.05em;color:#777;box-shadow:0 4px 10px rgba(0,0,0,.12)}
 #prog span.done{background:var(--maroon);color:#fff}
-@media(pointer:coarse){#prog{left:16px;top:64px;bottom:auto;max-width:190px}}
+body.mob #prog{left:16px;top:64px;bottom:auto;max-width:190px}
 #obj{position:fixed;left:16px;top:74px;z-index:5;width:172px;background:rgba(251,247,241,.9);border-radius:14px;padding:10px 12px;box-shadow:0 8px 20px rgba(0,0,0,.14),inset 0 -3px 0 rgba(0,0,0,.06);pointer-events:none;font:600 11px/1.5 'JetBrains Mono',monospace;color:#333}
 #obj h4{margin:0 0 6px;font:800 10px Inter;letter-spacing:.14em;color:#8a1c2b}
 #obj div{display:flex;gap:6px;align-items:center;color:#777}#obj div.done{color:#111}#obj div i{width:12px;height:12px;border-radius:50%;border:2px solid #bbb;display:inline-block;flex:none;font-style:normal;font-size:8px;line-height:9px;text-align:center}#obj div.done i{background:#8a1c2b;border-color:#8a1c2b;color:#fff}
@@ -83,12 +85,12 @@ canvas#c{display:block;width:100%;height:100%;touch-action:none;cursor:grab}canv
 #menu .go{margin-top:6px}
 #menu .keys{justify-content:flex-start}#ach span.on{background:#8a1c2b;color:#fff;border-color:#8a1c2b}
 #map{cursor:pointer;pointer-events:auto}
-@media(pointer:coarse){#panel.on.dock{max-height:80px}#status{display:none}#obj{top:64px;width:150px;font-size:10px}}
-@media(pointer:coarse) and (orientation:landscape){#panel{top:14px;bottom:14px;height:auto;width:44%;right:14px}#obj{display:none}#hint{bottom:14px}#map{width:110px;height:110px}}
+body.mob #panel.on.dock{max-height:80px}body.mob #status{display:none}body.mob #obj{top:64px;width:150px;font-size:10px}
+@media(orientation:landscape){body.mob #panel{top:14px;bottom:14px;height:auto;width:44%;right:14px}body.mob #obj{display:none}body.mob #hint{bottom:14px}body.mob #map{width:110px;height:110px}}
 #stick{position:fixed;left:26px;bottom:26px;width:120px;height:120px;border-radius:50%;background:rgba(17,17,17,.18);z-index:5;display:none;touch-action:none}
 #stick i{position:absolute;left:35px;top:35px;width:50px;height:50px;border-radius:50%;background:rgba(251,247,241,.95);box-shadow:0 6px 14px rgba(0,0,0,.25)}
 #jump{position:fixed;right:26px;bottom:26px;width:70px;height:70px;border-radius:50%;background:var(--maroon);color:#fff;border:0;font:800 12px Inter;z-index:5;display:none;box-shadow:0 8px 16px rgba(0,0,0,.3),inset 0 -4px 0 rgba(0,0,0,.25)}
-@media(pointer:coarse){#stick,#jump{display:block}#panel{top:auto;bottom:118px;height:48%;width:calc(100% - 28px)}#hint{bottom:106px}}
+body.mob #stick,body.mob #jump{display:block}body.mob #panel{top:auto;bottom:112px;height:56%;width:calc(100% - 28px)}body.mob #hint{bottom:100px}body.mob #panel .body{padding-bottom:40px}
 </style>
 </head>
 <body>
@@ -109,16 +111,16 @@ canvas#c{display:block;width:100%;height:100%;touch-action:none;cursor:grab}canv
 <canvas id="map" width="300" height="300"></canvas>
 <div id="hint"></div>
 <div id="prog"></div>
-<div id="obj"><h4>OBJECTIVES</h4><div id="objl"></div><div class="next" id="objn"></div><button id="tourBtn">&#9654; STORY TOUR</button></div>
+<div id="obj"><h4>OBJECTIVES</h4><div id="objl"></div><div class="next" id="objn"></div><button id="tourBtn">&#9654; STORY TOUR</button><button id="viewBtn">VIEW: AUTO</button></div>
 <div id="sub"></div>
 <div id="status"><span id="stLoc">MANILA</span><span id="stSpd">0 m/s</span><span id="stKey">WASD · drag to pan</span></div>
 <div id="vig"></div><div id="toasts"></div><div id="tip"></div><div id="fade"></div>
 <div id="menu"><div class="card">
 <h2>Paused</h2><p>Settings are saved on this device.</p>
-<div class="row"><button id="mRes">Resume</button><button id="mSnd">Sound</button><button id="mEdge">Edge scroll</button><button id="mVoice">Voice</button><button id="mMusic">Music</button><button id="mHat">Hat: auto</button><button id="mShare">Copy link to this spot</button><button id="mPhoto">Photo mode (P)</button><button id="mQ">Quality: auto</button><button id="mTour">Restart</button><a class="go" href="../" style="text-decoration:none;display:inline-block">Classic resume</a></div>
+<div class="row"><button id="mRes">Resume</button><button id="mSnd">Sound</button><button id="mEdge">Edge scroll</button><button id="mVoice">Voice</button><button id="mMusic">Music</button><button id="mHat">Hat: auto</button><button id="mShare">Copy link to this spot</button><button id="mPhoto">Photo mode (P)</button><button id="mView">View: auto</button><button id="mQ">Quality: auto</button><button id="mTour">Restart</button><a class="go" href="../" style="text-decoration:none;display:inline-block">Classic resume</a></div>
 <div id="ach" class="keys" style="margin-bottom:10px"></div><div class="keys"><span>W A S D / arrows = move on screen</span><span>SHIFT boost</span><span>SPACE jump</span><span>ENTER / E / click = use pad</span><span>Q / E rotate camera · C reset</span><span>H center on Kimpoy · B bark</span><span>Double-click ground = walk there</span><span>Drag / right-drag = pan · wheel = zoom</span><span>Minimap: click = peek · double-click = teleport</span><span>ESC menu · F1 help · L mute · R respawn</span><span>Gamepad: stick move, A jump, X use, RT boost, Start menu</span></div><p style="font-size:11px;color:#666;margin:10px 0 0">3D models via <a href="https://poly.pizza" target="_blank" rel="noopener">Poly Pizza</a>: Eiffel Tower by Scott Marshall (CC-BY), Lady Liberty by Anna M (CC-BY), Colosseum by CreativeTrio (CC0), Pyramid by Poly by Google (CC-BY), Torii Gate by Hattie Stroud (CC-BY), Anubis Statue by Zach Miller (CC-BY). Everything else is procedural.</p>
 </div></div>
-<aside id="panel"><header><div><em id="pk"></em><h2 id="pt"></h2></div><button id="px" aria-label="Close">×</button></header><div class="body" id="pb"></div></aside>
+<aside id="panel"><div class="grip"></div><header><div><em id="pk"></em><h2 id="pt"></h2></div><button id="px" aria-label="Close">×</button></header><div class="body" id="pb"></div></aside>
 <div id="stick"><i></i></div><button id="jump">JUMP</button>
 <div id="load"><div class="card">
 <h1>Mark's <span>World</span></h1>
@@ -456,8 +458,10 @@ var camT=new THREE.Vector3(0,0,10);
 var HS={x:0,z:0,vx:0,vz:0}; // hair spring state
 var ANG={def:new THREE.Vector3(.45,.85,.85),proj:new THREE.Vector3(.12,1.15,.75),cur:new THREE.Vector3(.45,.85,.85),yaw:0,yawC:0};var YUP=new THREE.Vector3(0,1,0);
 var TOUCH=matchMedia('(pointer:coarse)').matches;
+function applyView(){var mob=SET.view==='mobile'||(SET.view==='auto'&&TOUCH);document.body.classList.toggle('mob',mob);var t='VIEW: '+SET.view.toUpperCase()+(SET.view==='auto'?(mob?' (MOBILE)':' (DESKTOP)'):'');var b=document.getElementById('viewBtn');if(b)b.textContent=t;var m=document.getElementById('mView');if(m)m.textContent='View: '+SET.view;W=innerWidth;H=innerHeight;R.setSize(W,H);CAM.aspect=W/H;CAM.updateProjectionMatrix()}
+function cycleView(){SET.view=SET.view==='auto'?'mobile':SET.view==='mobile'?'desktop':'auto';saveSet();applyView();toast('Layout: '+SET.view)}
 // settings (localStorage) + pause menu
-var SET={sound:true,voice:true,music:true,edge:!TOUCH,quality:'auto',seen:false,hat:'auto'};try{Object.assign(SET,JSON.parse(localStorage.getItem('mw.settings')||'{}'))}catch(e){}
+var SET={sound:true,voice:true,music:true,edge:!TOUCH,quality:'auto',seen:false,hat:'auto',view:'auto'};try{Object.assign(SET,JSON.parse(localStorage.getItem('mw.settings')||'{}'))}catch(e){}
 function saveSet(){try{localStorage.setItem('mw.settings',JSON.stringify(SET))}catch(e){}}
 function applyQ(){var pr=SET.quality==='low'?1:SET.quality==='high'?Math.min(devicePixelRatio,2):Math.min(devicePixelRatio,TOUCH?1.5:1.75);R.setPixelRatio(pr);R.shadowMap.enabled=SET.quality!=='low';sun.shadow.mapSize.set(SET.quality==='high'?4096:TOUCH?1024:2048,SET.quality==='high'?4096:TOUCH?1024:2048);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null}document.getElementById('mQ').textContent='Quality: '+SET.quality}
 var MENU={on:false},menuEl=document.getElementById('menu');
@@ -474,7 +478,7 @@ function shareSpot(){var u=location.origin+location.pathname+(cur?'#'+cur.id:'')
 document.getElementById('mShare').onclick=function(){menuToggle();shareSpot()};
 function photoToggle(){document.body.classList.toggle('photo');toast(document.body.classList.contains('photo')?'Photo mode · press P to exit':'HUD back')}
 document.getElementById('mPhoto').onclick=function(){menuToggle();photoToggle()};
-mute=!SET.sound;applyQ();
+mute=!SET.sound;applyQ();applyView();document.getElementById('viewBtn').onclick=function(){grabFocus();cycleView()};document.getElementById('mView').onclick=function(){cycleView()};
 // Mark's voice per landmark (HeyGen v1 clone, MP3 in world/vo) + subtitles
 var VOT={home:"Welcome to Manila. I'm Mark Edcel Lopez, full-stack developer, SEO and AEO specialist. Ride Kimpoy to any landmark and I'll tell you the story behind the numbers.",journey:"Banaue. Every terrace here is a step: service crew at Greenwich, six years as a headhunter, civil engineering at the University of Makati, then ReferNation, Alorica, Coggno, and now Bytown Bath and Futurebloom.",expertise:"Giza. Four pyramids, four things I do: WordPress development, technical SEO, answer engine optimization, and automation with Node and the Claude API. One hire, not two.",skills:"Paris. This is the stack I work with every day: WordPress and Elementor, Search Console and GA4, JSON-LD schema, and Node, React and Vercel.",projects:"Boracay. Seven boards, seven receipts. Coggno at number two in AI visibility. Bytown Bath at position two point seven. Aire One with forty-four AI citations a day. Press Enter on any board to open the live site.",certs:"Rome. Twenty-nine credentials in the Colosseum: engineering project management, business, communication, and English at C2. Every one links to its certificate.",contact:"New York. If you want a site that ranks on Google and gets cited by ChatGPT, this is the stop. Email me, or press Enter on a pad. I work US, Canada and Australia hours."};
 var VO={},voCur=null,subEl=document.getElementById('sub');

@@ -354,7 +354,7 @@ var RG=new THREE.Group(),DOG=new THREE.Group(),legs=[],tail,dHair,EARS=[],TONGUE
  [[-.33,0],[.33,0]].forEach(function(q){var st=new THREE.Mesh(new THREE.BoxGeometry(.14,.6,.2),HRM);st.position.set(q[0],-.12,-.05);HAIR.add(st)});   // side strands
 })();
 // ===== real 3D figures: Hunyuan3D-2.1 shapes; Kimpoy = UniRig skeleton (36 bones) animated procedurally; Dianna = shader sway =====
-var FIG={kim:null,dia:null,B:null,kimH:2.35,kimY:.05,kimZ:.05,diaH:1.8,diaY:1.0,diaZ:-.5,lean:.1};
+var FIG={kim:null,dia:null,B:null,kimH:2.35,kimY:.05,kimZ:.05,diaH:1.85,diaY:1.22,diaZ:-.5,lean:.08};
 function figMesh(gl,h,dy,dz){var mesh=null;gl.scene.traverse(function(m){if(m.isMesh&&!mesh)mesh=m});if(!mesh)return null;var g=mesh.geometry;g.computeVertexNormals();g.computeBoundingBox();var bb=g.boundingBox,sz=bb.getSize(new THREE.Vector3()),c=bb.getCenter(new THREE.Vector3()),sc=h/sz.y;
  var old=mesh.material;mesh.material=new THREE.MeshStandardMaterial({vertexColors:!!g.attributes.color,map:old.map||null,color:0xffffff,roughness:.95,metalness:0});mesh.castShadow=true;mesh.position.set(-c.x*sc,-bb.min.y*sc+(dy||0),-c.z*sc+(dz||0));mesh.scale.setScalar(sc);return mesh}
 FIG.d={uT:{value:0},uPh:{value:0},uRun:{value:0},uSx:{value:0},uSz:{value:0},uMin:{value:new THREE.Vector3()},uSize:{value:new THREE.Vector3(1,1,1)}};
@@ -407,6 +407,8 @@ function loadFigures(){
   var old=mesh.material;mesh.material=new THREE.MeshStandardMaterial({map:old.map||null,color:0xffffff,roughness:.9,metalness:0,skinning:true});mesh.castShadow=true;mesh.frustumCulled=false;
   var B={};root.traverse(function(x){if(x.isBone){B[x.name]=x;x.userData.rest=x.quaternion.clone()}});FIG.dB=B;
   var wrap=new THREE.Group();wrap.position.set(0,FIG.diaY,FIG.diaZ);wrap.rotation.x=FIG.lean;wrap.rotation.y=Math.PI;wrap.add(root);FIG.dia=wrap;DOG.add(wrap);
+  // riding pose baked into the rest quaternions (verified by screenshot): arms down holding the fur, elbows bent, legs spread over the flanks, knees back
+  var _Z=new THREE.Vector3(0,0,1);wrap.updateMatrixWorld(true);[['bone_6',_AX,1.15],['bone_11',_AX,1.15],['bone_7',_AX,.35],['bone_12',_AX,.35],['bone_16',_Z,.6],['bone_20',_Z,-.6],['bone_17',_AX,-.5],['bone_21',_AX,-.5]].forEach(function(p){var bn=B[p[0]];if(!bn)return;rotW(bn,p[1],p[2],wrap);bn.userData.rest.copy(bn.quaternion);wrap.updateMatrixWorld(true)});
   DOG.children.forEach(function(ch){if(ch.userData.dianna)ch.visible=false})},undefined,function(){});
 }
 loadFigures();

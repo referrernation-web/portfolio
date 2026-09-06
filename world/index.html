@@ -391,8 +391,14 @@ function figAnim(sp,run,boost){var t=performance.now()/1000,ph=P.ft*Math.PI,air=
  var pitch=spring(SPR.pitch,-accZ*.35-air*.15+(boost?-.08:0),60,9,dt),roll=spring(SPR.roll,turn*.35*run,50,8,dt);
  if(FIG.dia&&FIG.dia.parent){var wr=FIG.dia.parent;wr.position.y=FIG.diaY+bob;wr.rotation.x=FIG.lean+pitch;wr.rotation.z=roll}
  var K=FIG.K;if(K){var r=FIG.kim,sw=Math.sin(ph)*run*.55,kn=Math.max(0,Math.sin(ph+.6))*run*.5,kn2=Math.max(0,-Math.sin(ph+.6))*run*.5;
-  K.legs.forEach(function(c){var same=(c.front===c.right),s1=(same?-1:1)*sw,k=same?kn:kn2,tuck=c.front?-.9:.9; // diagonal pairs; negative X = forward for front legs
-   rotW(pick(c,0),_AX,s1*(1-air)+tuck*air,r);rotW(pick(c,1),_AX,-k*.8*(1-air)+tuck*.6*air,r);rotW(pick(c,2),_AX,k*.6*(1-air),r)});
+  // gait v2: each leg runs a stance/swing cycle. stance (60%) sweeps the leg back slowly and plants it; swing (40%) whips it forward with the knee lifted.
+  // trot < 10 m/s: diagonal pairs in phase; gallop >= 10: front pair leads the back pair by a quarter cycle (spine flexes with it)
+  var gallop=Math.max(0,Math.min(1,(sp-9)/4)),cyc=(P.ft*.5)%1;
+  function legCurve(ph01){var st=.6;if(ph01<st){var u=ph01/st;return {sw:.45-u*.9,knee:.05,lift:0}}var u=(ph01-st)/(1-st);return {sw:-.45+u*.9,knee:Math.sin(u*Math.PI)*.9,lift:Math.sin(u*Math.PI)}}
+  K.legs.forEach(function(c){var same=(c.front===c.right);var offTrot=same?0:.5;var offGal=(c.front?0:.25)+(c.right?0:.08);var off=offTrot*(1-gallop)+offGal*gallop;var g=legCurve((cyc+off)%1);
+   var dir=c.front?-1:1;   // negative X swings a front leg forward
+   var amp=run*(1-air);rotW(pick(c,0),_AX,dir*g.sw*1.1*amp+(c.front?-.9:.9)*air,r);rotW(pick(c,1),_AX,(c.front?1:-1)*g.knee*.9*amp+(c.front?-.55:.55)*air,r);rotW(pick(c,2),_AX,(c.front?-1:1)*g.lift*.5*amp,r)});
+  if(K.head.length>1){rotW(K.head[0],_AX,-Math.sin(cyc*Math.PI*2)*.18*gallop*run,r)}   // neck dips with the gallop
   var vy=Math.max(-1,Math.min(1,(P.vy||0)/9)),earS=spring(SPR.ear,vy*.6-air*.3-run*.3,120,10,dt);
   if(K.head.length>1)rotW(K.head[0],_AX,Math.sin(ph*2+.5)*.06*run,r);   // neck flexes with the gallop
   var wag=Math.sin(t*(sp>.4?7:11))*(.22+.1*(boost?1:0))-turn*.5,lift=-.25-.3*(boost?1:0)-.15*run+vy*.2;   // physics: tail swings out of a turn, lifts on the way up

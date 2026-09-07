@@ -89,7 +89,7 @@ body.mob #panel.on.dock{max-height:80px}body.mob #status{display:none}body.mob #
 @media(orientation:landscape){body.mob #panel{top:14px;bottom:14px;height:auto;width:44%;right:14px}body.mob #obj{display:none}body.mob #hint{bottom:14px}body.mob #map{width:110px;height:110px}}
 #stick{position:fixed;left:26px;bottom:26px;width:120px;height:120px;border-radius:50%;background:rgba(17,17,17,.18);z-index:5;display:none;touch-action:none}
 #stick i{position:absolute;left:35px;top:35px;width:50px;height:50px;border-radius:50%;background:rgba(251,247,241,.95);box-shadow:0 6px 14px rgba(0,0,0,.25)}
-#jump{position:fixed;right:26px;bottom:26px;width:70px;height:70px;border-radius:50%;background:var(--maroon);color:#fff;border:0;font:800 12px Inter;z-index:5;display:none;box-shadow:0 8px 16px rgba(0,0,0,.3),inset 0 -4px 0 rgba(0,0,0,.25)}
+#jump{position:fixed;right:26px;bottom:26px;width:70px;height:70px;border-radius:50%;background:var(--maroon);color:#fff;border:0;font:800 12px Inter;z-index:5;display:none;box-shadow:0 8px 16px rgba(0,0,0,.3),inset 0 -4px 0 rgba(0,0,0,.25)}#mnt{position:fixed;right:26px;bottom:106px;height:42px;padding:0 16px;border-radius:21px;background:var(--maroon);color:#fff;border:0;font:800 12px Inter;z-index:5;box-shadow:0 6px 12px rgba(0,0,0,.3);cursor:pointer}body.photo #mnt{display:none}
 body.mob #stick,body.mob #jump{display:block}body.mob #panel{top:auto;bottom:112px;height:56%;width:calc(100% - 28px)}body.mob #hint{bottom:100px}body.mob #panel .body{padding-bottom:40px}
 </style>
 </head>
@@ -121,7 +121,7 @@ body.mob #stick,body.mob #jump{display:block}body.mob #panel{top:auto;bottom:112
 <div id="ach" class="keys" style="margin-bottom:10px"></div><div class="keys"><span>W A S D / arrows = move on screen</span><span>SHIFT boost</span><span>SPACE jump</span><span>ENTER / E / click = use pad</span><span>Q / E rotate camera · C reset</span><span>H center on Kimpoy · B bark</span><span>Double-click ground = walk there</span><span>Drag / right-drag = pan · wheel = zoom</span><span>Minimap: click = peek · double-click = teleport</span><span>ESC menu · F1 help · L mute · R respawn</span><span>Gamepad: stick move, A jump, X use, RT boost, Start menu</span></div><p style="font-size:11px;color:#666;margin:10px 0 0">3D models via <a href="https://poly.pizza" target="_blank" rel="noopener">Poly Pizza</a>: Eiffel Tower by Scott Marshall (CC-BY), Lady Liberty by Anna M (CC-BY), Colosseum by CreativeTrio (CC0), Pyramid by Poly by Google (CC-BY), Torii Gate by Hattie Stroud (CC-BY), Anubis Statue by Zach Miller (CC-BY). Everything else is procedural.</p>
 </div></div>
 <aside id="panel"><div class="grip"></div><header><div><em id="pk"></em><h2 id="pt"></h2></div><button id="px" aria-label="Close">×</button></header><div class="body" id="pb"></div></aside>
-<div id="stick"><i></i></div><button id="jump">JUMP</button>
+<div id="stick"><i></i></div><button id="jump">JUMP</button><button id="mnt">&#128021; BABA (G)</button>
 <div id="load"><div class="card">
 <h1>Mark's <span>World</span></h1>
 <p>Dianna rides Kimpoy across the wonders of the world. Every landmark is one part of my resume. Drive in and the sign opens. Plow through the letters, bowl the pins, kick the coconuts.</p>
@@ -361,7 +361,7 @@ var _q1=new THREE.Quaternion(),_q2=new THREE.Quaternion(),_q3=new THREE.Quaterni
 function rotW(bone,axis,ang,root){bone.parent.getWorldQuaternion(_q1);root.getWorldQuaternion(_q2);var prel=_q2.invert().multiply(_q1);_q3.setFromAxisAngle(axis,ang);var d=prel.clone().invert().multiply(_q3).multiply(prel);bone.quaternion.copy(d).multiply(bone.userData.rest)}
 function rotAdd(bone,axis,ang,root){bone.parent.getWorldQuaternion(_q1);root.getWorldQuaternion(_q2);var prel=_q2.invert().multiply(_q1);_q3.setFromAxisAngle(axis,ang);var d=prel.clone().invert().multiply(_q3).multiply(prel);bone.quaternion.premultiply(d)}   // additive: on top of whatever the mixer posed
 function boneChains(root){ // normalised bone positions in root space + leaf-to-branch chains
- root.updateMatrixWorld(true);var inv=new THREE.Matrix4().copy(root.matrixWorld).invert(),bones=[];root.traverse(function(x){if(x.isBone){var p=new THREE.Vector3();x.getWorldPosition(p);p.applyMatrix4(inv);x.userData.rest=x.quaternion.clone();x.userData.p=p;bones.push(x)}});
+ root.updateMatrixWorld(true);var inv=new THREE.Matrix4().copy(root.matrixWorld).invert(),bones=[];root.traverse(function(x){if(x.isBone){var p=new THREE.Vector3();x.getWorldPosition(p);p.applyMatrix4(inv);x.userData.rest=x.quaternion.clone();x.userData.rest0=x.quaternion.clone();x.userData.p=p;bones.push(x)}});
  var bb=new THREE.Box3();bones.forEach(function(x){bb.expandByPoint(x.userData.p)});var sz=bb.getSize(new THREE.Vector3());bones.forEach(function(x){x.userData.n=new THREE.Vector3((x.userData.p.x-bb.min.x)/sz.x,(x.userData.p.y-bb.min.y)/sz.y,(x.userData.p.z-bb.min.z)/sz.z)});
  function kids(x){return x.children.filter(function(c){return c.isBone})}
  var chains=[];bones.forEach(function(x){if(kids(x).length)return;var ch=[x],c=x;while(c.parent&&c.parent.isBone&&kids(c.parent).length===1){c=c.parent;ch.unshift(c)}chains.push(ch)});
@@ -387,16 +387,16 @@ function pick(chain,i){return chain[Math.min(chain.length-1,Math.max(0,i))]}
 // spring-damper (research: secondary motion = each part is a point mass on a spring toward its rigid target -> lag, overshoot, settle)
 var SPR={bob:{v:0,x:0},pitch:{v:0,x:0},roll:{v:0,x:0},head:{v:0,x:0},ear:{v:0,x:0},t:0};
 function spring(s,target,k,d,dt){var a=(target-s.x)*k-s.v*d;s.v+=a*dt;s.x+=s.v*dt;return s.x}
-function figAnim(sp,run,boost){var t=performance.now()/1000,ph=P.ft*Math.PI,air=P.air?1:0;var dt=Math.min(.05,Math.max(.001,t-(SPR.t||t)));SPR.t=t;
+function figAnim(sp,run,boost,M){M=M||P;var t=performance.now()/1000,ph=M.ft*Math.PI,air=M.air?1:0;var dt=Math.min(.05,Math.max(.001,t-(SPR.t||t)));SPR.t=t;
  // rider physics: Kimpoy's back bobs with the gait; Dianna is a mass on a spring above it (lags, overshoots), leans back under acceleration, rolls into turns
- var accZ=Math.max(-1,Math.min(1,HS.z*.5)),turn=Math.max(-1,Math.min(1,(P.turnV||0)));
- var bob=spring(SPR.bob,(P.air?-.12:Math.abs(Math.sin(ph))*.22*run),140,14,dt);
+ var accZ=Math.max(-1,Math.min(1,HS.z*.5)),turn=Math.max(-1,Math.min(1,(M.turnV||0)));
+ var bob=spring(SPR.bob,(M.air?-.12:Math.abs(Math.sin(ph))*.22*run),140,14,dt);
  var pitch=spring(SPR.pitch,-accZ*.35-air*.15+(boost?-.08:0),60,9,dt),roll=spring(SPR.roll,turn*.35*run,50,8,dt);
- if(FIG.dia&&FIG.dia.parent){var wr=FIG.dia.parent;wr.position.y=(FIG.onSeat?FIG.diaYs:FIG.diaY)+bob;if(FIG.onSeat)wr.position.z=FIG.diaZs;wr.rotation.x=FIG.lean+pitch;wr.rotation.z=roll}
+ if(FIG.dia&&FIG.dia.parent&&RIDE.on){var wr=FIG.dia.parent;wr.position.y=(FIG.onSeat?FIG.diaYs:FIG.diaY)+bob;if(FIG.onSeat)wr.position.z=FIG.diaZs;wr.rotation.x=FIG.lean+pitch;wr.rotation.z=roll}
  var K=FIG.K;if(K){var r=FIG.kim,sw=Math.sin(ph)*run*.55,kn=Math.max(0,Math.sin(ph+.6))*run*.5,kn2=Math.max(0,-Math.sin(ph+.6))*run*.5;
   // gait v2: each leg runs a stance/swing cycle. stance (60%) sweeps the leg back slowly and plants it; swing (40%) whips it forward with the knee lifted.
   // trot < 10 m/s: diagonal pairs in phase; gallop >= 10: front pair leads the back pair by a quarter cycle (spine flexes with it)
-  var gallop=Math.max(0,Math.min(1,(sp-9)/4)),cyc=(P.ft*.5)%1;
+  var gallop=Math.max(0,Math.min(1,(sp-9)/4)),cyc=(M.ft*.5)%1;
   function legCurve(ph01){var st=.6;if(ph01<st){var u=ph01/st;return {sw:.45-u*.9,knee:.05,lift:0}}var u=(ph01-st)/(1-st);return {sw:-.45+u*.9,knee:Math.sin(u*Math.PI)*.9,lift:Math.sin(u*Math.PI)}}
   K.legs.forEach(function(c){var same=(c.front===c.right);var offTrot=same?0:.5;var offGal=(c.front?0:.25)+(c.right?0:.08);var off=offTrot*(1-gallop)+offGal*gallop;var g=legCurve((cyc+off)%1);
    var dir=c.front?-1:1;   // negative X swings a front leg forward
@@ -406,30 +406,30 @@ function figAnim(sp,run,boost){var t=performance.now()/1000,ph=P.ft*Math.PI,air=
   var ik=(typeof IDLE!=='undefined'&&IDLE.k)||0,sit=(IDLE&&IDLE.st==='sit')?ik:0,slp=(IDLE&&IDLE.st==='sleep')?ik:0;   // sit / sleep on the real skeleton
   if(sit+slp>0){K.legs.forEach(function(c){if(!c.front){rotW(pick(c,0),_AX,1.25*(sit+slp),r);rotW(pick(c,1),_AX,-1.6*(sit+slp),r);rotW(pick(c,2),_AX,1.1*(sit+slp),r)}else if(slp){rotW(pick(c,0),_AX,-1.2*slp,r);rotW(pick(c,1),_AX,1.5*slp,r)}});
    if(K.head.length>1){rotW(K.head[0],_AX,.35*slp,r)}}
-  var vy=Math.max(-1,Math.min(1,(P.vy||0)/9)),earS=spring(SPR.ear,vy*.6-air*.3-run*.3,120,10,dt);
+  var vy=Math.max(-1,Math.min(1,(M.vy||0)/9)),earS=spring(SPR.ear,vy*.6-air*.3-run*.3,120,10,dt);
   if(K.head.length>1)rotW(K.head[0],_AX,Math.sin(ph*2+.5)*.06*run,r);   // neck flexes with the gallop
   var wag=Math.sin(t*(sp>.4?7:11))*(.22+.1*(boost?1:0))-turn*.5,lift=-.25-.3*(boost?1:0)-.15*run+vy*.2;   // physics: tail swings out of a turn, lifts on the way up
   K.tail.forEach(function(bn,i){rotW(bn,_AY,wag*(1+i*.35),r);bn.quaternion.multiply(_q3.setFromAxisAngle(_AX,lift*.25))});
   if(K.head.length){var hb=pick(K.head,Math.floor(K.head.length/2)),nb=pick(K.head,0);rotW(hb,_AX,Math.sin(ph*2)*.08*run-.15*air+Math.sin(t*.9)*.05*(1-run)+Math.max(-.35,Math.min(.35,HS.z*.25))-vy*.15,r);rotW(nb,_AY,Math.sin(t*.7)*.25*(1-run),r);if(K.head.length>2)rotW(K.head[K.head.length-1],_AX,.12*(boost?1:0),r)}
   K.ears.forEach(function(c){rotW(c[0],_AX,Math.sin(ph*2+1)*.2*run+earS,r)});   // ears: spring-lagged flop (fall/rise/run)
   if(FIG.hats&&K.head.length){_m4.copy(DOG.matrixWorld).invert();pick(K.head,Math.floor(K.head.length/2)).getWorldPosition(_v3);_v3.applyMatrix4(_m4);FIG.hats.forEach(function(h){h.position.set(_v3.x+.1,_v3.y+.1,_v3.z+.05)})}}
- if(FIG.mixer){var A=FIG.acts,st=P.air?'air':(sp>.5?'sit':(FIG.landmarkHit?'wave':(FIG.idleT>7&&A.talk?'talk':'sit')));FIG.idleT=(sp>.5||P.air)?0:(FIG.idleT||0)+dt;
+ if(FIG.mixer){var A=FIG.acts,st=M.air?'air':(sp>.5?'sit':(FIG.landmarkHit?'wave':(FIG.idleT>7&&A.talk?'talk':'sit')));FIG.idleT=(sp>.5||M.air)?0:(FIG.idleT||0)+dt;
   if(st!==FIG.state&&A[st]){var from=A[FIG.state],to=A[st];to.reset().setEffectiveWeight(1).play();if(from&&from!==to)from.crossFadeTo(to,.3,false);FIG.state=st;if(st==='wave'||st==='talk'){to.setLoop(THREE.LoopOnce,1);to.clampWhenFinished=false;FIG.landmarkHit=false;FIG.idleT=0}}
   if(FIG.state!=='sit'&&A[FIG.state]&&!A[FIG.state].isRunning()){A.sit.reset().play();A[FIG.state].crossFadeTo(A.sit,.3,false);FIG.state='sit'}
   if(A.sit)A.sit.timeScale=1+run*.6;FIG.mixer.update(dt)}
- var D=FIG.D;if(D){var r2=FIG.dia;var RW=FIG.mixer?rotAdd:rotW;if(D.head.length){RW(pick(D.head,D.head.length-1),_AX,Math.sin(ph*2)*.06*run+Math.sin(t*.8)*.05*(1-run)-pitch*.8,r2);RW(pick(D.head,D.head.length-2),_AZ,-roll*.7,r2);RW(pick(D.head,0),_AY,Math.sin(t*.6)*.45*(1-run)+Math.max(-.5,Math.min(.5,HS.x*.3)),r2)}
+ var D=FIG.D;if(D){if(RIDE.on){var r2=FIG.dia;var RW=FIG.mixer?rotAdd:rotW;if(D.head.length){RW(pick(D.head,D.head.length-1),_AX,Math.sin(ph*2)*.06*run+Math.sin(t*.8)*.05*(1-run)-pitch*.8,r2);RW(pick(D.head,D.head.length-2),_AZ,-roll*.7,r2);RW(pick(D.head,0),_AY,Math.sin(t*.6)*.45*(1-run)+Math.max(-.5,Math.min(.5,HS.x*.3)),r2)}
   if(!FIG.mixer){
 
   var ab=Math.sin(ph*2+1)*.18*run,idle=(1-run);D.arms.forEach(function(c,i){rotW(pick(c,0),_AX,ab*(i?-.8:1)-air*.5+Math.sin(t*1.3+i)*.06*idle,r2);rotW(pick(c,1),_AX,ab*(i?-.5:.6)-air*.3,r2);rotW(pick(c,2),_AX,ab*.5*(i?-1:1),r2)});   // visible arm swing while riding, slow drift at idle
    // idle behaviours (no clips yet): a wave every ~9 s with the right arm, a pat on Kimpoy with the left, slow look-around, breathing
-   FIG.idleT=(sp>.5||P.air)?0:(FIG.idleT||0)+dt;var it=FIG.idleT,cycle=it%9,wv=cycle>3&&cycle<5.4?Math.min(1,(cycle-3)*3,(5.4-cycle)*3):0,pat=cycle>6.5&&cycle<8.5?Math.sin((cycle-6.5)*Math.PI/2):0,pulse=Math.max(0,Math.sin((cycle-6.5)*7));
+   FIG.idleT=(sp>.5||M.air)?0:(FIG.idleT||0)+dt;var it=FIG.idleT,cycle=it%9,wv=cycle>3&&cycle<5.4?Math.min(1,(cycle-3)*3,(5.4-cycle)*3):0,pat=cycle>6.5&&cycle<8.5?Math.sin((cycle-6.5)*Math.PI/2):0,pulse=Math.max(0,Math.sin((cycle-6.5)*7));
    if(wv>0&&D.arms[1]){var c=D.arms[1];rotW(pick(c,0),_AX,-1.7*wv,r2);rotAdd(pick(c,0),_AZ,.6*wv,r2);rotW(pick(c,2),_AX,-.9*wv,r2);rotW(pick(c,3),_AZ,(-.3+Math.sin(t*9)*.35)*wv,r2)}   // raise, bend, wave the hand
    if(pat>0&&D.arms[0]){var c0=D.arms[0];rotW(pick(c0,0),_AZ,-.9*pat,r2);rotAdd(pick(c0,0),_AX,(.1+.3*pulse)*pat,r2);rotW(pick(c0,2),_AX,.3*pat,r2)}   // hand out over the flank, patting down on the fur
    FIG.wv=wv;FIG.pat=pat;if(D.spine.length>1){rotW(D.spine[1],_AZ,Math.sin(it*.9)*.04*(1-run),r2)}   // weight shift
-  var sq=P.squash||0;r2.scale.y=r2.userData.sc0?r2.userData.sc0*(1-sq*.35):r2.scale.y;if(!r2.userData.sc0)r2.userData.sc0=r2.scale.y;   // landing squash
+  var sq=M.squash||0;r2.scale.y=r2.userData.sc0?r2.userData.sc0*(1-sq*.35):r2.scale.y;if(!r2.userData.sc0)r2.userData.sc0=r2.scale.y;   // landing squash
   if(D.spine.length>1){rotW(D.spine[1],_AZ,Math.max(-.25,Math.min(.25,-HS.x*.25))+Math.sin(ph)*.05*run,r2);rotW(D.spine[D.spine.length-1],_AX,Math.max(-.2,Math.min(.2,HS.z*.2))+Math.sin(ph*2)*.08*run+(1-run)*.02*Math.sin(t*2.2),r2)}   // torso rocks with the gait, breathes at idle
-  D.legs.forEach(function(c,i){rotW(pick(c,1),_AX,Math.sin(ph*2)*.05*run*(i?-1:1)+air*.4,r2)})}}   // legs swing back in the air (procedural only when there are no clips)
- if(FIG.ik){var I=FIG.ikc,hold=!P.air;if(I.armL)I.armL.iteration=hold&&!(FIG.pat>0)?10:0;if(I.armR)I.armR.iteration=hold&&!(FIG.wv>0)?10:0;DOG.updateMatrixWorld(true);FIG.ik.update()}   // contact constraints: hands on the handle, feet in the stirrups (off in the air / while waving or patting)
+  D.legs.forEach(function(c,i){rotW(pick(c,1),_AX,Math.sin(ph*2)*.05*run*(i?-1:1)+air*.4,r2)})}}else{walkAnim(D,FIG.dia,t,dt)}}   // legs swing back in the air (procedural only when there are no clips)
+ if(FIG.ik&&RIDE.on){var I=FIG.ikc,hold=!M.air;if(I.armL)I.armL.iteration=hold&&!(FIG.pat>0)?10:0;if(I.armR)I.armR.iteration=hold&&!(FIG.wv>0)?10:0;DOG.updateMatrixWorld(true);FIG.ik.update()}   // contact constraints: hands on the handle, feet in the stirrups (off in the air / while waving or patting)
 }
 function fitRoot(root,h,dy,dz){root.updateMatrixWorld(true);var bb=new THREE.Box3().setFromObject(root),sz=bb.getSize(new THREE.Vector3()),c=bb.getCenter(new THREE.Vector3()),sc=h/sz.y;root.scale.setScalar(sc);root.position.set(-c.x*sc,-bb.min.y*sc+(dy||0),-c.z*sc+(dz||0));root.updateMatrixWorld(true)}
 function skinMat(mesh,rough){var old=mesh.material;mesh.material=new THREE.MeshStandardMaterial({map:old.map||null,color:0xffffff,roughness:rough,metalness:0,skinning:true});mesh.castShadow=true;mesh.frustumCulled=false}
@@ -468,7 +468,7 @@ function attachRider(){if(!FIG.seat||!FIG.dia||FIG.onSeat)return;var wr=FIG.dia.
  function chain(c,eff,li,target){return {target:ix(target),effector:ix(pick(c,eff)),links:li.map(function(k){return {index:ix(pick(c,k))}}),iteration:10}}
  var iks={};if(D.arms[0])iks.armL=chain(D.arms[0],5,[3,2,1,0],T.gripL);if(D.arms[1])iks.armR=chain(D.arms[1],5,[3,2,1,0],T.gripR);
  var list=Object.keys(iks).map(function(k){return iks[k]});FIG.ikc=iks;FIG.ik=new THREE.CCDIKSolver({skeleton:{bones:bones}},list);   // the solver only reads mesh.skeleton.bones, so targets can live on Kimpoy's seat
- list.forEach(function(k){k.iteration=80});FIG.ik.update();list.forEach(function(k){k.iteration=10;k.links.forEach(function(l){var b=bones[l.index];b.userData.rest.copy(b.quaternion)})})}   // solve once hard, bake as rest so each frame starts next to the answer
+ list.forEach(function(k){k.iteration=80});FIG.ik.update();list.forEach(function(k){k.iteration=10;k.links.forEach(function(l){var b=bones[l.index];b.userData.rest.copy(b.quaternion)})});saveRests(D,FIG.dia)}   // solve once hard, bake as rest so each frame starts next to the answer
 function loadFigures(){
  GL.load('models/kimpoy-rig.glb?v='+FIGV,function(gl){var root=gl.scene,mesh=null;root.traverse(function(m){if(m.isSkinnedMesh)mesh=m});if(!mesh)return;
   fitRoot(root,FIG.kimH,FIG.kimY,FIG.kimZ);skinMat(mesh,1.0);var wrap=new THREE.Group();wrap.add(root);DOG.add(wrap);FIG.kim=root;FIG.K=dogRoles(root);makeSeat(root,mesh);
@@ -488,6 +488,39 @@ function loadFigures(){
 loadFigures();
 var shadow=new THREE.Mesh(new THREE.CircleGeometry(1.4,16),new THREE.MeshBasicMaterial({color:0x000,transparent:true,opacity:.28}));shadow.rotation.x=-Math.PI/2;S.add(shadow);
 var P={x:0,z:10,y:0,vy:0,head:Math.PI,speed:0,frame:0,ft:0,air:false,face:1,vx:0,vz:0,squash:0,slide:0,lastFr:0,dustT:0,gpj:false,turnV:0};
+// ===== mount / dismount (games: rider hops off to one side, the mount stays a living thing; whistle brings it back; hop on = remount) =====
+var RIDE={on:true,ph:'ride',t:0,side:-1,from:new THREE.Vector3(),to:new THREE.Vector3()};
+var KIM={x:0,z:0,y:0,head:0,ft:0,speed:0,air:false,turnV:0,vy:0,squash:0};DOG.rotation.order='YXZ';   // heading first, then pitch/roll in the body frame (matters once DOG carries its own heading)
+var WS={hip:1,knee:1,arm:1};   // walk-cycle signs (verified in the pane)
+var shadow2=new THREE.Mesh(shadow.geometry,shadow.material);shadow2.rotation.x=-Math.PI/2;shadow2.visible=false;S.add(shadow2);
+function saveRests(D,root){var bones=[];root.traverse(function(b){if(b.isBone)bones.push(b)});bones.forEach(function(b){b.userData.restRide=b.userData.rest.clone();b.userData.rest.copy(b.userData.rest0);b.quaternion.copy(b.userData.rest0)});root.updateMatrixWorld(true);
+ D.arms.forEach(function(c){dropArm(c,root)});bones.forEach(function(b){b.userData.restStand=b.userData.rest.clone();b.userData.rest.copy(b.userData.restRide);b.quaternion.copy(b.userData.restRide)});root.updateMatrixWorld(true)}   // standing = T-pose legs/spine + arms hanging
+function setRest(root,kind){root.traverse(function(b){if(b.isBone&&b.userData[kind]){b.userData.rest.copy(b.userData[kind]);b.quaternion.copy(b.userData.rest)}})}
+function mountTarget(){FIG.seat.updateMatrixWorld(true);return FIG.seat.localToWorld(new THREE.Vector3(0,FIG.diaYs,FIG.diaZs))}
+function mountKey(){if(!FIG.onSeat)return;if(RIDE.ph==='ride'){if(!P.air)dismount()}else if(RIDE.ph==='walk'){if(Math.hypot(P.x-KIM.x,P.z-KIM.z)<3.5)mountStart();else{RIDE.ph='whistle';IDLE.st='run';IDLE.t=0;IDLE.k=0;DOG.rotation.x=0;DOG.rotation.z=0;blip(900,1600,.22,'sine',.12);setTimeout(function(){blip(1600,1100,.3,'sine',.12)},240);showBub('Kimpoy!')}}mountUI()}
+function dismount(){var wr=FIG.dia.parent;RIDE.ph='off';RIDE.t=0;RIDE.side=(K.KeyD||K.ArrowRight)?1:-1;
+ KIM.x=P.x;KIM.z=P.z;KIM.y=P.y;KIM.head=P.head;KIM.speed=0;KIM.ft=P.ft;S.attach(DOG);IDLE.t=0;IDLE.k=0;IDLE.st='run';IDLE.dy=0;DOG.rotation.x=0;DOG.rotation.z=0;
+ S.attach(wr);RIDE.from.copy(wr.position);var tx=P.x+Math.cos(P.head)*RIDE.side*1.7,tz=P.z-Math.sin(P.head)*RIDE.side*1.7;RIDE.to.set(tx,ground(tx,tz),tz);setRest(FIG.dia,'restStand');FIG.pat=0;FIG.wv=0;blip(420,260,.15,'triangle',.12);CNT.dismount=(CNT.dismount||0)+1}
+function mountStart(){var wr=FIG.dia.parent;S.attach(wr);RIDE.from.copy(wr.position);RIDE.ph='mount';RIDE.t=0;KIM.speed=0;IDLE.st='run';IDLE.t=0;IDLE.k=0;DOG.rotation.x=0;DOG.rotation.z=0;blip(260,440,.15,'triangle',.12)}
+function mountNow(){var wr=FIG.dia.parent;P.x=KIM.x;P.z=KIM.z;P.head=KIM.head;P.y=ground(P.x,P.z);P.vx=P.vz=0;P.speed=0;P.ft=KIM.ft;P.air=false;RG.position.set(P.x,P.y,P.z);RG.rotation.set(0,P.head,0);RG.updateMatrixWorld(true);
+ RG.add(DOG);DOG.position.set(0,-.25,0);DOG.rotation.set(0,0,0);DOG.scale.setScalar(1);DOG.updateMatrixWorld(true);FIG.seat.add(wr);wr.position.set(0,FIG.diaYs,FIG.diaZs);wr.rotation.set(FIG.lean,0,0);wr.scale.setScalar(1);setRest(FIG.dia,'restRide');
+ RIDE.ph='ride';RIDE.on=true;IDLE.t=0;IDLE.k=0;IDLE.st='run';IDLE.dy=0;shadow2.visible=false;mountUI()}
+function rideStep(dt){var wr=FIG.dia&&FIG.dia.parent;if(!wr||!FIG.onSeat)return;
+ if(RIDE.ph==='off'||RIDE.ph==='mount'){RIDE.t+=dt;var u=Math.min(1,RIDE.t/.6),e=u*u*(3-2*u),to=RIDE.ph==='mount'?mountTarget():RIDE.to;wr.position.lerpVectors(RIDE.from,to,e);wr.position.y+=Math.sin(u*Math.PI)*.8;wr.rotation.set(0,RIDE.ph==='mount'?KIM.head:P.head,0);   // hop = smoothstep arc in world space (the wrap sits under S during the hop)
+  if(u>=1){if(RIDE.ph==='off'){P.x=to.x;P.z=to.z;P.y=to.y;P.vx=P.vz=0;P.speed=0;P.squash=.2;RG.position.set(P.x,P.y,P.z);RG.rotation.set(0,P.head,0);RG.updateMatrixWorld(true);RG.attach(wr);wr.position.set(0,0,0);wr.rotation.set(0,0,0);wr.scale.setScalar(1);RIDE.ph='walk';RIDE.on=false;shadow2.visible=true;for(var i=0;i<5;i++)puff(P.x,P.y+.3,P.z,'#cdbfa4',.7,(Math.random()-.5)*2,1,(Math.random()-.5)*2);mountUI()}else mountNow()}}
+ if(RIDE.ph==='whistle')kimRun(dt);else if(!RIDE.on)kimIdle(dt);if(!RIDE.on)kimPlace();mountUI()}
+function kimRun(dt){var dx=P.x-KIM.x,dz=P.z-KIM.z,d=Math.hypot(dx,dz),tgt=Math.atan2(dx,dz),da=tgt-KIM.head;while(da>Math.PI)da-=2*Math.PI;while(da<-Math.PI)da+=2*Math.PI;KIM.head+=da*Math.min(1,dt*5);KIM.turnV=Math.max(-1,Math.min(1,da));
+ if(d>2.2){KIM.speed+=(10-KIM.speed)*Math.min(1,dt*3);KIM.x+=Math.sin(KIM.head)*KIM.speed*dt;KIM.z+=Math.cos(KIM.head)*KIM.speed*dt;KIM.ft+=dt*(6+KIM.speed*.8)}
+ else{KIM.speed*=1-Math.min(1,dt*8);if(KIM.speed<.6&&Math.abs(da)<.35){KIM.speed=0;mountStart()}}}
+function kimIdle(dt){KIM.speed*=1-Math.min(1,dt*6);KIM.turnV*=1-Math.min(1,dt*6)}
+function kimPlace(){KIM.y=ground(KIM.x,KIM.z);var run=Math.min(1,KIM.speed/8),bob=Math.abs(Math.sin(KIM.ft*Math.PI))*.16*run*1.35;DOG.position.set(KIM.x,KIM.y-.34+bob+(IDLE.dy||0),KIM.z);DOG.rotation.y=KIM.head;shadow2.position.set(KIM.x,KIM.y+.06,KIM.z)}
+var _mntTxt='';function mountUI(){var t=RIDE.ph==='ride'?'\uD83D\uDC15 BABA (G)':RIDE.ph==='walk'?(Math.hypot(P.x-KIM.x,P.z-KIM.z)<3.5?'\uD83D\uDC15 SAKAY (G)':'\uD83D\uDC15 SIPOL (G)'):RIDE.ph==='whistle'?'\uD83D\uDC15 PAPUNTA...':'...';if(t!==_mntTxt){_mntTxt=t;var el=document.getElementById('mnt');if(el)el.textContent=t}}
+function walkAnim(D,r2,t,dt){var sp=P.speed,run=Math.min(1,sp/3),air=P.air?1:0,wr=r2.parent,ph=P.ft*Math.PI;   // her own clock (figAnim's ph belongs to Kimpoy when parked)   // on foot: procedural walk on the same skeleton (standing rest pose)
+ D.legs.forEach(function(c,i){var o=i?Math.PI:0;rotW(pick(c,0),_AX,WS.hip*Math.sin(ph+o)*.55*run+air*.35,r2);rotW(pick(c,1),_AX,WS.knee*Math.max(0,Math.sin(ph+o-Math.PI/2))*.7*run+air*.5,r2)});   // knee peaks mid-swing (foot travelling forward), straight in stance
+ D.arms.forEach(function(c,i){var o=i?0:Math.PI;rotW(pick(c,0),_AX,WS.arm*Math.sin(ph+o)*.4*run+Math.sin(t*1.3+i)*.05*(1-run)-air*.5,r2);rotW(pick(c,2),_AX,WS.arm*.25*run,r2)});
+ if(D.spine.length>1){rotW(D.spine[1],_AZ,Math.sin(ph)*.05*run,r2);rotW(D.spine[D.spine.length-1],_AX,.08*run+.02*Math.sin(t*2.2)*(1-run),r2)}
+ if(D.head.length){rotW(pick(D.head,0),_AY,Math.sin(t*.6)*.4*(1-run),r2);rotW(pick(D.head,D.head.length-1),_AX,Math.sin(ph*2)*.03*run,r2)}
+ if(wr&&RIDE.ph==='walk'){wr.position.y=Math.abs(Math.sin(ph))*.05*run;wr.rotation.x=.06*run}}
 
 // ===== audio (WebAudio synth, walang assets) =====
 var AC=null,mute=false;
@@ -578,13 +611,13 @@ var SEEN={};
 function visit(id){if(SEEN[id])return;SEEN[id]=1;FIG.landmarkHit=true;try{localStorage.setItem('mw.seen',JSON.stringify(SEEN))}catch(e){}achieve('first');if(Object.keys(SEEN).length===ST.length)achieve('all');var stn=ST.filter(function(s){return s.id===id})[0];toast('Landmark discovered: '+stn.n+' ('+(Object.keys(SEEN).length)+'/7)');objUpdate();var el=document.querySelector('#prog [data-id="'+id+'"]');if(el)el.classList.add('done');if(Object.keys(SEEN).length===ST.length){confetti();blip(520,1040,.5,'sine',.16);hint.textContent='ALL 7 WONDERS VISITED - HEAD TO NEW YORK TO HIRE ME';hint.classList.add('on')}}
 var KMAP={w:'KeyW',a:'KeyA',s:'KeyS',d:'KeyD',q:'KeyQ',e:'KeyE',f:'KeyF',b:'KeyB',h:'KeyH',c:'KeyC',p:'KeyP',r:'KeyR',l:'KeyL',' ':'Space',Enter:'Enter',Escape:'Escape',F1:'F1',ArrowUp:'ArrowUp',ArrowDown:'ArrowDown',ArrowLeft:'ArrowLeft',ArrowRight:'ArrowRight',Shift:'ShiftLeft'};
 function kcode(e){if(e.code)return e.code;var k=e.key||'';return KMAP[k]||KMAP[k.toLowerCase()]||''}
-var K={};addEventListener('keydown',function(e){var tg=e.target&&e.target.tagName;var code=kcode(e);if(!code)return;e={code:code,key:e.key,target:e.target,preventDefault:function(){e0.preventDefault()},e0:e};var e0=e.e0;if(/INPUT|TEXTAREA|SELECT/.test(tg))return;if(/BUTTON|A/.test(tg)&&(e.code==='Enter'||e.code==='Space')){e.preventDefault();e.target.blur();cv.focus()}if(MENU.on&&e.code!=='Escape'&&e.code!=='F1')return;K[e.code]=true;if(e.code==='KeyB')bark();if(e.code==='KeyH')centerCam();if(e.code==='KeyQ')ANG.yaw+=Math.PI/4;if(e.code==='KeyE'&&!PADS.some(function(p){return p.in}))ANG.yaw-=Math.PI/4;if(e.code==='KeyC'){ANG.yaw=0;zoom=.5}if(e.code==='F1'){e.preventDefault();menuToggle()}if(e.code==='KeyP')photoToggle();konami(e.code);if(e.code==='Enter'||e.code==='KeyE'||e.code==='KeyF'){PADS.forEach(function(p){if(p.in)padGo(p)})}if(e.code==='Space')jump();if(e.code==='KeyR')respawn();if(e.code==='KeyL')mute=!mute;if(e.code==='Escape'){if(panel.classList.contains('on'))closeP();else menuToggle()}if(['Space','ArrowUp','ArrowDown'].indexOf(e.code)>-1)e.preventDefault()});addEventListener('keyup',function(e){var c=kcode(e);if(c)K[c]=false;if(c==='ShiftLeft')K.ShiftRight=false});
-function jump(){if(!P.air){CNT.jump++;if(CNT.jump>=40)achieve('jump');P.vy=9.2;P.air=true;blip(170,330,.16,'sine',.14)}}function respawn(){P.x=0;P.z=10;P.speed=0;P.vx=P.vz=0;P.head=Math.PI;P.vy=0}
+var K={};addEventListener('keydown',function(e){var tg=e.target&&e.target.tagName;var code=kcode(e);if(!code)return;e={code:code,key:e.key,target:e.target,preventDefault:function(){e0.preventDefault()},e0:e};var e0=e.e0;if(/INPUT|TEXTAREA|SELECT/.test(tg))return;if(/BUTTON|A/.test(tg)&&(e.code==='Enter'||e.code==='Space')){e.preventDefault();e.target.blur();cv.focus()}if(MENU.on&&e.code!=='Escape'&&e.code!=='F1')return;K[e.code]=true;if(e.code==='KeyB')bark();if(e.code==='KeyG')mountKey();if(e.code==='KeyH')centerCam();if(e.code==='KeyQ')ANG.yaw+=Math.PI/4;if(e.code==='KeyE'&&!PADS.some(function(p){return p.in}))ANG.yaw-=Math.PI/4;if(e.code==='KeyC'){ANG.yaw=0;zoom=.5}if(e.code==='F1'){e.preventDefault();menuToggle()}if(e.code==='KeyP')photoToggle();konami(e.code);if(e.code==='Enter'||e.code==='KeyE'||e.code==='KeyF'){PADS.forEach(function(p){if(p.in)padGo(p)})}if(e.code==='Space')jump();if(e.code==='KeyR')respawn();if(e.code==='KeyL')mute=!mute;if(e.code==='Escape'){if(panel.classList.contains('on'))closeP();else menuToggle()}if(['Space','ArrowUp','ArrowDown'].indexOf(e.code)>-1)e.preventDefault()});addEventListener('keyup',function(e){var c=kcode(e);if(c)K[c]=false;if(c==='ShiftLeft')K.ShiftRight=false});
+function jump(){if(!P.air){CNT.jump++;if(CNT.jump>=40)achieve('jump');P.vy=RIDE.on?9.2:6.5;P.air=true;blip(170,330,.16,'sine',.14)}}function respawn(){if(!RIDE.on&&FIG.onSeat)mountNow();P.x=0;P.z=10;P.speed=0;P.vx=P.vz=0;P.head=Math.PI;P.vy=0}
 // touch stick
 var stick=document.getElementById('stick'),knob=stick.firstElementChild,SV={x:0,y:0},sid=null;
 stick.addEventListener('pointerdown',function(e){sid=e.pointerId;stick.setPointerCapture(sid);stickMove(e)});stick.addEventListener('pointermove',function(e){if(e.pointerId===sid)stickMove(e)});stick.addEventListener('pointerup',function(){sid=null;SV.x=SV.y=0;knob.style.transform=''});
 function stickMove(e){var r=stick.getBoundingClientRect();var dx=e.clientX-r.left-60,dy=e.clientY-r.top-60;var l=Math.hypot(dx,dy)||1;var k=Math.min(1,l/45);dx=dx/l*k;dy=dy/l*k;SV.x=dx;SV.y=dy;knob.style.transform='translate('+dx*40+'px,'+dy*40+'px)'}
-document.getElementById('jump').addEventListener('pointerdown',function(e){e.preventDefault();jump()});
+document.getElementById('jump').addEventListener('pointerdown',function(e){e.preventDefault();jump()});document.getElementById('mnt').addEventListener('pointerdown',function(e){e.preventDefault();mountKey()});
 // camera zoom
 var zoom=.5;addEventListener('wheel',function(e){zoom=Math.min(1,Math.max(0,zoom+e.deltaY*.0008))},{passive:true});
 var camT=new THREE.Vector3(0,0,10);
@@ -632,9 +665,18 @@ var HASHID={manila:'home',banaue:'journey',giza:'expertise',paris:'skills',borac
 function applyHash(){var h=(location.hash||'').replace('#','').toLowerCase();var id=HASHID[h]||(DATA[h]?h:null);if(!id)return null;var st=ST.filter(function(s){return s.id===id})[0];P.x=st.x;P.z=st.z+Math.max(0,st.r-8);P.vx=P.vz=0;return st}
 // Kimpoy idle AI (sit -> sleep) when nobody is driving
 var IDLE={t:0,st:'run',bark:0};
-function idleStep(dt,manual){if(manual||AUTO||P.air||P.speed>.5){IDLE.t=0;IDLE.k=0;if(IDLE.st!=='run'){IDLE.st='run';DOG.rotation.x=0;DOG.rotation.z=0}return}IDLE.t+=dt;var ns=IDLE.t>26?'sleep':IDLE.t>6?'sit':'run';if(ns!==IDLE.st){IDLE.st=ns;if(ns==='sit')showBub(['Hmm?','Tara na?','...'][Math.floor(Math.random()*3)]);if(ns==='sleep')showBub('Zzz')}
- if(IDLE.st==='sit'){IDLE.k=Math.min(1,(IDLE.k||0)+dt*2.5);legs[2].rotation.x=1.35*IDLE.k;legs[3].rotation.x=1.35*IDLE.k;legs[0].rotation.x=-.25*IDLE.k;legs[1].rotation.x=-.25*IDLE.k;DOG.rotation.x=-.28*IDLE.k;DOG.position.y-=.25*IDLE.k;IDLE.bark+=dt;if(IDLE.bark>9){IDLE.bark=0;if(Math.random()<.6)bark()}}
- else if(IDLE.st==='sleep'){IDLE.k=Math.min(1,(IDLE.k||0)+dt*1.5);DOG.rotation.z=1.25*IDLE.k;DOG.rotation.x=0;DOG.position.y-=.6*IDLE.k;legs.forEach(function(l,i){l.rotation.x=(i<2?-.6:.9)*IDLE.k});if(Math.random()<dt*.4)showBub('Zzz')}}
+function idleStep(dt,manual){var moving=RIDE.on?(manual||AUTO||P.air||P.speed>.5):(RIDE.ph==='whistle'||KIM.speed>.5);
+ if(moving){IDLE.t=0;IDLE.k=0;if(IDLE.st!=='run'){IDLE.st='run';DOG.rotation.x=0;DOG.rotation.z=0}clampDog(dt);return}IDLE.t+=dt;
+ var ns=(!RIDE.on&&IDLE.t>20)?'sleep':IDLE.t>6?'sit':'run';   // a mount never lies down with a rider on it (Malbers / RDR2 / BotW) - it sits; it sleeps only when parked
+ if(ns!==IDLE.st){IDLE.st=ns;if(ns==='sit')showBub(['Hmm?','Tara na?','...'][Math.floor(Math.random()*3)]);if(ns==='sleep')showBub('Zzz')}
+ if(IDLE.st==='sit'){IDLE.k=Math.min(1,(IDLE.k||0)+dt*2.5);DOG.rotation.x=-.28*IDLE.k;DOG.rotation.z=0;IDLE.bark+=dt;if(IDLE.bark>9){IDLE.bark=0;if(Math.random()<.6)bark()}}
+ else if(IDLE.st==='sleep'){IDLE.k=Math.min(1,(IDLE.k||0)+dt*1.5);DOG.rotation.x=-.1*IDLE.k;DOG.rotation.z=1.1*IDLE.k;if(Math.random()<dt*.4)showBub('Zzz')}
+ clampDog(dt)}
+function clampDog(dt){if(!FIG.K||!FIG.kim)return;var w=new THREE.Vector3();
+ if(IDLE.st==='run'&&RIDE.on){IDLE.dy=(IDLE.dy||0)*(1-Math.min(1,dt*6));return}   // ridden and standing/moving: the normal ground code places the body
+ DOG.updateMatrixWorld(true);var m=1e9;function at(b,r){b.getWorldPosition(w);if(w.y-r<m)m=w.y-r}   // physics proxy: every bone carries a body radius (world units); the lowest one must rest ON the ground
+ FIG.K.legs.forEach(function(c){c.forEach(function(b){at(b,.15)})});(FIG.K.spine||[]).forEach(function(b){at(b,.55)});FIG.K.head.forEach(function(b){at(b,.35)});FIG.K.tail.forEach(function(b){at(b,.12)});
+ DOG.getWorldPosition(w);var gy=ground(w.x,w.z),sc=RIDE.on?RG.scale.y:1;IDLE.dy=(IDLE.dy||0)+(gy-m)/sc*Math.min(1,dt*8)}
 // ===== ambient sound per zone (WebAudio, no assets): waves, wind, birds, city hum =====
 var AMB=null;
 function ambInit(){if(AMB||!AC)return;var buf=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate),d=buf.getChannelData(0);for(var i=0;i<d.length;i++)d[i]=Math.random()*2-1;
@@ -727,14 +769,15 @@ function step(dt){
  var boost=K.ShiftLeft||K.ShiftRight;
  if(sid!==null){ix=SV.x;iy=-SV.y}
  var gps=navigator.getGamepads&&navigator.getGamepads(),pad=null;if(gps)for(var i=0;i<gps.length;i++)if(gps[i]&&gps[i].connected){pad=gps[i];break}
- if(pad){var ax=pad.axes[0]||0,ay=pad.axes[1]||0;if(Math.hypot(ax,ay)>.18){ix=ax;iy=-ay}if(pad.buttons[0]&&pad.buttons[0].pressed){if(!P.gpj)jump();P.gpj=true}else P.gpj=false;if(pad.buttons[7]&&pad.buttons[7].value>.3)boost=true}
+ if(pad){var ax=pad.axes[0]||0,ay=pad.axes[1]||0;if(Math.hypot(ax,ay)>.18){ix=ax;iy=-ay}if(pad.buttons[0]&&pad.buttons[0].pressed){if(!P.gpj)jump();P.gpj=true}else P.gpj=false;if(pad.buttons[7]&&pad.buttons[7].value>.3)boost=true;if(pad.buttons[1]&&pad.buttons[1].pressed){if(!P.gpb)mountKey();P.gpb=true}else P.gpb=false}
+ if(RIDE.ph==='off'||RIDE.ph==='mount'){ix=0;iy=0}   // no steering mid-hop
  // screen axes on the ground plane (camera sits at +x,+z looking back)
  var anr=ANG.cur.clone().applyAxisAngle(YUP,ANG.yawC);var CFx=-anr.x,CFz=-anr.z,cl=Math.hypot(CFx,CFz);CFx/=cl;CFz/=cl; // screen-up, follows camera angle + yaw
  var CRx=-CFz,CRz=CFx;
  var manual=Math.hypot(ix,iy)>0.05;if(pad&&pad.axes[2]&&Math.abs(pad.axes[2])>.3)ANG.yaw-=pad.axes[2]*dt*2;if(pad&&pad.buttons[2]&&pad.buttons[2].pressed&&!P.gpx){PADS.forEach(function(p){if(p.in)padGo(p)})}P.gpx=!!(pad&&pad.buttons[2]&&pad.buttons[2].pressed);if(pad&&pad.buttons[9]&&pad.buttons[9].pressed&&!P.gpm)menuToggle();P.gpm=!!(pad&&pad.buttons[9]&&pad.buttons[9].pressed);
  if(AUTO&&!manual){var adx=AUTO.x-P.x,adz=AUTO.z-P.z,ad=Math.hypot(adx,adz);if(ad<1.6){AUTO=null;AUTOm.visible=false}else{adx/=ad;adz/=ad;iy=adx*CFx+adz*CFz;ix=adx*CRx+adz*CRz;var sl=Math.min(1,ad/6);ix*=sl;iy*=sl}}else if(manual&&AUTO){AUTO=null;AUTOm.visible=false;if(TOUR.on)tourStop()}                                          // screen-right
  var dx=CFx*iy+CRx*ix,dz=CFz*iy+CRz*ix,mag=Math.min(1,Math.hypot(dx,dz));
- var max=boost?26:16;if(mag>0.05){PAN.tx=PAN.tz=0}
+ var max=RIDE.on?(boost?26:16):(boost?8:5.5);if(mag>0.05){PAN.tx=PAN.tz=0}
  if(mag>0.05){var l=Math.hypot(dx,dz);dx/=l;dz/=l;
   var tgt=Math.atan2(dx,dz),da=tgt-P.head;while(da>Math.PI)da-=2*Math.PI;while(da<-Math.PI)da+=2*Math.PI;P.turnV=da;
   var k=Math.min(1,dt*(P.speed<3?9:4.5)); // agad tumutugon mula sa hinto, may momentum pag mabilis
@@ -761,9 +804,8 @@ function step(dt){
  var RS=1.35;RG.scale.set(RS*(1+P.squash*.5),RS*(1-P.squash*.9),RS*(1+P.squash*.5));
  var run=Math.min(1,sp/8),sw=Math.sin(P.ft*Math.PI)*run*.95;
  if(P.air){legs[0].rotation.x=legs[1].rotation.x=-.9;legs[2].rotation.x=legs[3].rotation.x=.9}else{legs[0].rotation.x=sw;legs[3].rotation.x=sw;legs[1].rotation.x=-sw;legs[2].rotation.x=-sw}
- DOG.position.y=(P.air?0:Math.abs(Math.sin(P.ft*Math.PI))*.16*run)-(g<1.02&&!P.air?.55:0);
- DOG.rotation.x=P.air?0:Math.sin(P.ft*Math.PI*2)*.06*run;
- tail.rotation.z=Math.sin(performance.now()*(sp>.4?.012:.02))*.55;figAnim(sp,run,boost);
+ if(RIDE.on){DOG.position.y=(P.air?0:Math.abs(Math.sin(P.ft*Math.PI))*.16*run)-(g<1.02&&!P.air?.55:0)+(IDLE.dy||0);DOG.rotation.x=P.air?0:Math.sin(P.ft*Math.PI*2)*.06*run}   // parked: kimPlace() owns DOG
+ tail.rotation.z=Math.sin(performance.now()*(sp>.4?.012:.02))*.55;rideStep(dt);figAnim(RIDE.on?sp:KIM.speed,RIDE.on?run:Math.min(1,KIM.speed/8),RIDE.on&&boost,RIDE.on?P:KIM);
  // secondary motion (Bruno's antenna spring): hair lags behind acceleration, ears fold back with speed
  var ax=Math.max(-40,Math.min(40,(P.vx-(P.pvx||0))/dt)),az=Math.max(-40,Math.min(40,(P.vz-(P.pvz||0))/dt));P.pvx=P.vx;P.pvz=P.vz;
  var lax=ax*Math.cos(P.head)-az*Math.sin(P.head),laz=ax*Math.sin(P.head)+az*Math.cos(P.head);
@@ -771,7 +813,7 @@ function step(dt){
  HAIR.rotation.x=Math.max(-.6,Math.min(.6,HS.z*.35));HAIR.rotation.z=Math.max(-.6,Math.min(.6,-HS.x*.35));
  EARS[0].rotation.x=EARS[1].rotation.x=-Math.min(1,sp/16)*.9+Math.sin(P.ft*Math.PI*2)*.15*run;
  TONGUE.visible=!!boost||sp>17;
- shadow.position.set(P.x,g+.06,P.z);var sh=Math.max(.35,1-(P.y-g)*.12);shadow.scale.set(sh,sh,1);
+ shadow.position.set(P.x,g+.06,P.z);var sh=Math.max(.35,1-(P.y-g)*.12);sh*=RIDE.on?1:.45;shadow.scale.set(sh,sh,1);
  var la=Math.min(7,sp*.32);
  camT.x+=((P.x+fx*la)-camT.x)*Math.min(1,dt*3.5);camT.y+=(P.y-camT.y)*Math.min(1,dt*3.5);camT.z+=((P.z+fz*la)-camT.z)*Math.min(1,dt*3.5);
  if(SET.edge&&!TOUCH&&!PAN.on&&!manual&&mx>=0&&document.hasFocus()&&performance.now()-mxT<4000){var ex=mx<26?-1:mx>W-26?1:0,ey=my<26?1:my>H-26?-1:0;if(ex||ey){PAN.tx+=(CRx*ex+CFx*ey)*dt*34;PAN.tz+=(CRz*ex+CFz*ey)*dt*34}}
@@ -779,7 +821,7 @@ function step(dt){
  ANG.yawC+=(ANG.yaw-ANG.yawC)*Math.min(1,dt*4);
  PAN.x+=(PAN.tx-PAN.x)*Math.min(1,dt*6);PAN.z+=(PAN.tz-PAN.z)*Math.min(1,dt*6);
  ANG.cur.lerp((cur&&cur.id==='projects')?ANG.proj:ANG.def,Math.min(1,dt*1.5));
- if(bubT>0){bubT-=dt;BUB.position.set(P.x,P.y+5.4,P.z);BUB.material.opacity=Math.min(1,bubT*2);BUB.visible=bubT>0}
+ if(bubT>0){bubT-=dt;var bp=(!RIDE.on&&IDLE.st!=='run')?KIM:P;BUB.position.set(bp.x,bp.y+5.4,bp.z);BUB.material.opacity=Math.min(1,bubT*2);BUB.visible=bubT>0}
  var dist=30+zoom*32+sp*.35,an=ANG.cur.clone().applyAxisAngle(YUP,ANG.yawC).normalize();
  CAM.position.set(camT.x+an.x*dist+PAN.x,camT.y+an.y*dist,camT.z+an.z*dist+PAN.z);CAM.lookAt(camT.x+PAN.x,camT.y+1.2,camT.z+PAN.z);
  S.children.forEach(function(o){if(o.userData.face){o.lookAt(CAM.position.x,o.position.y,CAM.position.z)}});

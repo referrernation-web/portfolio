@@ -16,7 +16,7 @@
 :root{--maroon:#8a1c2b;--ink:#111;--cream:#fbf7f1}
 *{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:radial-gradient(circle at 50% 18%,#eef8ff 0%,#cfe8f5 45%,#a8d1ea 100%) fixed;font-family:Inter,system-ui,sans-serif;color:var(--ink);-webkit-tap-highlight-color:transparent}
 .seo{position:absolute;left:-9999px;top:0;width:1px;height:1px;overflow:hidden}
-body.photo #hud,body.photo #map,body.photo #obj,body.photo #status,body.photo #hint,body.photo #toasts,body.photo #tip,body.photo #stick,body.photo #jump,body.photo #sub{display:none!important}
+body.photo #hud,body.photo #dial,body.photo #map,body.photo #obj,body.photo #status,body.photo #hint,body.photo #toasts,body.photo #tip,body.photo #stick,body.photo #jump,body.photo #sub{display:none!important}
 canvas#c{display:block;width:100%;height:100%;touch-action:none;cursor:grab}canvas#c.grabbing{cursor:grabbing}
 #load{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 30%,#ffe9c7,#f4c6a0 55%,#8a1c2b 140%);transition:opacity .6s}
 #load.off{opacity:0;pointer-events:none}
@@ -55,7 +55,7 @@ canvas#c{display:block;width:100%;height:100%;touch-action:none;cursor:grab}canv
 #prog span{background:rgba(251,247,241,.88);border-radius:99px;padding:6px 10px;font:700 10px 'JetBrains Mono',monospace;letter-spacing:.05em;color:#777;box-shadow:0 4px 10px rgba(0,0,0,.12)}
 #prog span.done{background:var(--maroon);color:#fff}
 body.mob #prog{left:16px;top:64px;bottom:auto;max-width:190px}
-#clock{position:fixed;right:14px;top:172px;z-index:6;display:flex;align-items:center;gap:7px;background:rgba(251,247,241,.9);border:0;border-radius:14px;padding:7px 12px;box-shadow:0 8px 20px rgba(0,0,0,.14),inset 0 -3px 0 rgba(0,0,0,.06);font:800 12px 'JetBrains Mono',monospace;color:var(--ink);cursor:pointer;-webkit-tap-highlight-color:transparent}#clock i{font-style:normal;font-size:14px;line-height:1}#clock b{font-weight:800;letter-spacing:.5px}#clock small{font:700 9px Inter;opacity:.55;letter-spacing:.6px}body.mob #clock{top:132px;padding:6px 10px;font-size:11px}body.photo #clock{display:none}#obj{position:fixed;left:16px;top:74px;z-index:5;width:172px;background:rgba(251,247,241,.9);border-radius:14px;padding:10px 12px;box-shadow:0 8px 20px rgba(0,0,0,.14),inset 0 -3px 0 rgba(0,0,0,.06);pointer-events:none;font:600 11px/1.5 'JetBrains Mono',monospace;color:#333}
+#dial{position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:6;width:84px;height:84px;padding:0;border:0;border-radius:50%;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent;filter:drop-shadow(0 8px 18px rgba(0,0,0,.28));transition:filter .5s linear}#dial:hover{transform:translateX(-50%) scale(1.06)}body.mob #dial{width:62px;height:62px;top:170px}body.photo #dial{display:none}#obj{position:fixed;left:16px;top:74px;z-index:5;width:172px;background:rgba(251,247,241,.9);border-radius:14px;padding:10px 12px;box-shadow:0 8px 20px rgba(0,0,0,.14),inset 0 -3px 0 rgba(0,0,0,.06);pointer-events:none;font:600 11px/1.5 'JetBrains Mono',monospace;color:#333}
 #obj h4{margin:0 0 6px;font:800 10px Inter;letter-spacing:.14em;color:#8a1c2b}
 #obj div{display:flex;gap:6px;align-items:center;color:#777}#obj div.done{color:#111}#obj div i{width:12px;height:12px;border-radius:50%;border:2px solid #bbb;display:inline-block;flex:none;font-style:normal;font-size:8px;line-height:9px;text-align:center}#obj div.done i{background:#8a1c2b;border-color:#8a1c2b;color:#fff}
 #obj .next{margin-top:8px;padding-top:6px;border-top:1px dashed #d9cbb9;color:#8a1c2b}
@@ -85,7 +85,7 @@ body.mob #prog{left:16px;top:64px;bottom:auto;max-width:190px}
 #menu .go{margin-top:6px}
 #menu .keys{justify-content:flex-start}#ach span.on{background:#8a1c2b;color:#fff;border-color:#8a1c2b}
 #map{cursor:pointer;pointer-events:auto}
-body.mob #panel.on.dock{max-height:80px}body.mob #status{display:none}body.mob #obj{top:64px;width:150px;font-size:10px}
+body.mob #panel.on.dock{max-height:80px}body.mob #status{display:none}body.mob #obj{top:64px;width:128px;font-size:10px}   /* narrow enough to clear the centred dial */
 @media(orientation:landscape){body.mob #panel{top:14px;bottom:14px;height:auto;width:44%;right:14px}body.mob #obj{display:none}body.mob #hint{bottom:14px}body.mob #map{width:110px;height:110px}}
 #stick{position:fixed;left:26px;bottom:26px;width:120px;height:120px;border-radius:50%;background:rgba(17,17,17,.18);z-index:5;display:none;touch-action:none}
 #stick i{position:absolute;left:35px;top:35px;width:50px;height:50px;border-radius:50%;background:rgba(251,247,241,.95);box-shadow:0 6px 14px rgba(0,0,0,.25)}
@@ -112,7 +112,7 @@ body.mob #stick,body.mob #jump{display:block}body.mob #panel{top:auto;bottom:112
 <div id="hint"></div>
 <div id="prog"></div>
 <div id="obj"><h4>OBJECTIVES</h4><div id="objl"></div><div class="next" id="objn"></div><button id="tourBtn">&#9654; STORY TOUR</button><button id="viewBtn">VIEW: AUTO</button></div>
-<button id="clock" title="Day / night"><i id="clkIco">☀</i><b id="clkTime">12:00</b><small id="clkMode">AUTO</small></button>
+<canvas id="dial" width="240" height="240" title="Day / night - click to change"></canvas>
 <div id="sub"></div>
 <div id="status"><span id="stLoc">MANILA</span><span id="stSpd">0 m/s</span><span id="stKey">WASD · drag to pan</span></div>
 <div id="vig"></div><div id="toasts"></div><div id="tip"></div><div id="fade"></div>
@@ -702,7 +702,7 @@ document.getElementById('mMusic').onclick=function(){SET.music=!SET.music;saveSe
 document.getElementById('mHat').onclick=function(){var hs=['auto','none'].concat(Object.keys(HATS).filter(function(h){return ACH.has[HATS[h].ach]}));SET.hat=hs[(hs.indexOf(SET.hat)+1)%hs.length];saveSet();this.textContent='Hat: '+SET.hat;applyHat()};
 document.getElementById('mQ').onclick=function(){SET.quality=SET.quality==='auto'?'high':SET.quality==='high'?'low':'auto';saveSet();applyQ()};
 document.getElementById('mTime').onclick=function(){cycleTime()};
-document.getElementById('clock').onclick=function(){grabFocus();cycleTime()};
+document.getElementById('dial').onclick=function(){grabFocus();cycleTime()};
 document.getElementById('mTour').onclick=function(){menuToggle();respawn();centerCam()};
 function shareSpot(){var u=location.origin+location.pathname+(cur?'#'+cur.id:'');(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){toast('Link copied: '+u.replace(location.origin,''))},function(){prompt('Copy this link',u)})}
 document.getElementById('mShare').onclick=function(){menuToggle();shareSpot()};
@@ -755,10 +755,28 @@ function cycleTime(){SET.time=SET.time==='auto'?'day':SET.time==='day'?'night':'
 function clockText(){var h;
  if(SET.time==='day')h=12.4;else if(SET.time==='night')h=0.6;else h=((SKY.t-.25)*24+12+24)%24;   // t .25 = noon, .75 = midnight
  var hh=Math.floor(h),mm=Math.floor((h-hh)*60);
- var e=document.getElementById('clkTime');if(e)e.textContent=(hh<10?'0':'')+hh+':'+(mm<10?'0':'')+mm;
- var i=document.getElementById('clkIco');if(i)i.textContent=SKY.night>.62?'\u263D':SKY.night>.22?'\u2601':'\u2600';
- var m=document.getElementById('clkMode');if(m)m.textContent=SET.time.toUpperCase()}
-function applyTime(){var b=document.getElementById('mTime');if(b)b.textContent='Time: '+SET.time;SKY.shown=-1;skyStep(0);clockText()}
+ SKY.hhmm=(hh<10?'0':'')+hh+':'+(mm<10?'0':'')+mm;SKY.mode=SET.time.toUpperCase()}
+function applyTime(){var b=document.getElementById('mTime');if(b)b.textContent='Time: '+SET.time;SKY.shown=-1;skyStep(0);clockText();dialDraw()}
+// ---- the day dial: segmented ring + a marker riding it, the Don't Starve read-at-a-glance idiom ----
+var dialEl=null,dc=null,DIALC={day:'#ffd98a',dusk:'#e8834e',night:'#223a63',dawn:'#f0a2ad'},dialGlowShown=-1;
+function dAng(t){return (t-.25)*Math.PI*2-Math.PI/2}   // noon at the top, dusk right, midnight bottom, dawn left
+function dialDraw(){if(!dc){dialEl=document.getElementById('dial');if(!dialEl)return;dc=dialEl.getContext('2d')}
+ var n=SKY.night,t=SET.time==='day'?.25:SET.time==='night'?.75:SKY.t,C=120,R=96,q=dc;
+ q.clearRect(0,0,240,240);
+ q.lineWidth=22;q.lineCap='butt';
+ var bands=[[.05,.45,DIALC.day],[.45,.55,DIALC.dusk],[.55,.95,DIALC.night],[.95,1.05,DIALC.dawn]];
+ for(var i=0;i<bands.length;i++){q.beginPath();q.strokeStyle=bands[i][2];q.arc(C,C,R,dAng(bands[i][0]),dAng(bands[i][1]));q.stroke()}
+ q.strokeStyle='rgba(255,255,255,.85)';q.lineWidth=3;q.beginPath();q.moveTo(C,C-R-13);q.lineTo(C,C-R+13);q.stroke();   // the noon notch
+ q.beginPath();q.fillStyle=n>.5?'rgba(16,26,46,.94)':'rgba(251,247,241,.94)';q.arc(C,C,74,0,7);q.fill();
+ q.save();q.translate(C+Math.cos(dAng(t))*R,C+Math.sin(dAng(t))*R);
+ q.shadowColor='rgba(255,214,140,.95)';q.shadowBlur=26*n;
+ if(n>.55){q.fillStyle='#e9f0ff';q.beginPath();q.arc(0,0,15,0,7);q.fill();q.shadowBlur=0;q.fillStyle=n>.5?'rgba(16,26,46,.94)':'rgba(251,247,241,.94)';q.beginPath();q.arc(6,-4,12,0,7);q.fill()}   // crescent
+ else{q.fillStyle='#fff3c8';q.beginPath();q.arc(0,0,13,0,7);q.fill();q.lineWidth=3.5;q.strokeStyle='#fff3c8';for(var r2=0;r2<8;r2++){var a2=r2/8*Math.PI*2;q.beginPath();q.moveTo(Math.cos(a2)*17,Math.sin(a2)*17);q.lineTo(Math.cos(a2)*23,Math.sin(a2)*23);q.stroke()}}
+ q.restore();q.shadowBlur=0;
+ q.textAlign='center';q.shadowColor='rgba(255,206,128,.9)';q.shadowBlur=20*n;
+ q.fillStyle=n>.5?'#ffe6b0':'#111';q.font="700 42px 'JetBrains Mono',monospace";q.fillText(SKY.hhmm||'12:00',C,C+8);
+ q.shadowBlur=0;q.fillStyle=n>.5?'rgba(255,230,176,.6)':'rgba(17,17,17,.5)';q.font='700 18px Inter,sans-serif';q.fillText(SKY.mode||'AUTO',C,C+34);
+ if(Math.abs(n-dialGlowShown)>.02){dialGlowShown=n;dialEl.style.filter='drop-shadow(0 8px 18px rgba(0,0,0,'+(.28-.16*n).toFixed(2)+'))'+(n>.05?' drop-shadow(0 0 '+(14*n).toFixed(1)+'px rgba(255,198,110,'+(.75*n).toFixed(2)+'))':'')}}
 var IDLE={t:0,st:'run',bark:0};
 function idleStep(dt,manual){var moving=RIDE.on?(manual||AUTO||P.air||P.speed>.5):(RIDE.ph==='whistle'||KIM.speed>.5);
  if(moving){IDLE.t=0;IDLE.k=0;if(IDLE.st!=='run'){IDLE.st='run';DOG.rotation.x=0;DOG.rotation.z=0}clampDog(dt);return}IDLE.t+=dt;
@@ -931,7 +949,7 @@ function step(dt){
  var no=nextObj();if(no){ARROW.visible=true;ARROW.position.set(P.x,P.y+4.7+Math.sin(performance.now()*.005)*.15,P.z);ARROW.rotation.set(0,Math.atan2(no.x-P.x,no.z-P.z),0)}else ARROW.visible=false;
  if(AUTOm.visible){var as=1+Math.sin(performance.now()*.008)*.15;AUTOm.scale.set(as,as,1)}
  hudT=(hudT||0)+dt;if(hudT>.25){hudT=0;objUpdate();clockText();document.getElementById('stSpd').textContent=Math.round(sp)+' m/s';var ns=null,nd2=1e9;ST.forEach(function(s2){var d2=Math.hypot(P.x-s2.x,P.z-s2.z);if(d2<nd2){nd2=d2;ns=s2}});document.getElementById('stLoc').textContent=(cur?cur.n:ns.n).toUpperCase();document.getElementById('stKey').textContent=padHint?padHint.replace('ENTER / TAP → ','ENTER: '):(AUTO?'walking…':'WASD · Q/E rotate · dbl-click to walk')}
- zones(dt);minimap();
+ zones(dt);minimap();dialDraw();
 }
 
 // ===== zones, panel, minimap =====

@@ -398,7 +398,7 @@ var RG=new THREE.Group(),DOG=new THREE.Group(),legs=[],tail,dHair,EARS=[],TONGUE
  [[-.33,0],[.33,0]].forEach(function(q){var st=new THREE.Mesh(new THREE.BoxGeometry(.14,.6,.2),HRM);st.position.set(q[0],-.12,-.05);HAIR.add(st)});   // side strands
 })();
 // ===== real 3D figures (Rodin meshes + UniRig skeletons); roles detected from bone positions; procedural rig = fallback =====
-var FIGV='21';   // bump when a rig file changes (GitHub Pages CDN caches GLBs ~10 min)
+var FIGV='26';   // bump when a rig file changes (GitHub Pages CDN caches GLBs ~10 min)
 var FIG={kim:null,dia:null,K:null,D:null,hats:null,kimH:2.35,kimY:.05,kimZ:.05,diaH:1.9,diaY:1.22,diaZ:-.45,lean:.08,seat:null,onSeat:false,diaYs:0,diaZs:0,targets:null,ik:null,ikc:null,wv:0,pat:0};
 var _q1=new THREE.Quaternion(),_q2=new THREE.Quaternion(),_q3=new THREE.Quaternion(),_AX=new THREE.Vector3(1,0,0),_AY=new THREE.Vector3(0,1,0),_AZ=new THREE.Vector3(0,0,1),_m4=new THREE.Matrix4(),_v3=new THREE.Vector3();
 function rotW(bone,axis,ang,root){bone.parent.getWorldQuaternion(_q1);root.getWorldQuaternion(_q2);var prel=_q2.invert().multiply(_q1);_q3.setFromAxisAngle(axis,ang);var d=prel.clone().invert().multiply(_q3).multiply(prel);bone.quaternion.copy(d).multiply(bone.userData.rest)}
@@ -456,9 +456,11 @@ function figAnim(sp,run,boost,M){M=M||P;var t=performance.now()/1000,ph=M.ft*Mat
   if(K.head.length){var hb=pick(K.head,Math.floor(K.head.length/2)),nb=pick(K.head,0);rotW(hb,_AX,Math.sin(ph*2)*.08*run-.15*air+Math.sin(t*.9)*.05*(1-run)+Math.max(-.35,Math.min(.35,HS.z*.25))-vy*.15,r);rotW(nb,_AY,Math.sin(t*.7)*.25*(1-run),r);if(K.head.length>2)rotW(K.head[K.head.length-1],_AX,.12*(boost?1:0),r)}
   K.ears.forEach(function(c){rotW(c[0],_AX,Math.sin(ph*2+1)*.2*run+earS,r)});   // ears: spring-lagged flop (fall/rise/run)
   if(FIG.hats&&K.head.length){_m4.copy(DOG.matrixWorld).invert();pick(K.head,Math.floor(K.head.length/2)).getWorldPosition(_v3);_v3.applyMatrix4(_m4);FIG.hats.forEach(function(h){h.position.set(_v3.x+.1,_v3.y+.1,_v3.z+.05)})}}
- if(FIG.mixer){var A=FIG.acts,st=M.air?'air':(sp>.5?'sit':(FIG.landmarkHit?'wave':(FIG.idleT>7&&A.talk?'talk':'sit')));FIG.idleT=(sp>.5||M.air)?0:(FIG.idleT||0)+dt;
-  if(st!==FIG.state&&A[st]){var from=A[FIG.state],to=A[st];to.reset().setEffectiveWeight(1).play();if(from&&from!==to)from.crossFadeTo(to,.3,false);FIG.state=st;if(st==='wave'||st==='talk'){to.setLoop(THREE.LoopOnce,1);to.clampWhenFinished=false;FIG.landmarkHit=false;FIG.idleT=0}}
-  if(FIG.state!=='sit'&&A[FIG.state]&&!A[FIG.state].isRunning()){A.sit.reset().play();A[FIG.state].crossFadeTo(A.sit,.3,false);FIG.state='sit'}
+ if(FIG.mixer){var A=FIG.acts;FIG.idleT=(sp>.5||M.air)?0:(FIG.idleT||0)+dt;
+  var st=(FIG.lockT>t&&!M.air)?FIG.state:(M.air?'air':(sp>.5?'sit':(FIG.landmarkHit?'wave':(FIG.idleT>7&&A.talk?'talk':'sit'))));   // a one-shot gesture keeps the rig until its clip ends, or it lasts a single frame
+
+  if(st!==FIG.state&&A[st]){var from=A[FIG.state],to=A[st];to.reset().setEffectiveWeight(1).play();if(from&&from!==to)from.crossFadeTo(to,.3,false);FIG.state=st;if(st==='wave'||st==='talk'){to.setLoop(THREE.LoopOnce,1);to.clampWhenFinished=false;FIG.landmarkHit=false;FIG.idleT=0;FIG.lockT=t+to.getClip().duration}else FIG.lockT=0}
+  if(FIG.state!=='sit'&&FIG.lockT<=t&&A[FIG.state]&&!A[FIG.state].isRunning()){A.sit.reset().play();A[FIG.state].crossFadeTo(A.sit,.3,false);FIG.state='sit'}
   if(A.sit)A.sit.timeScale=1+run*.6;FIG.mixer.update(dt)}
  var D=FIG.D;if(D){if(RIDE.on){var r2=FIG.dia;var RW=FIG.mixer?rotAdd:rotW;if(D.head.length){RW(pick(D.head,D.head.length-1),_AX,Math.sin(ph*2)*.06*run+Math.sin(t*.8)*.05*(1-run)-pitch*.8,r2);RW(pick(D.head,D.head.length-2),_AZ,-roll*.7,r2);RW(pick(D.head,0),_AY,Math.sin(t*.6)*.45*(1-run)+Math.max(-.5,Math.min(.5,HS.x*.3)),r2)}
   if(!FIG.mixer){
@@ -472,7 +474,7 @@ function figAnim(sp,run,boost,M){M=M||P;var t=performance.now()/1000,ph=M.ft*Mat
   var sq=M.squash||0;r2.scale.y=r2.userData.sc0?r2.userData.sc0*(1-sq*.35):r2.scale.y;if(!r2.userData.sc0)r2.userData.sc0=r2.scale.y;   // landing squash
   if(D.spine.length>1){rotW(D.spine[1],_AZ,Math.max(-.25,Math.min(.25,-HS.x*.25))+Math.sin(ph)*.05*run,r2);rotW(D.spine[D.spine.length-1],_AX,Math.max(-.2,Math.min(.2,HS.z*.2))+Math.sin(ph*2)*.08*run+(1-run)*.02*Math.sin(t*2.2),r2)}   // torso rocks with the gait, breathes at idle
   D.legs.forEach(function(c,i){rotW(pick(c,1),_AX,Math.sin(ph*2)*.05*run*(i?-1:1)+air*.4,r2)})}}else{walkAnim(D,FIG.dia,t,dt)}}   // legs swing back in the air (procedural only when there are no clips)
- if(FIG.ik&&RIDE.on){var I=FIG.ikc,hold=!M.air;if(I.armL)I.armL.iteration=hold&&!(FIG.pat>0)?10:0;if(I.armR)I.armR.iteration=hold&&!(FIG.wv>0)?10:0;DOG.updateMatrixWorld(true);FIG.ik.update()}   // contact constraints: hands on the handle, feet in the stirrups (off in the air / while waving or patting)
+ if(FIG.ik&&RIDE.on){var I=FIG.ikc,gest=FIG.mixer&&(FIG.state==='wave'||FIG.state==='talk'),hold=!M.air&&!gest;if(I.armL)I.armL.iteration=hold&&!(FIG.pat>0)?10:0;if(I.armR)I.armR.iteration=hold&&!(FIG.wv>0)?10:0;DOG.updateMatrixWorld(true);FIG.ik.update()}   // contact constraints: hands on the handle, feet in the stirrups (off in the air / while waving or patting)
 }
 function fitRoot(root,h,dy,dz){root.updateMatrixWorld(true);var bb=new THREE.Box3().setFromObject(root),sz=bb.getSize(new THREE.Vector3()),c=bb.getCenter(new THREE.Vector3()),sc=h/sz.y;root.scale.setScalar(sc);root.position.set(-c.x*sc,-bb.min.y*sc+(dy||0),-c.z*sc+(dz||0));root.updateMatrixWorld(true)}
 function skinMat(mesh,rough){var old=mesh.material;mesh.material=new THREE.MeshStandardMaterial({map:old.map||null,color:0xffffff,roughness:rough,metalness:0,skinning:true});mesh.castShadow=true;mesh.frustumCulled=false}
@@ -506,7 +508,7 @@ function poseLegs(D,root,fW){var inv=new THREE.Matrix4(),w=new THREE.Vector3();f
   knee.quaternion.copy(knee.userData.rest);rotW(knee,_AX,bx,root);rotAdd(knee,_AZ,bz,root);knee.userData.rest.copy(knee.quaternion);root.updateMatrixWorld(true)})}
 function attachRider(){if(!FIG.seat||!FIG.dia||FIG.onSeat)return;var wr=FIG.dia.parent,seat=FIG.seat,D=FIG.D;seat.add(wr);wr.position.set(0,0,0);wr.rotation.set(FIG.lean,0,0);DOG.updateMatrixWorld(true);
  var hip=D.spine[0]||FIG.dia,hp=seat.worldToLocal(hip.getWorldPosition(new THREE.Vector3()));wr.position.y=-(hp.y-.08);wr.position.z=-hp.z;FIG.diaYs=wr.position.y;FIG.diaZs=wr.position.z;FIG.onSeat=true;DOG.updateMatrixWorld(true);   // hips on the cushion
- var T=FIG.targets;if(T&&FIG.seatM){poseLegs(D,FIG.dia,FIG.seatM.fW);DOG.updateMatrixWorld(true);if(D.legs[0])placeStirrup(T.stirL,seat,pick(D.legs[0],2).getWorldPosition(new THREE.Vector3()));if(D.legs[1])placeStirrup(T.stirR,seat,pick(D.legs[1],2).getWorldPosition(new THREE.Vector3()))}
+ var T=FIG.targets;if(T&&FIG.seatM&&!FIG.mixer){poseLegs(D,FIG.dia,FIG.seatM.fW);DOG.updateMatrixWorld(true);if(D.legs[0])placeStirrup(T.stirL,seat,pick(D.legs[0],2).getWorldPosition(new THREE.Vector3()));if(D.legs[1])placeStirrup(T.stirR,seat,pick(D.legs[1],2).getWorldPosition(new THREE.Vector3()))}
  if(!THREE.CCDIKSolver||!T)return;var sm=FIG.dia.getObjectByProperty('type','SkinnedMesh'),bones=sm.skeleton.bones.slice();function ix(b){var i=bones.indexOf(b);if(i<0){bones.push(b);i=bones.length-1}return i}
  function chain(c,eff,li,target){return {target:ix(target),effector:ix(pick(c,eff)),links:li.map(function(k){return {index:ix(pick(c,k))}}),iteration:10}}
  var iks={};if(D.arms[0])iks.armL=chain(D.arms[0],5,[3,2,1,0],T.gripL);if(D.arms[1])iks.armR=chain(D.arms[1],5,[3,2,1,0],T.gripR);

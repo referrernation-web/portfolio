@@ -731,7 +731,7 @@ function applyHash(){var h=(location.hash||'').replace('#','').toLowerCase();var
 // ===== day/night: one scalar drives sky, fog, both lights and the emissive channel =====
 var DAYLEN=180,SKY={t:.2,night:0,shown:-1,star:''};
 var DAYP={sun:0xfff6e6,si:1.1,hs:0xfff4e0,hg:0x7a9a6a,hi:.9,fog:0xcfe8f5,a:0xeef8ff,b:0xcfe8f5,c:0xa8d1ea};
-var NGTP={sun:0xa9c0ea,si:.24,hs:0x33507d,hg:0x0f1723,hi:.26,fog:0x152438,a:0x27405f,b:0x172a43,c:0x0a1220};   // tuned live: the grass stayed too bright above hi .30
+var NGTP={sun:0xa9c0ea,si:.18,hs:0x2c4468,hg:0x0d1420,hi:.17,fog:0x152438,a:0x27405f,b:0x172a43,c:0x0a1220};   // tuned against the LIVE site: at hi .26 the grass still read as dusk and the lamps did not pop
 var _c1=new THREE.Color(),_c2=new THREE.Color(),_c3=new THREE.Color();
 (function(){var st=[];for(var i=0;i<26;i++){var x=(7+i*37)%100,y=(11+i*23)%46;st.push('radial-gradient(1.5px 1.5px at '+x+'% '+y+'%, rgba(255,255,255,A), transparent)')}SKY.star=st.join(',')})();
 function mixHex(h1,h2,k){_c1.setHex(h1);_c2.setHex(h2);return _c1.lerp(_c2,k)}

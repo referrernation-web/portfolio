@@ -11,11 +11,12 @@
 # base at z = 0, centred in x/y, at the nominal size the JS builders scale from.
 #
 # run: blender -b -P blend_kit.py -- models/kit.glb
-import bpy, sys, math
+import bpy, sys, math, random
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 
 OUT = (sys.argv[sys.argv.index('--')+1:] or ['kit.glb'])[0]
+RNG = random.Random(20260907)   # fixed seed so a rebuild does not reshuffle every window
 TAU = math.pi*2
 
 # ---- palette (same hexes the world already uses) -> 0..1 tuples ----
@@ -69,6 +70,15 @@ def cyl(x, y, z, rb, rt, h, seg, col, tint=1, rz=0.0):
 def cone(x, y, z, r, h, seg, col, tint=1, rz=0.0):
     cyl(x, y, z, r, 0.0, h, seg, col, tint, rz)
 
+def quad(pts, col, tint=1):
+    """flat 4-vertex face - 2 triangles, used for window panes so each one carries its own seed"""
+    emit(list(pts), [(0, 1, 2, 3)], col, tint)
+
+# COLOR_0 alpha doubles as the night channel, read by the patched mp() in index.html:
+#   1.00 body (tint with the palette colour) · 0.00 accent · 0.10 always lit · 0.35-0.90 window with that seed
+LIT = 0.10
+def seed(rng): return 0.35 + rng.random()*0.55
+
 def prism(x, y, z, w, d, h, col, tint=1):
     """triangular prism (roof ridge) running along x"""
     hw, hd = w/2.0, d/2.0
@@ -81,10 +91,18 @@ def prism(x, y, z, w, d, h, col, tint=1):
 def facade(w, d, h, floors, body, glass, podium=True):
     fh = h/float(floors)
     ins = min(0.20, w*0.085)
+    box(0, 0, h/2.0, w-ins*2.1, d-ins*2.1, h, DARK, 0)                        # solid core, so the glazing gaps never see through
     for i in range(floors):
         z0 = i*fh
         box(0, 0, z0 + fh*0.23, w, d, fh*0.46, body, 1)                       # spandrel band
-        box(0, 0, z0 + fh*0.73, w-ins*2, d-ins*2, fh*0.54, glass, 0)          # recessed glazing
+        za, zb = z0 + fh*0.50, z0 + fh*0.96                                    # the glazing band, as individually seeded panes
+        for sg in (-1, 1):
+            ey, ex = sg*(d/2.0 - ins), sg*(w/2.0 - ins)
+            for k in (-1, 1):
+                xa, xb = k*0.04*w, k*(w/2.0 - ins*1.1)
+                quad(((xa, ey, za), (xb, ey, za), (xb, ey, zb), (xa, ey, zb)), glass, seed(RNG))
+                ya, yb = k*0.04*d, k*(d/2.0 - ins*1.1)
+                quad(((ex, ya, za), (ex, yb, za), (ex, yb, zb), (ex, ya, zb)), glass, seed(RNG))
         box(0, 0, z0 + fh*0.99, w-ins*0.6, d-ins*0.6, fh*0.06, body, 1)       # lintel over the reveal
     # mullions sit ON each face, in the reveal - spanning the full depth would skin the building shut
     n = max(2, int(w/0.9)); m = max(2, int(d/0.9))
@@ -99,7 +117,7 @@ def facade(w, d, h, floors, body, glass, podium=True):
     if podium:
         box(0, 0, fh*0.55, w+0.34, d+0.34, fh*1.1, body, 1)                    # base podium
         box(0, -(d/2.0+0.30), fh*0.95, w*0.5, 0.62, 0.1, DARK, 0)              # entrance canopy
-        box(0, -(d/2.0+0.02), fh*0.45, w*0.34, 0.08, fh*0.8, GLASS, 0)         # doors
+        box(0, -(d/2.0+0.02), fh*0.45, w*0.34, 0.08, fh*0.8, GLASS, LIT)       # lobby doors stay lit
 
 def roofplant(w, d, tall=True):
     box(0, 0, 0.16, w+0.30, d+0.30, 0.32, DARK, 0)                             # parapet
@@ -195,7 +213,7 @@ fh = 6.0/4
 for i in range(4):
     z0 = i*fh
     box(0, 0, z0+fh*0.22, 4.0, 4.0, fh*0.44, WHITE, 1)
-    box(0, 0, z0+fh*0.72, 3.7, 3.7, fh*0.56, GLASS, 0)
+    box(0, 0, z0+fh*0.72, 3.7, 3.7, fh*0.56, GLASS, seed(RNG))
     box(0, -2.08, z0+fh*0.62, 3.2, 0.22, fh*0.42, WHITE, 1)        # balcony slab
     box(0, -2.18, z0+fh*0.86, 3.2, 0.06, 0.34, METAL, 0)           # railing
 box(0, 0, 6.18, 4.4, 4.4, 0.36, WHITE, 1)
@@ -205,8 +223,8 @@ finish('mid_a')
 
 # --- Philippine shophouse: nominal 4 wide x 3.4 tall ---
 box(0, 0, 1.7, 4.0, 3.6, 3.4, WHITE, 1)
-box(0, -1.86, 0.95, 3.4, 0.12, 1.9, GLASS, 0)                      # shopfront glazing
-box(0, -1.95, 2.35, 4.2, 0.18, 0.7, MAROON, 0)                     # signage board
+box(0, -1.86, 0.95, 3.4, 0.12, 1.9, GLASS, LIT)                    # shopfront glazing, lit all night
+box(0, -1.95, 2.35, 4.2, 0.18, 0.7, MAROON, LIT)                   # signage board
 box(0, -2.25, 2.02, 4.0, 0.7, 0.06, CREAM, 0)                      # awning
 for s in (-1.6, 1.6): cyl(s, -2.5, 1.0, 0.05, 0.05, 2.0, 6, METAL, 0)
 box(1.35, -1.86, 2.8, 0.7, 0.3, 0.5, METAL, 0)                     # aircon box
@@ -215,7 +233,7 @@ finish('shop_a')
 
 box(0, 0, 1.5, 3.4, 3.4, 3.0, WHITE, 1)
 box(0, -1.78, 0.9, 2.8, 0.1, 1.7, WOOD2, 0)                        # roll-up shutter
-box(0, -1.86, 2.2, 3.6, 0.16, 0.6, GOLD, 0)
+box(0, -1.86, 2.2, 3.6, 0.16, 0.6, GOLD, LIT)
 prism(0, 0, 3.0, 3.6, 3.6, 0.7, MAROON, 0)                         # pitched roof
 finish('shop_b')
 
@@ -223,7 +241,7 @@ finish('shop_b')
 for sx in (-0.95, 0.95):
     for sy in (-0.85, 0.85): cyl(sx, sy, 0.36, 0.1, 0.08, 0.72, 5, WOOD2, 0)
 box(0, 0, 1.5, 2.4, 2.2, 1.5, NIPA, 0)
-box(0, -1.12, 1.6, 0.9, 0.1, 0.7, WOOD2, 0)                        # window flap
+box(0, -1.12, 1.6, 0.9, 0.1, 0.7, LAMP, LIT)                       # window, warm inside at night
 box(0, -1.3, 1.95, 0.9, 0.36, 0.05, BAMBOO, 0, 0.0)
 cone(0, 0, 2.25, 1.85, 1.5, 4, WOOD2, 0, math.pi/4)                # nipa roof
 cone(0, 0, 3.05, 1.05, 0.75, 4, WOOD2, 0, math.pi/4)               # second layer
@@ -235,9 +253,9 @@ box(0, 0, 1.05, 5.0, 2.0, 1.1, WHITE, 1)                           # body
 box(-0.3, 0, 1.95, 3.6, 1.9, 0.7, WHITE, 1)                        # cabin/roof
 box(-0.3, 0, 2.36, 3.8, 2.0, 0.12, METAL, 0)                       # roof rack
 box(1.9, 0, 1.85, 1.2, 1.8, 0.6, GLASS, 0)                         # windshield
-for s in (-1, 1): box(-0.3, s*0.96, 1.95, 3.4, 0.06, 0.5, GLASS2, 0)
+for s in (-1, 1): box(-0.3, s*0.96, 1.95, 3.4, 0.06, 0.5, GLASS2, LIT)   # jeepney cabin glow
 box(2.55, 0, 1.0, 0.3, 2.0, 0.5, METAL, 0)                         # bumper
-for s in (-1, 1): box(2.4, s*0.7, 1.35, 0.16, 0.34, 0.28, LAMP, 0)
+for s in (-1, 1): box(2.4, s*0.7, 1.35, 0.16, 0.34, 0.28, LAMP, LIT)
 for a in (-1.5, 1.6):
     for s in (-1, 1): cyl(a, s*1.02, 0.42, 0.42, 0.42, 0.28, 8, TYRE, 0, math.pi/2)
 box(0, 0, 0.5, 4.6, 1.7, 0.5, DARK, 0)
@@ -248,7 +266,7 @@ box(0, 0, 0.72, 4.0, 1.8, 0.66, WHITE, 1)
 box(-0.15, 0, 1.32, 2.2, 1.66, 0.62, WHITE, 1)
 box(-0.15, 0, 1.34, 2.05, 1.72, 0.5, GLASS, 0)
 box(0, 0, 1.66, 1.9, 1.6, 0.06, WHITE, 1)
-for s in (-1, 1): box(1.75, s*0.6, 0.86, 0.2, 0.36, 0.22, LAMP, 0)
+for s in (-1, 1): box(1.75, s*0.6, 0.86, 0.2, 0.36, 0.22, LAMP, LIT)
 box(-1.92, 0, 0.86, 0.14, 1.4, 0.16, RED, 0)
 for a in (-1.28, 1.32):
     for s in (-1, 1): cyl(a, s*0.9, 0.36, 0.36, 0.36, 0.24, 8, TYRE, 0, math.pi/2)
@@ -258,7 +276,7 @@ finish('car2')
 cyl(0, 0, 0.09, 0.2, 0.17, 0.18, 8, DARK, 0)
 cyl(0, 0, 1.7, 0.075, 0.05, 3.2, 6, ASPH, 0)
 box(0.32, 0, 3.32, 0.75, 0.1, 0.1, ASPH, 0)
-box(0.62, 0, 3.2, 0.44, 0.26, 0.16, LAMP, 0)
+box(0.62, 0, 3.2, 0.44, 0.26, 0.16, LAMP, LIT)   # street lamp head
 finish('lamp2')
 
 for s in (-0.7, 0.7): box(s, 0, 0.22, 0.1, 0.5, 0.44, ASPH, 0)
@@ -278,7 +296,7 @@ finish('bollard')
 
 for sx in (-1.5, 1.5):
     for sy in (-0.6, 0.6): cyl(sx, sy, 1.2, 0.06, 0.06, 2.4, 6, METAL, 0)
-box(0, 0, 2.48, 3.4, 1.5, 0.14, MAROON, 0)
+box(0, 0, 2.48, 3.4, 1.5, 0.14, MAROON, 0); box(0, 0, 2.36, 2.9, 1.1, 0.05, LAMP, LIT)   # shelter ceiling light
 box(0, 0.66, 1.3, 3.2, 0.08, 1.9, GLASS2, 0)
 box(0, 0.2, 0.5, 2.4, 0.4, 0.1, WOOD, 0)
 for s in (-1, 1): box(s*1.05, 0.2, 0.24, 0.1, 0.4, 0.4, ASPH, 0)
@@ -288,7 +306,7 @@ for sx in (-1.1, 1.1):
     for sy in (-0.8, 0.8): cyl(sx, sy, 1.0, 0.05, 0.05, 2.0, 5, WOOD2, 0)
 box(0, 0, 1.02, 2.4, 1.8, 0.1, WOOD, 0)                            # counter
 prism(0, 0, 2.0, 2.7, 2.1, 0.55, MAROON, 0)                        # tarp roof
-for i in range(3): box(-0.7 + i*0.7, -0.2, 1.18, 0.42, 0.42, 0.24, GOLD, 0)
+for i in range(3): box(-0.7 + i*0.7, -0.2, 1.18, 0.42, 0.42, 0.24, GOLD, LIT)
 finish('stall')
 
 # --- nature: one mesh each (palm was 7 separate meshes in the world) ---

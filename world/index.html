@@ -132,6 +132,7 @@ body.mob #stick,body.mob #jump{display:block}body.mob #panel{top:auto;bottom:112
 </div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/animation/CCDIKSolver.js"></script>
 <script>
 // ===== content (same facts as the classic resume) =====
 var DATA={
@@ -355,7 +356,7 @@ var RG=new THREE.Group(),DOG=new THREE.Group(),legs=[],tail,dHair,EARS=[],TONGUE
 })();
 // ===== real 3D figures (Rodin meshes + UniRig skeletons); roles detected from bone positions; procedural rig = fallback =====
 var FIGV='21';   // bump when a rig file changes (GitHub Pages CDN caches GLBs ~10 min)
-var FIG={kim:null,dia:null,K:null,D:null,hats:null,kimH:2.35,kimY:.05,kimZ:.05,diaH:1.9,diaY:1.22,diaZ:-.45,lean:.08};
+var FIG={kim:null,dia:null,K:null,D:null,hats:null,kimH:2.35,kimY:.05,kimZ:.05,diaH:1.9,diaY:1.22,diaZ:-.45,lean:.08,seat:null,onSeat:false,diaYs:0,diaZs:0,targets:null,ik:null,ikc:null,wv:0,pat:0};
 var _q1=new THREE.Quaternion(),_q2=new THREE.Quaternion(),_q3=new THREE.Quaternion(),_AX=new THREE.Vector3(1,0,0),_AY=new THREE.Vector3(0,1,0),_AZ=new THREE.Vector3(0,0,1),_m4=new THREE.Matrix4(),_v3=new THREE.Vector3();
 function rotW(bone,axis,ang,root){bone.parent.getWorldQuaternion(_q1);root.getWorldQuaternion(_q2);var prel=_q2.invert().multiply(_q1);_q3.setFromAxisAngle(axis,ang);var d=prel.clone().invert().multiply(_q3).multiply(prel);bone.quaternion.copy(d).multiply(bone.userData.rest)}
 function rotAdd(bone,axis,ang,root){bone.parent.getWorldQuaternion(_q1);root.getWorldQuaternion(_q2);var prel=_q2.invert().multiply(_q1);_q3.setFromAxisAngle(axis,ang);var d=prel.clone().invert().multiply(_q3).multiply(prel);bone.quaternion.premultiply(d)}   // additive: on top of whatever the mixer posed
@@ -373,7 +374,8 @@ function dogRoles(root){var R=boneChains(root),ch=R.chains.slice();function leaf
  var head=rest.filter(function(c){return c!==tail}).sort(function(p,q){return leaf(q).z-leaf(p).z})[0];   // frontmost leaf = snout
  if(head){head=head.slice();for(var k=0;k<2;k++){var pb=head[0].parent;if(pb&&pb.isBone&&pb.userData.n.y>.45&&pb.userData.n.z>.55)head.unshift(pb);else break}}   // snout chain + head + neck
  var ears=rest.filter(function(c){return c!==tail&&c!==head&&c.length<=3&&leaf(c).y>.6&&leaf(c).z>.5});
- return {legs:legs,tail:tail||[],head:head||[],ears:ears}}
+ var spine=[];var sc=head&&head[0];while(sc&&sc.parent&&sc.parent.isBone){sc=sc.parent;spine.unshift(sc)}
+ return {legs:legs,tail:tail||[],head:head||[],ears:ears,spine:spine}}
 function girlRoles(root){var R=boneChains(root),ch=R.chains.slice();function leaf(c){return c[c.length-1].userData.n}
  var legs=ch.sort(function(p,q){return leaf(p).y-leaf(q).y}).slice(0,2).sort(function(p,q){return leaf(p).x-leaf(q).x});legs.forEach(function(c,i){c.right=i===1});   // left/right by relative x
  var rest=ch.filter(function(c){return legs.indexOf(c)<0});
@@ -390,7 +392,7 @@ function figAnim(sp,run,boost){var t=performance.now()/1000,ph=P.ft*Math.PI,air=
  var accZ=Math.max(-1,Math.min(1,HS.z*.5)),turn=Math.max(-1,Math.min(1,(P.turnV||0)));
  var bob=spring(SPR.bob,(P.air?-.12:Math.abs(Math.sin(ph))*.22*run),140,14,dt);
  var pitch=spring(SPR.pitch,-accZ*.35-air*.15+(boost?-.08:0),60,9,dt),roll=spring(SPR.roll,turn*.35*run,50,8,dt);
- if(FIG.dia&&FIG.dia.parent){var wr=FIG.dia.parent;wr.position.y=FIG.diaY+bob;wr.rotation.x=FIG.lean+pitch;wr.rotation.z=roll}
+ if(FIG.dia&&FIG.dia.parent){var wr=FIG.dia.parent;wr.position.y=(FIG.onSeat?FIG.diaYs:FIG.diaY)+bob;if(FIG.onSeat)wr.position.z=FIG.diaZs;wr.rotation.x=FIG.lean+pitch;wr.rotation.z=roll}
  var K=FIG.K;if(K){var r=FIG.kim,sw=Math.sin(ph)*run*.55,kn=Math.max(0,Math.sin(ph+.6))*run*.5,kn2=Math.max(0,-Math.sin(ph+.6))*run*.5;
   // gait v2: each leg runs a stance/swing cycle. stance (60%) sweeps the leg back slowly and plants it; swing (40%) whips it forward with the knee lifted.
   // trot < 10 m/s: diagonal pairs in phase; gallop >= 10: front pair leads the back pair by a quarter cycle (spine flexes with it)
@@ -400,6 +402,7 @@ function figAnim(sp,run,boost){var t=performance.now()/1000,ph=P.ft*Math.PI,air=
    var dir=c.front?-1:1;   // negative X swings a front leg forward
    var amp=run*(1-air);rotW(pick(c,0),_AX,dir*g.sw*1.1*amp+(c.front?-.9:.9)*air,r);rotW(pick(c,1),_AX,(c.front?1:-1)*g.knee*.9*amp+(c.front?-.55:.55)*air,r);rotW(pick(c,2),_AX,(c.front?-1:1)*g.lift*.5*amp,r)});
   if(K.head.length>1){rotW(K.head[0],_AX,-Math.sin(cyc*Math.PI*2)*.18*gallop*run,r)}   // neck dips with the gallop
+  if(K.spine)K.spine.forEach(function(b,i){rotW(b,_AX,Math.sin(cyc*Math.PI*2+.4)*.06*(i+1)*gallop*run+Math.sin(ph)*.02*run,r)});   // back flexes with the gallop (rider sits on this bone)
   var ik=(typeof IDLE!=='undefined'&&IDLE.k)||0,sit=(IDLE&&IDLE.st==='sit')?ik:0,slp=(IDLE&&IDLE.st==='sleep')?ik:0;   // sit / sleep on the real skeleton
   if(sit+slp>0){K.legs.forEach(function(c){if(!c.front){rotW(pick(c,0),_AX,1.25*(sit+slp),r);rotW(pick(c,1),_AX,-1.6*(sit+slp),r);rotW(pick(c,2),_AX,1.1*(sit+slp),r)}else if(slp){rotW(pick(c,0),_AX,-1.2*slp,r);rotW(pick(c,1),_AX,1.5*slp,r)}});
    if(K.head.length>1){rotW(K.head[0],_AX,.35*slp,r)}}
@@ -419,13 +422,14 @@ function figAnim(sp,run,boost){var t=performance.now()/1000,ph=P.ft*Math.PI,air=
 
   var ab=Math.sin(ph*2+1)*.18*run,idle=(1-run);D.arms.forEach(function(c,i){rotW(pick(c,0),_AX,ab*(i?-.8:1)-air*.5+Math.sin(t*1.3+i)*.06*idle,r2);rotW(pick(c,1),_AX,ab*(i?-.5:.6)-air*.3,r2);rotW(pick(c,2),_AX,ab*.5*(i?-1:1),r2)});   // visible arm swing while riding, slow drift at idle
    // idle behaviours (no clips yet): a wave every ~9 s with the right arm, a pat on Kimpoy with the left, slow look-around, breathing
-   FIG.idleT=(sp>.5||P.air)?0:(FIG.idleT||0)+dt;var it=FIG.idleT,cycle=it%9,wv=cycle>3&&cycle<5.4?Math.min(1,(cycle-3)*3,(5.4-cycle)*3):0,pat=cycle>6.5&&cycle<8.5?Math.sin((cycle-6.5)*Math.PI/2)*Math.max(0,Math.sin((cycle-6.5)*6)):0;
-   if(wv>0&&D.arms[1]){var c=D.arms[1];rotW(pick(c,0),_AX,1.9*wv,r2);rotAdd(pick(c,0),_AZ,.5*wv,r2);rotW(pick(c,2),_AX,.9*wv,r2);rotW(pick(c,3),_AZ,(-.4+Math.sin(t*9)*.35)*wv,r2)}   // raise, bend, wave the hand
-   if(pat>0&&D.arms[0]){var c0=D.arms[0];rotW(pick(c0,0),_AX,.4+pat*.5,r2);rotW(pick(c0,1),_AX,.3+pat*.4,r2)}   // pat the fur
-   if(D.spine.length>1){rotW(D.spine[1],_AZ,Math.sin(it*.9)*.04*(1-run),r2)}   // weight shift   // arms fly up in the air
+   FIG.idleT=(sp>.5||P.air)?0:(FIG.idleT||0)+dt;var it=FIG.idleT,cycle=it%9,wv=cycle>3&&cycle<5.4?Math.min(1,(cycle-3)*3,(5.4-cycle)*3):0,pat=cycle>6.5&&cycle<8.5?Math.sin((cycle-6.5)*Math.PI/2):0,pulse=Math.max(0,Math.sin((cycle-6.5)*7));
+   if(wv>0&&D.arms[1]){var c=D.arms[1];rotW(pick(c,0),_AX,-1.7*wv,r2);rotAdd(pick(c,0),_AZ,.6*wv,r2);rotW(pick(c,2),_AX,-.9*wv,r2);rotW(pick(c,3),_AZ,(-.3+Math.sin(t*9)*.35)*wv,r2)}   // raise, bend, wave the hand
+   if(pat>0&&D.arms[0]){var c0=D.arms[0];rotW(pick(c0,0),_AZ,-.9*pat,r2);rotAdd(pick(c0,0),_AX,(.1+.3*pulse)*pat,r2);rotW(pick(c0,2),_AX,.3*pat,r2)}   // hand out over the flank, patting down on the fur
+   FIG.wv=wv;FIG.pat=pat;if(D.spine.length>1){rotW(D.spine[1],_AZ,Math.sin(it*.9)*.04*(1-run),r2)}   // weight shift
   var sq=P.squash||0;r2.scale.y=r2.userData.sc0?r2.userData.sc0*(1-sq*.35):r2.scale.y;if(!r2.userData.sc0)r2.userData.sc0=r2.scale.y;   // landing squash
   if(D.spine.length>1){rotW(D.spine[1],_AZ,Math.max(-.25,Math.min(.25,-HS.x*.25))+Math.sin(ph)*.05*run,r2);rotW(D.spine[D.spine.length-1],_AX,Math.max(-.2,Math.min(.2,HS.z*.2))+Math.sin(ph*2)*.08*run+(1-run)*.02*Math.sin(t*2.2),r2)}   // torso rocks with the gait, breathes at idle
   D.legs.forEach(function(c,i){rotW(pick(c,1),_AX,Math.sin(ph*2)*.05*run*(i?-1:1)+air*.4,r2)})}}   // legs swing back in the air (procedural only when there are no clips)
+ if(FIG.ik){var I=FIG.ikc,hold=!P.air;if(I.armL)I.armL.iteration=hold&&!(FIG.pat>0)?10:0;if(I.armR)I.armR.iteration=hold&&!(FIG.wv>0)?10:0;DOG.updateMatrixWorld(true);FIG.ik.update()}   // contact constraints: hands on the handle, feet in the stirrups (off in the air / while waving or patting)
 }
 function fitRoot(root,h,dy,dz){root.updateMatrixWorld(true);var bb=new THREE.Box3().setFromObject(root),sz=bb.getSize(new THREE.Vector3()),c=bb.getCenter(new THREE.Vector3()),sc=h/sz.y;root.scale.setScalar(sc);root.position.set(-c.x*sc,-bb.min.y*sc+(dy||0),-c.z*sc+(dz||0));root.updateMatrixWorld(true)}
 function skinMat(mesh,rough){var old=mesh.material;mesh.material=new THREE.MeshStandardMaterial({map:old.map||null,color:0xffffff,roughness:rough,metalness:0,skinning:true});mesh.castShadow=true;mesh.frustumCulled=false}
@@ -433,11 +437,43 @@ function dropArm(c,root){if(!c||!c.length)return;var sh=pick(c,0),hand=c[c.lengt
  for(var a=-2.6;a<=2.6;a+=.1){sh.quaternion.copy(sh.userData.rest);rotW(sh,_AZ,a,root);root.updateMatrixWorld(true);inv.copy(root.matrixWorld).invert();hand.getWorldPosition(w);w.applyMatrix4(inv);if(w.y<bestY){bestY=w.y;best=a}}
  sh.quaternion.copy(sh.userData.rest);rotW(sh,_AZ,best,root);sh.userData.rest.copy(sh.quaternion);root.updateMatrixWorld(true);c.dropAng=best}
 function bakePose(list,root){list.forEach(function(p){if(!p[0])return;rotW(p[0],p[1],p[2],root);p[0].userData.rest.copy(p[0].quaternion);root.updateMatrixWorld(true)})}
+// ===== mount point: a seat Object3D attached to Kimpoy's mid-spine bone (like a saddle bone in games); harness prop + IK targets hang off it =====
+function makeSeat(root,mesh){DOG.updateMatrixWorld(true);var inv=new THREE.Matrix4().copy(DOG.matrixWorld).invert(),pos=mesh.geometry.attributes.position,v=new THREE.Vector3(),top=-1e9,cTop=-1e9,cBot=1e9,cW=0,fW=0;
+ for(var i=0;i<pos.count;i++){v.fromBufferAttribute(pos,i);mesh.localToWorld(v);v.applyMatrix4(inv);   // rest pose = bind pose, so vertex -> world is exact
+  if(Math.abs(v.x)<.12&&v.z>-.3&&v.z<.1&&v.y>top)top=v.y;
+  if(v.z>.4&&v.z<.5){if(Math.abs(v.x)<.15){if(v.y>cTop)cTop=v.y;if(v.y<cBot)cBot=v.y}if(v.y>1.0&&v.y<1.9&&Math.abs(v.x)>cW)cW=Math.abs(v.x)}
+  if(v.z>-.2&&v.z<0&&v.y>1.0&&v.y<1.9&&Math.abs(v.x)>fW)fW=Math.abs(v.x)}
+ var K=FIG.K,mount=(K.spine&&K.spine.length)?K.spine[K.spine.length-1]:(K.head[0]&&K.head[0].parent);var seat=new THREE.Object3D();seat.position.set(0,top,-.1);DOG.add(seat);DOG.updateMatrixWorld(true);if(mount&&mount.isBone)mount.attach(seat);   // attach() keeps the world pose (undoes the bone's rotation/scale)
+ FIG.seat=seat;FIG.seatTop=top;FIG.seatM={top:top,cTop:cTop,cBot:cBot,cW:cW,fW:fW};makeHarness(seat,FIG.seatM)}
+function makeHarness(seat,m){var lea=mat(0x2a2118),met=mat(0xb8b8b8);
+ var pad=new THREE.Mesh(new THREE.SphereGeometry(1,20,12),mat(0x8a1c2b));pad.scale.set(.5,.11,.46);pad.position.set(0,-.06,.02);seat.add(pad);   // saddle cushion, sunk into the fur
+ var arch=new THREE.Mesh(new THREE.TorusGeometry(.12,.024,8,18,Math.PI),lea);arch.position.set(0,.27,.40);seat.add(arch);   // grab handle
+ [-1,1].forEach(function(sg){var post=new THREE.Mesh(new THREE.CylinderGeometry(.024,.024,.29,8),lea);post.position.set(sg*.12,.13,.40);seat.add(post)});
+ var strap=new THREE.Mesh(new THREE.TorusGeometry(.6,.022,8,28),lea);strap.scale.set((m.cW+.02)/.6,((m.cTop-m.cBot)/2+.02)/.6,1);strap.position.set(0,(m.cTop+m.cBot)/2-m.top,.55);seat.add(strap);   // chest strap behind the front legs
+ var T={};[-1,1].forEach(function(sg){var g=new THREE.Bone();g.position.set(sg*.11,.33,.40);seat.add(g);T[sg<0?'gripL':'gripR']=g;
+  var x=sg*(m.fW+.06),y=-.27;var st=new THREE.Mesh(new THREE.TorusGeometry(.07,.012,6,14),met);st.rotation.y=Math.PI/2;st.position.set(x,y,-.05);seat.add(st);   // stirrup
+  var sb=new THREE.Mesh(new THREE.BoxGeometry(.02,-y-.07,.06),lea);sb.position.set(x,y/2,-.05);seat.add(sb);T[sg<0?'stirL':'stirR']={ring:st,strap:sb}});   // snapped to the ankles in attachRider
+ FIG.targets=T}
+function placeStirrup(T,seat,ankW){var p=seat.worldToLocal(ankW.clone());T.ring.position.set(p.x,p.y-.02,p.z);var len=Math.max(.05,-p.y-.02);T.strap.geometry.dispose();T.strap.geometry=new THREE.BoxGeometry(.02,len,.06);T.strap.position.set(p.x,-len/2,p.z)}
+function poseLegs(D,root,fW){var inv=new THREE.Matrix4(),w=new THREE.Vector3();function P(b){b.getWorldPosition(w);return w.applyMatrix4(inv)}   // numeric pose search (like dropArm): thigh out to the flank, shin hanging straight down outside the fur
+ D.legs.forEach(function(c){var hip=pick(c,0),knee=pick(c,1),ank=pick(c,2),s=c.right?1:-1,best=0,bs=1e9;DOG.updateMatrixWorld(true);inv.copy(DOG.matrixWorld).invert();var hy=P(hip).y;
+  for(var a=-2.4;a<=2.4;a+=.1){hip.quaternion.copy(hip.userData.rest);rotW(hip,_AZ,a,root);root.updateMatrixWorld(true);var k=P(knee);var sc=Math.abs(k.x-s*(fW+.03))+(k.y>hy?2:0);if(sc<bs){bs=sc;best=a}}
+  hip.quaternion.copy(hip.userData.rest);rotW(hip,_AZ,best,root);hip.userData.rest.copy(hip.quaternion);root.updateMatrixWorld(true);
+  var kx=Math.abs(P(knee).x),bx=0,bz=0;bs=1e9;for(var ax=-2.6;ax<=2.6;ax+=.13)for(var az=-2.6;az<=2.6;az+=.13){knee.quaternion.copy(knee.userData.rest);rotW(knee,_AX,ax,root);rotAdd(knee,_AZ,az,root);root.updateMatrixWorld(true);var q=P(ank);var sc2=q.y+(Math.abs(q.x)<kx-.06?2:0);if(sc2<bs){bs=sc2;bx=ax;bz=az}}
+  knee.quaternion.copy(knee.userData.rest);rotW(knee,_AX,bx,root);rotAdd(knee,_AZ,bz,root);knee.userData.rest.copy(knee.quaternion);root.updateMatrixWorld(true)})}
+function attachRider(){if(!FIG.seat||!FIG.dia||FIG.onSeat)return;var wr=FIG.dia.parent,seat=FIG.seat,D=FIG.D;seat.add(wr);wr.position.set(0,0,0);wr.rotation.set(FIG.lean,0,0);DOG.updateMatrixWorld(true);
+ var hip=D.spine[0]||FIG.dia,hp=seat.worldToLocal(hip.getWorldPosition(new THREE.Vector3()));wr.position.y=-(hp.y-.08);wr.position.z=-hp.z;FIG.diaYs=wr.position.y;FIG.diaZs=wr.position.z;FIG.onSeat=true;DOG.updateMatrixWorld(true);   // hips on the cushion
+ var T=FIG.targets;if(T&&FIG.seatM){poseLegs(D,FIG.dia,FIG.seatM.fW);DOG.updateMatrixWorld(true);if(D.legs[0])placeStirrup(T.stirL,seat,pick(D.legs[0],2).getWorldPosition(new THREE.Vector3()));if(D.legs[1])placeStirrup(T.stirR,seat,pick(D.legs[1],2).getWorldPosition(new THREE.Vector3()))}
+ if(!THREE.CCDIKSolver||!T)return;var sm=FIG.dia.getObjectByProperty('type','SkinnedMesh'),bones=sm.skeleton.bones.slice();function ix(b){var i=bones.indexOf(b);if(i<0){bones.push(b);i=bones.length-1}return i}
+ function chain(c,eff,li,target){return {target:ix(target),effector:ix(pick(c,eff)),links:li.map(function(k){return {index:ix(pick(c,k))}}),iteration:10}}
+ var iks={};if(D.arms[0])iks.armL=chain(D.arms[0],5,[3,2,1,0],T.gripL);if(D.arms[1])iks.armR=chain(D.arms[1],5,[3,2,1,0],T.gripR);
+ var list=Object.keys(iks).map(function(k){return iks[k]});FIG.ikc=iks;FIG.ik=new THREE.CCDIKSolver({skeleton:{bones:bones}},list);   // the solver only reads mesh.skeleton.bones, so targets can live on Kimpoy's seat
+ list.forEach(function(k){k.iteration=80});FIG.ik.update();list.forEach(function(k){k.iteration=10;k.links.forEach(function(l){var b=bones[l.index];b.userData.rest.copy(b.quaternion)})})}   // solve once hard, bake as rest so each frame starts next to the answer
 function loadFigures(){
  GL.load('models/kimpoy-rig.glb?v='+FIGV,function(gl){var root=gl.scene,mesh=null;root.traverse(function(m){if(m.isSkinnedMesh)mesh=m});if(!mesh)return;
-  fitRoot(root,FIG.kimH,FIG.kimY,FIG.kimZ);skinMat(mesh,1.0);var wrap=new THREE.Group();wrap.add(root);DOG.add(wrap);FIG.kim=root;FIG.K=dogRoles(root);
+  fitRoot(root,FIG.kimH,FIG.kimY,FIG.kimZ);skinMat(mesh,1.0);var wrap=new THREE.Group();wrap.add(root);DOG.add(wrap);FIG.kim=root;FIG.K=dogRoles(root);makeSeat(root,mesh);
   var hats=Object.keys(HATM).map(function(k){return HATM[k]});FIG.hats=hats;DOG.children.forEach(function(ch){if(ch!==wrap&&!ch.userData.rider&&hats.indexOf(ch)<0&&!ch.userData.dianna)ch.visible=false});   // hide the procedural dog only (never the rider's wrap: load order is a race)
- },undefined,function(){});
+  attachRider()},undefined,function(){});
  function setupDianna(gl,clips){var root=gl.scene,mesh=null;root.traverse(function(m){if(m.isSkinnedMesh)mesh=m});if(!mesh)return;
   if(clips&&clips.length){var mx=new THREE.AnimationMixer(root),A={};clips.forEach(function(c){var n=c.name.toLowerCase(),k=/fall|air|jump/.test(n)?'air':/wave/.test(n)?'wave':/talk|clap|laugh|cheer|victory/.test(n)?'talk':/sit|idle/.test(n)?'sit':null;if(k&&!A[k])A[k]=mx.clipAction(c)});
    if(A.sit){A.sit.play()}FIG.mixer=mx;FIG.acts=A;FIG.state='sit';FIG.stateT=0}
@@ -445,8 +481,8 @@ function loadFigures(){
   // riding pose baked into the rest pose: shoulders forward-down (hands on the fur), elbows bent, legs spread over the flanks, knees back
   if(!clips||!clips.length){D.arms.forEach(function(c){dropArm(c,root)});   // whatever the rest pose (T, raised, waving): search the Z angle that hangs the hand lowest
   bakePose([[pick(D.arms[0]||[],0),_AX,.55],[pick(D.arms[1]||[],0),_AX,.55],[pick(D.arms[0]||[],2),_AX,.4],[pick(D.arms[1]||[],2),_AX,.4],
-   [pick(D.legs[0]||[],0),_AZ,D.legs[0]&&D.legs[0].right?-.32:.32],[pick(D.legs[1]||[],0),_AZ,D.legs[1]&&D.legs[1].right?-.32:.32],[pick(D.legs[0]||[],1),_AX,-.7],[pick(D.legs[1]||[],1),_AX,-.7]],root)}
-  DOG.children.forEach(function(ch){if(ch.userData.dianna)ch.visible=false})}
+   [pick(D.legs[0]||[],0),_AZ,D.legs[0]&&D.legs[0].right?-.6:.6],[pick(D.legs[1]||[],0),_AZ,D.legs[1]&&D.legs[1].right?-.6:.6],[pick(D.legs[0]||[],1),_AX,-1.1],[pick(D.legs[1]||[],1),_AX,-1.1]],root)}
+  DOG.children.forEach(function(ch){if(ch.userData.dianna)ch.visible=false});attachRider()}
  GL.load('models/dianna-anim.glb?v='+FIGV,function(gl){setupDianna(gl,gl.animations)},undefined,function(){GL.load('models/dianna-rig.glb?v='+FIGV,function(gl){setupDianna(gl,null)},undefined,function(){})});   // Mixamo clips if present, else the UniRig file
 }
 loadFigures();

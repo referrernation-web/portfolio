@@ -2,6 +2,7 @@
 import sys, time, json, os, requests
 KEY=os.environ.get('RODIN_KEY','vibecoding'); out=sys.argv[1]; imgs=sys.argv[2:]
 files=[("images",(f"{i:04d}"+os.path.splitext(p)[1],open(p,'rb').read())) for i,p in enumerate(imgs)]
+if os.environ.get("RODIN_PROMPT"): files+=[("prompt",(None,os.environ["RODIN_PROMPT"]))]   # text-to-3D when no photos are on hand
 files+=[("tier",(None,os.environ.get("RODIN_TIER","Sketch"))),("mesh_mode",(None,"Raw")),("texture_mode",(None,"high"))]
 r=requests.post("https://hyperhuman.deemos.com/api/v2/rodin",headers={"Authorization":f"Bearer {KEY}"},files=files,timeout=120); d=r.json(); print("create:",json.dumps(d)[:400])
 sub=d.get("jobs",{}).get("subscription_key"); uuid=d.get("uuid")

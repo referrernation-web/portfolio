@@ -75,11 +75,13 @@ actions = []
 
 for spec in CLIPS:
     path, name = spec.rsplit('=', 1)
+    upper = name.endswith(':upper'); name = name.replace(':upper', '')
     before = set(bpy.context.scene.objects)
     bpy.ops.import_scene.fbx(filepath=path, ignore_leaf_bones=True, automatic_bone_orientation=False)
     new = [o for o in bpy.context.scene.objects if o not in before]
     src = [o for o in new if o.type == 'ARMATURE'][0]
     src_act = src.animation_data.action
+    if not actions: base = src; base_f0 = int(src_act.frame_range[0])   # keep the first (seated) clip's rig around as the lower-body source
     f0, f1 = (int(src_act.frame_range[0]), int(src_act.frame_range[1]))
     f1 = min(f1, f0 + 300)                               # cap at 10 s; Sitting Talking runs 45 s
     # order parent-first so a child reads its parent's already-retargeted position
@@ -92,8 +94,13 @@ for spec in CLIPS:
     for f in range(f0, f1+1, STEP):
         bpy.context.scene.frame_set(f)
         for sname, dname in order:
-            spb = src.pose.bones[sname]; dpb = dia.pose.bones[dname]
-            delta = spb.matrix.to_quaternion() @ src.data.bones[sname].matrix_local.to_quaternion().inverted()
+            lower = any(k in sname for k in ('Hips', 'UpLeg', 'Leg', 'Foot'))
+            if upper and lower:
+                spb = base.pose.bones[sname]; sb = base.data.bones[sname]   # same frame of the seated idle: the legs keep breathing under the gesture
+            else:
+                spb = src.pose.bones[sname]; sb = src.data.bones[sname]
+            dpb = dia.pose.bones[dname]
+            delta = spb.matrix.to_quaternion() @ sb.matrix_local.to_quaternion().inverted()
             want  = delta @ dia.data.bones[dname].matrix_local.to_quaternion()
             loc = dpb.matrix.to_translation()
             dpb.matrix = Matrix.LocRotScale(loc, want, Vector((1.0, 1.0, 1.0)))
@@ -104,9 +111,11 @@ for spec in CLIPS:
     act.use_fake_user = True
     actions.append(act)
     print('  %-22s frames %d..%d  keys %d -> action %s' % (name, f0, f1, nkeys, act.name))
-    for o in new: bpy.data.objects.remove(o, do_unlink=True)
+    if src is not base:
+        for o in new: bpy.data.objects.remove(o, do_unlink=True)
 
 # glTF exports every action it can see, so drop the imported Mixamo originals or the file doubles
+for o in [o for o in bpy.context.scene.objects if o not in (dia, mesh)]: bpy.data.objects.remove(o, do_unlink=True)
 for a in list(bpy.data.actions):
     if a not in actions: bpy.data.actions.remove(a)
 dia.animation_data.action = actions[0]

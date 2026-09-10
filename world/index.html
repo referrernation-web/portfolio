@@ -133,6 +133,7 @@ body.mob #stick,body.mob #jump{display:block}body.mob #panel{top:auto;bottom:112
 </div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/animation/CCDIKSolver.js"></script>
 <script>
 // ===== content (same facts as the classic resume) =====
@@ -223,7 +224,7 @@ function board(x,z,ry,name,img,line){var y=ground(x,z);SHB.push([x,z,3.4,4]);var
  var c=document.createElement('canvas');c.width=512;c.height=64;var q=c.getContext('2d');q.fillStyle='#111';q.font='900 40px Inter';q.textAlign='center';q.fillText(name,256,46);var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;var tm=new THREE.Mesh(new THREE.PlaneGeometry(6,.75),new THREE.MeshBasicMaterial({map:t,transparent:true}));tm.position.set(x+Math.sin(ry)*.17,y+1.9,z+Math.cos(ry)*.17);tm.rotation.y=ry;S.add(tm);COL.push({x:x,z:z,r:3.2})}
 
 // ===== landmarks (v2, merged geometry per landmark) =====
-var GL=new THREE.GLTFLoader(),EIF=null;
+var GL=new THREE.GLTFLoader().setDRACOLoader(new THREE.DRACOLoader().setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/draco/gltf/')),EIF=null;
 var GCACHE={};
 function placeModel(file,x,z,size,fit,ry,cb){function put(src){var o=src.clone(true);o.rotation.y=ry||0;o.updateMatrixWorld(true);var b=new THREE.Box3().setFromObject(o),sz=b.getSize(new THREE.Vector3());var sc=size/(fit==='w'?Math.max(sz.x,sz.z):sz.y);o.scale.setScalar(sc);o.updateMatrixWorld(true);b=new THREE.Box3().setFromObject(o);var c=b.getCenter(new THREE.Vector3());o.position.set(x-c.x,ground(x,z)-b.min.y,z-c.z);o.traverse(function(m){if(m.isMesh){m.castShadow=true;m.receiveShadow=true;if(m.material){m.material.roughness=Math.max(.6,m.material.roughness||.8);m.material.metalness=0}OCC.push(m)}});S.add(o);if(cb)cb(o)}
  if(GCACHE[file])return put(GCACHE[file]);
@@ -263,7 +264,7 @@ function hut(x,z,ry,sc){sc=sc||1;var y=ground(x,z);
 function lamp(x,z){var y=ground(x,z);LAMPS.push([x,y+3.3,z,1,.86,.55]);if(KIT.lamp2){mp(KIT.lamp2,0xffffff,x,y,z,0,(x*3+z)%6.28);return}
  mp(CY(.06,.09,3.2,6),0x2f3b45,x,y+1.6,z);MPE=1;mp(SP(.28),0xfff2b0,x,y+3.35,z);MPE=0}
 function animal(x,z,ry,c,hd){var y=ground(x,z);mp(BX(1.6,.9,.8),c,x,y+1.05,z,0,ry);mp(BX(.6,.5,.55),c,x+Math.cos(ry)*1.0,y+1.35,z-Math.sin(ry)*1.0,0,ry);for(var i=0;i<4;i++)mp(CY(.09,.11,.7,5),c,x+Math.cos(ry)*(i<2?.55:-.55)-Math.sin(ry)*(i%2?.28:-.28),y+.35,z-Math.sin(ry)*(i<2?.55:-.55)-Math.cos(ry)*(i%2?.28:-.28));if(hd)hd(x+Math.cos(ry)*1.0,y+1.35,z-Math.sin(ry)*1.0,ry)}
-var KITV='2',KIT={},KITM=null,PALMS=[],LAMPS=[],HALO=null,SHM=null,kitBuilt=false;
+var KITV='3',KIT={},KITM=null,PALMS=[],LAMPS=[],HALO=null,SHM=null,kitBuilt=false;
 function buildAll(){if(kitBuilt)return;kitBuilt=true;buildWorld();buildPalms();buildPaths();buildShadows();buildHalos();applyTime()}
 function buildWorld(){
  // ---------- MANILA: BGC-style towers, jeepney, sari-sari store, Rizal monument, bangka ----------
@@ -415,7 +416,7 @@ var RG=new THREE.Group(),DOG=new THREE.Group(),legs=[],tail,dHair,EARS=[],TONGUE
  [[-.33,0],[.33,0]].forEach(function(q){var st=new THREE.Mesh(new THREE.BoxGeometry(.14,.6,.2),HRM);st.position.set(q[0],-.12,-.05);HAIR.add(st)});   // side strands
 })();
 // ===== real 3D figures (Rodin meshes + UniRig skeletons); roles detected from bone positions; procedural rig = fallback =====
-var FIGV='26';   // bump when a rig file changes (GitHub Pages CDN caches GLBs ~10 min)
+var FIGV='27';   // bump when a rig file changes (GitHub Pages CDN caches GLBs ~10 min)
 var FIG={kim:null,dia:null,K:null,D:null,hats:null,kimH:2.35,kimY:.05,kimZ:.05,diaH:1.9,diaY:1.22,diaZ:-.45,lean:.08,seat:null,onSeat:false,diaYs:0,diaZs:0,targets:null,ik:null,ikc:null,wv:0,pat:0};
 var _q1=new THREE.Quaternion(),_q2=new THREE.Quaternion(),_q3=new THREE.Quaternion(),_AX=new THREE.Vector3(1,0,0),_AY=new THREE.Vector3(0,1,0),_AZ=new THREE.Vector3(0,0,1),_m4=new THREE.Matrix4(),_v3=new THREE.Vector3();
 function rotW(bone,axis,ang,root){bone.parent.getWorldQuaternion(_q1);root.getWorldQuaternion(_q2);var prel=_q2.invert().multiply(_q1);_q3.setFromAxisAngle(axis,ang);var d=prel.clone().invert().multiply(_q3).multiply(prel);bone.quaternion.copy(d).multiply(bone.userData.rest)}
